@@ -19,6 +19,10 @@
 
 #include "util/FileSystem.hh"
 #include "util/File.hh"
+#include "util/CArray.hh"
+
+#include <algorithm>
+#include <map>
 
 #include "fcgiapp.h"
 #include <cstdlib>
@@ -26,9 +30,45 @@
 
 using namespace wb ;
 
+typedef std::map<fs::path, std::string> MimeMap ;
+const MimeMap::value_type mime_map_val[] =
+{
+	std::make_pair( fs::path(".html"),	"text/html" ),
+	std::make_pair( fs::path(".js"),	"application/javascript" ),
+} ;
+const MimeMap mime_map( Begin(mime_map_val), End(mime_map_val) ) ;
+
+fs::path RepointPath( const fs::path& req_uri )
+{
+	static const fs::path wb_root = "/webwrite/" ;
+	
+	std::pair<fs::path::const_iterator, fs::path::const_iterator> r =
+		std::mismatch( wb_root.begin(), wb_root.end(), req_uri.begin() ) ;
+
+	fs::path result ;
+	while ( r.second != req_uri.end() )
+	{
+		result /= *r.second ;
+		r.second++ ;
+	}
+	
+	return result ;
+}
+
 std::size_t SendFile( const fs::path& file, FCGX_Stream *out )
 {
 	File f( file ) ;
+	
+	std::cerr << "extension is " << file.extension() << std::endl ;
+	MimeMap::const_iterator mm = mime_map.find( file.extension() ) ;
+	if ( mm == mime_map.end() )
+		throw Exception() ;
+	
+	// content type header
+	FCGX_FPrintF( out,
+		"Content-type: %s\r\n"
+		"\r\n",
+		mm->second.c_str() ) ;
 	
 	char buf[4*1024] ;
 	std::size_t count ;
@@ -52,19 +92,14 @@ int main(void)
 	int r = FCGX_Accept_r( &request ) ;
     while ( r == 0 )
 	{
-
-        FCGX_FPrintF( request.out,
-				"Content-type: text/html\r\n"
-                "\r\n"
-/*                "<title>FastCGI Hello!</title>"
-                "<h1>FastCGI Hello!</h1>"
-                "Request number %d running on host <i>%s</i>\n",
-                ++count, FCGX_GetParam( "SERVER_NAME", request.envp )*/ );
+		std::cerr
+			<< "requesting: " << FCGX_GetParam( "REQUEST_URI", request.envp )
+			<< std::endl ;
 
 		char **env = request.envp;
 		for ( int i = 0 ; env[i] != 0 ; i++ )
 		{
-//			FCGX_FPrintF( request.out, "<p>%s</p>\n", env[i] ) ;
+//			std::cout << env[i] << std::endl ;
 		}
 	
 		char buf[80] ;
@@ -79,7 +114,19 @@ int main(void)
 
 		} while ( n == sizeof(buf) ) ;
 
-		SendFile( "lib/index.html", request.out ) ;
+		fs::path repoint = RepointPath( FCGX_GetParam( "REQUEST_URI", request.envp ) ) ;
+		
+		if ( !repoint.empty() && *repoint.begin() == "_" )
+		{
+			fs::path no_ ;
+			for ( fs::path::iterator i = ++repoint.begin() ; i != repoint.end() ; ++i )
+				no_ /= *i ;
+			
+			std::cerr << "no_ = " << no_ << std::endl ;
+			SendFile( "lib" / no_, request.out ) ;
+		}
+		else
+			SendFile( "lib/index.html", request.out ) ;
 		
 		FCGX_Finish_r( &request ) ;
 		r = FCGX_Accept_r( &request ) ;
