@@ -17,9 +17,28 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "util/FileSystem.hh"
+#include "util/File.hh"
+
 #include "fcgiapp.h"
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
+
+using namespace wb ;
+
+std::size_t SendFile( const fs::path& file, FCGX_Stream *out )
+{
+	File f( file ) ;
+	
+	char buf[4*1024] ;
+	std::size_t count ;
+	while ( (count = f.Read( buf, sizeof(buf) )) > 0 )
+	{
+		FCGX_PutStr( buf, count, out ) ;
+	}
+	
+	return 0 ;
+}
 
 int main(void)
 {
@@ -37,10 +56,10 @@ int main(void)
         FCGX_FPrintF( request.out,
 				"Content-type: text/html\r\n"
                 "\r\n"
-                "<title>FastCGI Hello!</title>"
+/*                "<title>FastCGI Hello!</title>"
                 "<h1>FastCGI Hello!</h1>"
                 "Request number %d running on host <i>%s</i>\n",
-                ++count, FCGX_GetParam( "SERVER_NAME", request.envp ) );
+                ++count, FCGX_GetParam( "SERVER_NAME", request.envp )*/ );
 
 		char **env = request.envp;
 		for ( int i = 0 ; env[i] != 0 ; i++ )
@@ -55,11 +74,13 @@ int main(void)
 			n = FCGX_GetStr( buf, sizeof(buf), request.in ) ;
 			if ( n > 0 )
 			{
-				fwrite( buf, n, 1, stderr ) ;
+				std::fwrite( buf, n, 1, stderr ) ;
 			}
 
 		} while ( n == sizeof(buf) ) ;
 
+		SendFile( "lib/index.html", request.out ) ;
+		
 		FCGX_Finish_r( &request ) ;
 		r = FCGX_Accept_r( &request ) ;
 	}

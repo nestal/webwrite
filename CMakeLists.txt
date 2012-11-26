@@ -18,23 +18,42 @@
 #
 
 project( webwrite )
+cmake_minimum_required(VERSION 2.8)
 
-find_package(Boost COMPONENTS program_options REQUIRED)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
+find_package(Boost COMPONENTS filesystem system REQUIRED)
+find_package(BFD)
 
 include_directories(
-	${grive_SOURCE_DIR}/include
+	${BOOST_INCLUDE_DIR}
+	${webwrite_SOURCE_DIR}/src
 )
 
 file (GLOB WEBWRITE_SRC
-    ${webwrite_SOURCE_DIR}/*.cc
+    ${webwrite_SOURCE_DIR}/src/*.cc
+    ${webwrite_SOURCE_DIR}/src/util/*.cc
 )
 
+# build bfd classes if libbfd is found
+if ( BFD_FOUND )
+        set( OPT_LIBS   ${DL_LIBRARY} ${BFD_LIBRARY} )
+        file( GLOB OPT_SRC
+                ${webwrite_SOURCE_DIR}/src/bfd/*.cc
+        )
+        add_definitions( -DHAVE_BFD )
+        
+endif ( BFD_FOUND )
+
 add_executable( webwrite
+	${OPT_SRC}
 	${WEBWRITE_SRC}
 )
 
 target_link_libraries( webwrite
 	fcgi
+	${OPT_LIBS}
+	${Boost_LIBRARIES}
 )
 
 install(TARGETS webwrite RUNTIME DESTINATION bin)
