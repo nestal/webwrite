@@ -23,16 +23,19 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 find_package(Boost COMPONENTS filesystem system REQUIRED)
+find_package(JSONC REQUIRED)
 find_package(BFD)
 
 include_directories(
 	${BOOST_INCLUDE_DIR}
+	${JSONC_INCLUDE_DIR}
 	${webwrite_SOURCE_DIR}/src
 )
 
 file (GLOB WEBWRITE_SRC
     ${webwrite_SOURCE_DIR}/src/*.cc
     ${webwrite_SOURCE_DIR}/src/util/*.cc
+    ${webwrite_SOURCE_DIR}/src/parser/*.cc
 )
 
 # build bfd classes if libbfd is found
@@ -54,6 +57,7 @@ target_link_libraries( webwrite
 	fcgi
 	${OPT_LIBS}
 	${Boost_LIBRARIES}
+	${JSONC_LIBRARY}
 )
 
 install(TARGETS webwrite RUNTIME DESTINATION bin)

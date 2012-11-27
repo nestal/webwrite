@@ -17,14 +17,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "Config.hh"
+
+#include "util/Exception.hh"
 #include "util/FileSystem.hh"
 #include "util/File.hh"
 #include "util/CArray.hh"
 
-#include <algorithm>
-#include <map>
+#include <boost/exception/all.hpp>
 
 #include "fcgiapp.h"
+
+#include <algorithm>
+#include <map>
 #include <cstdlib>
 #include <cstdio>
 
@@ -38,9 +43,9 @@ const MimeMap::value_type mime_map_val[] =
 } ;
 const MimeMap mime_map( Begin(mime_map_val), End(mime_map_val) ) ;
 
-fs::path RepointPath( const fs::path& req_uri )
+fs::path RepointPath( const fs::path& req_uri, const Config& cfg )
 {
-	static const fs::path wb_root = "/webwrite/" ;
+	const fs::path wb_root = cfg.Str("wb-root") ;
 	
 	std::pair<fs::path::const_iterator, fs::path::const_iterator> r =
 		std::mismatch( wb_root.begin(), wb_root.end(), req_uri.begin() ) ;
@@ -80,59 +85,64 @@ std::size_t SendFile( const fs::path& file, FCGX_Stream *out )
 	return 0 ;
 }
 
-int main(void)
+int main( int argc, char **argv )
 {
-    int count = 0;
+    if ( argc < 2 )
+    {
+		std::cerr << "usage: " << argv[0] << " [config file]" << std::endl ;
+		return -1 ;
+    }
 
-	FCGX_Request request ;
+    try
+    {
+		Config cfg( argv[1] );
+		
+		FCGX_Request request ;
 
-	FCGX_Init() ;
-	FCGX_InitRequest( &request, FCGX_OpenSocket( ":9000", 0 ), 0 ) ;
+		FCGX_Init() ;
+		FCGX_InitRequest( &request, FCGX_OpenSocket( cfg.Str("socket").c_str(), 0 ), 0 ) ;
 
-	int r = FCGX_Accept_r( &request ) ;
-    while ( r == 0 )
-	{
-		std::cerr
-			<< "requesting: " << FCGX_GetParam( "REQUEST_URI", request.envp )
-			<< std::endl ;
-
-		char **env = request.envp;
-		for ( int i = 0 ; env[i] != 0 ; i++ )
+		int r = FCGX_Accept_r( &request ) ;
+		while ( r == 0 )
 		{
-//			std::cout << env[i] << std::endl ;
-		}
-	
-		char buf[80] ;
-		int n ;
-		do
-		{
-			n = FCGX_GetStr( buf, sizeof(buf), request.in ) ;
-			if ( n > 0 )
+			std::cerr
+				<< "requesting: " << FCGX_GetParam( "REQUEST_URI", request.envp )
+				<< std::endl ;
+
+			char buf[80] ;
+			int n ;
+			do
 			{
-				std::fwrite( buf, n, 1, stderr ) ;
-			}
+				n = FCGX_GetStr( buf, sizeof(buf), request.in ) ;
+				if ( n > 0 )
+				{
+					std::fwrite( buf, n, 1, stderr ) ;
+				}
 
-		} while ( n == sizeof(buf) ) ;
+			} while ( n == sizeof(buf) ) ;
 
-		fs::path repoint = RepointPath( FCGX_GetParam( "REQUEST_URI", request.envp ) ) ;
-		
-		if ( !repoint.empty() && *repoint.begin() == "_" )
-		{
-			fs::path no_ ;
-			for ( fs::path::iterator i = ++repoint.begin() ; i != repoint.end() ; ++i )
-				no_ /= *i ;
+			fs::path repoint = RepointPath( FCGX_GetParam( "REQUEST_URI", request.envp ), cfg ) ;
 			
-			std::cerr << "no_ = " << no_ << std::endl ;
-			SendFile( "lib" / no_, request.out ) ;
+			if ( !repoint.empty() && *repoint.begin() == "_" )
+			{
+				fs::path no_ ;
+				for ( fs::path::iterator i = ++repoint.begin() ; i != repoint.end() ; ++i )
+					no_ /= *i ;
+				
+				std::cerr << "no_ = " << no_ << std::endl ;
+				SendFile( "lib" / no_, request.out ) ;
+			}
+			else
+				SendFile( "lib/index.html", request.out ) ;
+			
+			FCGX_Finish_r( &request ) ;
+			r = FCGX_Accept_r( &request ) ;
 		}
-		else
-			SendFile( "lib/index.html", request.out ) ;
-		
-		FCGX_Finish_r( &request ) ;
-		r = FCGX_Accept_r( &request ) ;
 	}
-
-	fprintf( stderr, "quit" ) ;
+	catch ( Exception& e )
+	{
+		std::cerr << boost::diagnostic_information(e) << std::endl ;
+	}
 
 	return 0 ;
 }

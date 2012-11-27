@@ -1,0 +1,9 @@
+{
+	"socket"	: ":9000",
+	"wb-root"	: "/webwrite",
+	"mime"		:
+	{
+		".html"	: "text/html",
+		".js"	: "application/javascript"
+	}
+}
