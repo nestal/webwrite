@@ -18,6 +18,7 @@
 */
 
 #include "Config.hh"
+#include "Request.hh"
 
 #include "util/Exception.hh"
 #include "util/FileSystem.hh"
@@ -60,29 +61,14 @@ fs::path RepointPath( const fs::path& req_uri, const Config& cfg )
 	return result ;
 }
 
-std::size_t SendFile( const fs::path& file, FCGX_Stream *out )
+std::size_t SendFile( const fs::path& file, Request *req )
 {
-	File f( file ) ;
-	
 	std::cerr << "extension is " << file.extension() << std::endl ;
 	MimeMap::const_iterator mm = mime_map.find( file.extension() ) ;
 	if ( mm == mime_map.end() )
 		throw Exception() ;
 	
-	// content type header
-	FCGX_FPrintF( out,
-		"Content-type: %s\r\n"
-		"\r\n",
-		mm->second.c_str() ) ;
-	
-	char buf[4*1024] ;
-	std::size_t count ;
-	while ( (count = f.Read( buf, sizeof(buf) )) > 0 )
-	{
-		FCGX_PutStr( buf, count, out ) ;
-	}
-	
-	return 0 ;
+	return req->SendFile( file, mm->second.c_str() ) ;
 }
 
 int main( int argc, char **argv )
@@ -105,6 +91,8 @@ int main( int argc, char **argv )
 		int r = FCGX_Accept_r( &request ) ;
 		while ( r == 0 )
 		{
+			Request req( &request ) ;
+		
 			std::cerr
 				<< "requesting: " << FCGX_GetParam( "REQUEST_URI", request.envp )
 				<< std::endl ;
@@ -130,10 +118,10 @@ int main( int argc, char **argv )
 					no_ /= *i ;
 				
 				std::cerr << "no_ = " << no_ << std::endl ;
-				SendFile( "lib" / no_, request.out ) ;
+				SendFile( "lib" / no_, &req ) ;
 			}
 			else
-				SendFile( "lib/index.html", request.out ) ;
+				SendFile( "lib/index.html", &req ) ;
 			
 			FCGX_Finish_r( &request ) ;
 			r = FCGX_Accept_r( &request ) ;
