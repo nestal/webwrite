@@ -17,6 +17,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#pragma once
+
 #include "util/FileSystem.hh"
 
 #include "fcgiapp.h"
@@ -30,14 +32,11 @@ class Config ;
 class Request
 {
 public :
-	enum Type { file, data } ;
-
-public :
 	explicit Request( FCGX_Request *req ) ;
 
-	Type ReqType() const ;
-	
 	bool IsPost() const ;
+	
+	std::string URI() const ;
 	
 	std::size_t Recv( char *data, std::size_t size ) ;
 	std::size_t Send( const char *data, std::size_t size ) ;

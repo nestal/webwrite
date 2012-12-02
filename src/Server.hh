@@ -17,31 +17,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#pragma once
-
-#include "parser/Json.hh"
-
-#include <map>
-#include <string>
-
 namespace wb {
 
-class Config
+class Config ;
+class Request ;
+
+class Server
 {
+protected :
+	~Server() = default ;
+	
 public :
-	explicit Config( const std::string& filename ) ;
-
-	std::string Str( const std::string& key ) const ;
-	
-	std::string Mime( const std::string& extension ) const ;
-
-private :
-	typedef std::map<std::string, std::string> MimeMap ;
-	
-private :
-	Json	m_cfg ;
-	
-	MimeMap	m_mime ;
+	virtual void Do( Request *req, const Config& cfg ) = 0 ;
 } ;
 
 } // end of namespace

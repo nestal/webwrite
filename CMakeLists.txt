@@ -26,6 +26,8 @@ find_package(Boost COMPONENTS filesystem system REQUIRED)
 find_package(JSONC REQUIRED)
 find_package(BFD)
 
+ADD_DEFINITIONS("-std=c++0x")
+
 include_directories(
 	${BOOST_INCLUDE_DIR}
 	${JSONC_INCLUDE_DIR}

@@ -19,29 +19,23 @@
 
 #pragma once
 
-#include "parser/Json.hh"
-
-#include <map>
-#include <string>
-
 namespace wb {
 
-class Config
+class Server ;
+class Config ;
+class Request ;
+
+class Reactor
 {
 public :
-	explicit Config( const std::string& filename ) ;
-
-	std::string Str( const std::string& key ) const ;
+	Reactor( const Config& cfg, Server *file ) ;
 	
-	std::string Mime( const std::string& extension ) const ;
-
-private :
-	typedef std::map<std::string, std::string> MimeMap ;
+	void Do( Request *req ) const ;
 	
 private :
-	Json	m_cfg ;
+	const Config& m_cfg ;
 	
-	MimeMap	m_mime ;
+	Server *m_file ;
 } ;
 
 } // end of namespace

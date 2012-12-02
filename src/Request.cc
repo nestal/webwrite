@@ -65,4 +65,9 @@ std::size_t Request::Send( const char *data, std::size_t size )
 	return ::FCGX_PutStr( data, size, m_req->out ) ;
 }
 
+std::string Request::URI() const
+{
+	return ::FCGX_GetParam( "REQUEST_URI", m_req->envp ) ;
+}
+
 } // end of namespace

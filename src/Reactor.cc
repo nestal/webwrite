@@ -17,31 +17,21 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#pragma once
+#include "Reactor.hh"
 
-#include "parser/Json.hh"
-
-#include <map>
-#include <string>
+#include "Config.hh"
+#include "Request.hh"
 
 namespace wb {
 
-class Config
+Reactor::Reactor( const Config& cfg, Server *file ) :
+	m_cfg( cfg ),
+	m_file( file )
 {
-public :
-	explicit Config( const std::string& filename ) ;
-
-	std::string Str( const std::string& key ) const ;
+}
 	
-	std::string Mime( const std::string& extension ) const ;
-
-private :
-	typedef std::map<std::string, std::string> MimeMap ;
-	
-private :
-	Json	m_cfg ;
-	
-	MimeMap	m_mime ;
-} ;
+void Reactor::Do( Request *req ) const
+{
+}
 
 } // end of namespace

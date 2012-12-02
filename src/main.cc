@@ -73,15 +73,16 @@ std::size_t SendFile( const fs::path& file, Request *req )
 
 int main( int argc, char **argv )
 {
-    if ( argc < 2 )
-    {
-		std::cerr << "usage: " << argv[0] << " [config file]" << std::endl ;
-		return -1 ;
-    }
+	std::string cfg_file ;
 
-    try
-    {
-		Config cfg( argv[1] );
+	if ( argc < 2 )
+		cfg_file = "config.json" ;
+	else
+		cfg_file = argv[1] ;
+
+	try
+	{
+		Config cfg( cfg_file );
 		
 		FCGX_Request request ;
 
@@ -93,9 +94,7 @@ int main( int argc, char **argv )
 		{
 			Request req( &request ) ;
 		
-			std::cerr
-				<< "requesting: " << FCGX_GetParam( "REQUEST_URI", request.envp )
-				<< std::endl ;
+			std::cerr << "requesting: " << req.URI() << std::endl ;
 
 			char buf[80] ;
 			int n ;
