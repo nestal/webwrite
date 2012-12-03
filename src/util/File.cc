@@ -30,10 +30,12 @@
 #include <boost/exception/errinfo_file_open_mode.hpp>
 #include <boost/exception/info.hpp>
 
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>
+#ifndef WIN32
+	#include <sys/mman.h>
+	#include <sys/stat.h>
+	#include <sys/types.h>
+	#include <fcntl.h>
+#endif
 
 // local functions
 namespace {
