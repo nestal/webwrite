@@ -17,25 +17,48 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "FileServer.hh"
+#include "RootServer.hh"
 
+#include "Config.hh"
 #include "Request.hh"
 
 namespace wb {
 
-FileServer::FileServer( const fs::path& base ) :
-	m_base( base )
+RootServer::RootServer( const Config& cfg ) :
+	m_file( cfg.Base() ),
+	m_wb_root( cfg.Str("wb-root") )
 {
 }
-
-Server* FileServer::Work( Request *req, const fs::path& rel )
-{
-	std::cerr << "serving: " << rel << std::endl ;
 	
-	fs::path file = m_base / rel ;
-	req->PrintF( "X-Sendfile: %s\r\n\r\n", file.string().c_str() ) ;
-
+Server* RootServer::Work( Request *req, const fs::path& location ) 
+{
+	fs::path rel = Relative( location ) ;
+	
+	if ( !rel.empty() && rel.begin()->string().front() == '_' )
+	{
+		return m_file.Work( req, rel.string().substr(1) ) ;
+	}
+	else
+	{
+		return m_file.Work( req, "lib/index.html" ) ;
+	}
+	
 	return 0 ;
+}
+
+fs::path RootServer::Relative( const fs::path& loc ) const
+{
+	std::pair<fs::path::const_iterator, fs::path::const_iterator> r =
+		std::mismatch( m_wb_root.begin(), m_wb_root.end(), loc.begin() ) ;
+
+	fs::path result ;
+	while ( r.second != loc.end() )
+	{
+		result /= *r.second ;
+		r.second++ ;
+	}
+	
+	return result ;
 }
 
 } // end of namespace

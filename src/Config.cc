@@ -22,7 +22,8 @@
 namespace wb {
 
 Config::Config( const std::string& filename ) :
-	m_cfg( Json::ParseFile( filename ) )
+	m_cfg( Json::ParseFile( filename ) ),
+	m_base( fs::current_path() )
 {
 }
 
@@ -34,6 +35,15 @@ std::string Config::Str( const std::string& key ) const
 std::string Config::Mime( const std::string& extension ) const
 {
 	return "" ;
+}
+
+/*!	This configuration parameter denotes the base directory. This directory
+	contains all the data files required by webwrite, e.g. "_lib" for the
+	HTML/javascript files and "data" for storing the raw data.
+*/
+fs::path Config::Base() const
+{
+	return m_cfg.Has("base") ? fs::path(m_cfg["base"].Str()) : m_base ;
 }
 
 } // end of namespace

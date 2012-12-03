@@ -20,6 +20,7 @@
 #pragma once
 
 #include "parser/Json.hh"
+#include "util/FileSystem.hh"
 
 #include <map>
 #include <string>
@@ -35,13 +36,17 @@ public :
 	
 	std::string Mime( const std::string& extension ) const ;
 
+	fs::path Base() const ;
+	
 private :
 	typedef std::map<std::string, std::string> MimeMap ;
 	
 private :
-	Json	m_cfg ;
+	Json		m_cfg ;
 	
-	MimeMap	m_mime ;
+	MimeMap		m_mime ;
+	
+	fs::path	m_base ;
 } ;
 
 } // end of namespace

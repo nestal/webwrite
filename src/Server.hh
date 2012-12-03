@@ -17,9 +17,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#pragma once
+
+#include "util/FileSystem.hh"
+
 namespace wb {
 
-class Config ;
 class Request ;
 
 class Server
@@ -28,7 +31,7 @@ protected :
 	~Server() = default ;
 	
 public :
-	virtual Server* Work( Request *req, const Config& cfg ) = 0 ;
+	virtual Server* Work( Request *req, const fs::path& location ) = 0 ;
 } ;
 
 } // end of namespace

@@ -19,6 +19,7 @@
 
 #include "Config.hh"
 #include "Request.hh"
+#include "RootServer.hh"
 
 #include "util/Exception.hh"
 #include "util/FileSystem.hh"
@@ -83,6 +84,8 @@ int main( int argc, char **argv )
 	try
 	{
 		Config cfg( cfg_file );
+		RootServer srv( cfg ) ;
+		
 		
 		FCGX_Request request ;
 
@@ -108,6 +111,8 @@ int main( int argc, char **argv )
 
 			} while ( n == sizeof(buf) ) ;
 
+			srv.Work( &req, req.URI() ) ;
+/*
 			fs::path repoint = RepointPath( FCGX_GetParam( "REQUEST_URI", request.envp ), cfg ) ;
 			
 			if ( !repoint.empty() && *repoint.begin() == "_" )
@@ -127,7 +132,8 @@ int main( int argc, char **argv )
 					"/home/nestal/code/webwrite/lib/index.html" ) ;
 
 			}
-			
+*/
+
 			FCGX_Finish_r( &request ) ;
 			r = FCGX_Accept_r( &request ) ;
 		}

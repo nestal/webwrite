@@ -17,21 +17,29 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Reactor.hh"
+#pragma once
 
-#include "Config.hh"
-#include "Request.hh"
+#include "Server.hh"
+#include "FileServer.hh"
 
 namespace wb {
 
-Reactor::Reactor( const Config& cfg, Server *file ) :
-	m_cfg( cfg ),
-	m_file( file )
+class Config ;
+class Request ;
+
+class RootServer : public Server
 {
-}
+public :
+	RootServer( const Config& cfg ) ;
 	
-void Reactor::Do( Request *req ) const
-{
-}
+	Server* Work( Request *req, const fs::path& location ) ;
+
+private :
+	fs::path Relative( const fs::path& loc ) const ;
+
+private :
+	FileServer		m_file ;
+	fs::path		m_wb_root ;
+} ;
 
 } // end of namespace
