@@ -120,7 +120,13 @@ int main( int argc, char **argv )
 				SendFile( "lib" / no_, &req ) ;
 			}
 			else
-				SendFile( "lib/index.html", &req ) ;
+			{
+// 				SendFile( "lib/index.html", &req ) ;
+
+				req.PrintF( "X-Sendfile: %s\r\n\r\n",
+					"/home/nestal/code/webwrite/lib/index.html" ) ;
+
+			}
 			
 			FCGX_Finish_r( &request ) ;
 			r = FCGX_Accept_r( &request ) ;

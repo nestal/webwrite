@@ -41,10 +41,42 @@ public :
 	std::size_t Recv( char *data, std::size_t size ) ;
 	std::size_t Send( const char *data, std::size_t size ) ;
 	
+	// templated version of printf
+	
+	template <typename P1>
+	std::size_t PrintF( const char *fmt, const P1& p1 ) ;
+
+	template <typename P1, typename P2>
+	std::size_t PrintF( const char *fmt, const P1& p1, const P2& p2 ) ;
+
+	template <typename P1, typename P2, typename P3>
+	std::size_t PrintF( const char *fmt, const P1& p1, const P2& p2, const P3& p3 ) ;
+
 	std::size_t SendFile( const fs::path& file, const std::string& mime ) ;
 	
 private :
 	FCGX_Request	*m_req ;
 } ;
+
+template <typename P1>
+std::size_t Request::PrintF( const char *fmt, const P1& p1 )
+{
+	return FCGX_FPrintF( m_req->out, fmt, p1 ) ;
+
+}
+
+template <typename P1, typename P2>
+std::size_t Request::PrintF( const char *fmt, const P1& p1, const P2& p2 )
+{
+	return FCGX_FPrintF( m_req->out, fmt, p1, p2 ) ;
+
+}
+
+template <typename P1, typename P2, typename P3>
+std::size_t Request::PrintF( const char *fmt, const P1& p1, const P2& p2, const P3& p3 )
+{
+	return FCGX_FPrintF( m_req->out, fmt, p1, p2, p3 ) ;
+
+}
 
 } // end of namespace

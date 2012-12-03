@@ -28,7 +28,7 @@ protected :
 	~Server() = default ;
 	
 public :
-	virtual void Do( Request *req, const Config& cfg ) = 0 ;
+	virtual Server* Work( Request *req, const Config& cfg ) = 0 ;
 } ;
 
 } // end of namespace
