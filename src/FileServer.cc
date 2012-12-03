@@ -23,16 +23,14 @@
 
 namespace wb {
 
-FileServer::FileServer( const fs::path& base ) :
-	m_base( base )
+FileServer::FileServer( const fs::path& lib_path ) :
+	m_lib( lib_path )
 {
 }
 
 Server* FileServer::Work( Request *req, const fs::path& rel )
 {
-	std::cerr << "serving: " << rel << std::endl ;
-	
-	fs::path file = m_base / rel ;
+	fs::path file = m_lib / rel ;
 	req->PrintF( "X-Sendfile: %s\r\n\r\n", file.string().c_str() ) ;
 
 	return 0 ;

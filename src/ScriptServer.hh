@@ -19,26 +19,18 @@
 
 #pragma once
 
-#include "parser/Json.hh"
-#include "util/FileSystem.hh"
-
-#include <string>
+#include "Server.hh"
 
 namespace wb {
 
-class Config
+class Request ;
+
+class ScriptServer : public Server
 {
 public :
-	explicit Config( const std::string& filename ) ;
+	ScriptServer( ) ;
 
-	std::string Str( const std::string& key ) const ;
-	
-	fs::path Base() const ;
-	
-private :
-	Json		m_cfg ;
-	
-	fs::path	m_base ;
+	Server* Work( Request *req, const fs::path& location ) ;
 } ;
 
 } // end of namespace

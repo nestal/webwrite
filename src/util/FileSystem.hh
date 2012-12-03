@@ -26,6 +26,16 @@ namespace wb
 {
 	namespace fs = boost::filesystem ;
 	
+	template <typename InputIt>
+	fs::path MakePath( InputIt first, InputIt last )
+	{
+		fs::path result ;
+		while ( first != last )
+			result /= *first++ ;
+		
+		return result ;
+	}
+	
 	// these two functions are for ancient distro which does not have boost v1.44 or later
 	// will be removed once people upgrade
 	

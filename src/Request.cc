@@ -70,4 +70,20 @@ std::string Request::URI() const
 	return ::FCGX_GetParam( "REQUEST_URI", m_req->envp ) ;
 }
 
+void Request::PrintEnv() const
+{
+	for ( int i = 0 ; m_req->envp[i] != 0 ; ++i )
+		std::cout << "env: " << m_req->envp[i] << std::endl ;
+}
+
+std::string Request::Method() const
+{
+	return ::FCGX_GetParam( "REQUEST_METHOD", m_req->envp ) ;
+}
+
+std::string Request::Referer() const
+{
+	return ::FCGX_GetParam( "HTTP_REFERER", m_req->envp ) ;
+}
+
 } // end of namespace

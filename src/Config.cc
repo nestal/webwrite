@@ -32,11 +32,6 @@ std::string Config::Str( const std::string& key ) const
 	return m_cfg[key].Str() ;
 }
 
-std::string Config::Mime( const std::string& extension ) const
-{
-	return "" ;
-}
-
 /*!	This configuration parameter denotes the base directory. This directory
 	contains all the data files required by webwrite, e.g. "_lib" for the
 	HTML/javascript files and "data" for storing the raw data.

@@ -17,28 +17,29 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#pragma once
+#include "ScriptServer.hh"
 
-#include "parser/Json.hh"
-#include "util/FileSystem.hh"
+#include "Request.hh"
 
-#include <string>
+#include <boost/format.hpp>
 
 namespace wb {
 
-class Config
+ScriptServer::ScriptServer()
 {
-public :
-	explicit Config( const std::string& filename ) ;
+}
 
-	std::string Str( const std::string& key ) const ;
+Server* ScriptServer::Work( Request *req, const fs::path& location )
+{
+	if ( location == "var.js" )
+	{
+		boost::format js( "\r\n\r\nvar post_url = \"%1%\";\n" ) ;
+		std::string s = (js % req->Referer() ).str() ;
+		
+		req->PrintF( "%s", s.c_str() ) ;
+	}
 	
-	fs::path Base() const ;
-	
-private :
-	Json		m_cfg ;
-	
-	fs::path	m_base ;
-} ;
+	return 0 ;
+}
 
 } // end of namespace

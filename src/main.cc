@@ -35,107 +35,28 @@
 #include <cstdlib>
 #include <cstdio>
 
-using namespace wb ;
-
-typedef std::map<fs::path, std::string> MimeMap ;
-const MimeMap::value_type mime_map_val[] =
-{
-	std::make_pair( fs::path(".html"),	"text/html" ),
-	std::make_pair( fs::path(".js"),	"application/javascript" ),
-} ;
-const MimeMap mime_map( Begin(mime_map_val), End(mime_map_val) ) ;
-
-fs::path RepointPath( const fs::path& req_uri, const Config& cfg )
-{
-	const fs::path wb_root = cfg.Str("wb-root") ;
-	
-	std::pair<fs::path::const_iterator, fs::path::const_iterator> r =
-		std::mismatch( wb_root.begin(), wb_root.end(), req_uri.begin() ) ;
-
-	fs::path result ;
-	while ( r.second != req_uri.end() )
-	{
-		result /= *r.second ;
-		r.second++ ;
-	}
-	
-	return result ;
-}
-
-std::size_t SendFile( const fs::path& file, Request *req )
-{
-	std::cerr << "extension is " << file.extension() << std::endl ;
-	MimeMap::const_iterator mm = mime_map.find( file.extension() ) ;
-	if ( mm == mime_map.end() )
-		throw Exception() ;
-	
-	return req->SendFile( file, mm->second.c_str() ) ;
-}
-
 int main( int argc, char **argv )
 {
-	std::string cfg_file ;
-
-	if ( argc < 2 )
-		cfg_file = "config.json" ;
-	else
-		cfg_file = argv[1] ;
-
+	using namespace wb ;
 	try
 	{
-		Config cfg( cfg_file );
+		Config cfg( argc < 2 ? "config.json" : argv[1] ) ;
 		RootServer srv( cfg ) ;
-		
 		
 		FCGX_Request request ;
 
 		FCGX_Init() ;
 		FCGX_InitRequest( &request, FCGX_OpenSocket( cfg.Str("socket").c_str(), 0 ), 0 ) ;
 
-		int r = FCGX_Accept_r( &request ) ;
-		while ( r == 0 )
+		int r ;
+		while ( (r = FCGX_Accept_r( &request )) == 0 )
 		{
 			Request req( &request ) ;
-		
 			std::cerr << "requesting: " << req.URI() << std::endl ;
 
-			char buf[80] ;
-			int n ;
-			do
-			{
-				n = FCGX_GetStr( buf, sizeof(buf), request.in ) ;
-				if ( n > 0 )
-				{
-					std::fwrite( buf, n, 1, stderr ) ;
-				}
-
-			} while ( n == sizeof(buf) ) ;
-
 			srv.Work( &req, req.URI() ) ;
-/*
-			fs::path repoint = RepointPath( FCGX_GetParam( "REQUEST_URI", request.envp ), cfg ) ;
-			
-			if ( !repoint.empty() && *repoint.begin() == "_" )
-			{
-				fs::path no_ ;
-				for ( fs::path::iterator i = ++repoint.begin() ; i != repoint.end() ; ++i )
-					no_ /= *i ;
-				
-				std::cerr << "no_ = " << no_ << std::endl ;
-				SendFile( "lib" / no_, &req ) ;
-			}
-			else
-			{
-// 				SendFile( "lib/index.html", &req ) ;
-
-				req.PrintF( "X-Sendfile: %s\r\n\r\n",
-					"/home/nestal/code/webwrite/lib/index.html" ) ;
-
-			}
-*/
 
 			FCGX_Finish_r( &request ) ;
-			r = FCGX_Accept_r( &request ) ;
 		}
 	}
 	catch ( Exception& e )

@@ -25,25 +25,32 @@
 namespace wb {
 
 RootServer::RootServer( const Config& cfg ) :
-	m_file( cfg.Base() ),
+	m_file( cfg.Base() / cfg.Str("lib-path") ),
 	m_wb_root( cfg.Str("wb-root") )
 {
 }
 	
 Server* RootServer::Work( Request *req, const fs::path& location ) 
 {
-	fs::path rel = Relative( location ) ;
+	fs::path	rel		= Relative( location ) ;
+	std::string	rel_str	= rel.string() ;
 	
-	if ( !rel.empty() && rel.begin()->string().front() == '_' )
-	{
-		return m_file.Work( req, rel.string().substr(1) ) ;
-	}
+	std::size_t pos = std::string::npos ;
+	
+	if ( rel.empty() )
+		return m_file.Work( req, "lib/index.html" ) ;
+	
+	else if ( rel.begin()->string() == "_lib" )
+		return m_file.Work( req, MakePath( ++rel.begin(), rel.end() ) ) ;
+
+	else if ( rel.begin()->string() == "_bin" )
+		return m_script.Work( req, MakePath( ++rel.begin(), rel.end() ) ) ;
+		
 	else
 	{
-		return m_file.Work( req, "lib/index.html" ) ;
+// 		req->PrintEnv() ;
+		return m_file.Work( req, "index.html" ) ;
 	}
-	
-	return 0 ;
 }
 
 fs::path RootServer::Relative( const fs::path& loc ) const

@@ -36,7 +36,10 @@ public :
 
 	bool IsPost() const ;
 	
+	// request environment
 	std::string URI() const ;
+	std::string Method() const ;
+	std::string Referer() const ;
 	
 	std::size_t Recv( char *data, std::size_t size ) ;
 	std::size_t Send( const char *data, std::size_t size ) ;
@@ -53,6 +56,9 @@ public :
 	std::size_t PrintF( const char *fmt, const P1& p1, const P2& p2, const P3& p3 ) ;
 
 	std::size_t SendFile( const fs::path& file, const std::string& mime ) ;
+	
+	// for debugging
+	void PrintEnv() const ;
 	
 private :
 	FCGX_Request	*m_req ;

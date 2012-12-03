@@ -29,12 +29,12 @@ class Request ;
 class FileServer : public Server
 {
 public :
-	FileServer( const fs::path& base ) ;
+	FileServer( const fs::path& lib_path ) ;
 	
 	Server* Work( Request *req, const fs::path& rel ) ;
 
 private :
-	fs::path	m_base ;
+	fs::path	m_lib ;
 } ;
 
 } // end of namespace
