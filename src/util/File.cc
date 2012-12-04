@@ -30,11 +30,14 @@
 #include <boost/exception/errinfo_file_open_mode.hpp>
 #include <boost/exception/info.hpp>
 
-#ifndef WIN32
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+
+#ifdef WIN32
+	#include <io.h>
+#else
 	#include <sys/mman.h>
-	#include <sys/stat.h>
-	#include <sys/types.h>
-	#include <fcntl.h>
 #endif
 
 // local functions
@@ -191,7 +194,7 @@ u64_t File::Size() const
 void File::Chmod( int mode )
 {
 	assert( IsOpened() ) ;
-	
+#ifndef WIN32	
 	if ( ::fchmod( m_fd, mode ) != 0 )
 	{
 		BOOST_THROW_EXCEPTION(
@@ -200,12 +203,16 @@ void File::Chmod( int mode )
 				<< boost::errinfo_errno(errno)
 		) ;
 	}
+#endif
 }
 
 void* File::Map( off_t offset, std::size_t length )
 {
 	assert( IsOpened() ) ;
 	
+#ifdef WIN32
+	return 0 ;
+#else
 	void *addr = ::mmap( 0, length, PROT_READ, MAP_PRIVATE, m_fd, offset ) ;
 	if ( addr == reinterpret_cast<void*>( -1 ) )
 	{
@@ -216,10 +223,12 @@ void* File::Map( off_t offset, std::size_t length )
 		) ;
 	}
 	return addr ;
+#endif
 }
 
 void File::UnMap( void *addr, std::size_t length )
 {
+#ifndef WIN32
 	if ( ::munmap( addr, length ) != 0 )
 	{
 		BOOST_THROW_EXCEPTION(
@@ -228,6 +237,7 @@ void File::UnMap( void *addr, std::size_t length )
 				<< boost::errinfo_errno(errno)
 		) ;
 	}
+#endif
 }
 
 } // end of namespace

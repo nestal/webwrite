@@ -67,12 +67,7 @@ private :
 	void Open( const fs::path& path, int flags, int mode ) ;
 	
 private :
-#ifdef WIN32
-	struct Impl ;
-	std::auto_ptr<Impl>	m_ ;
-#else
 	int	m_fd ;
-#endif
 } ;
 	
 } // end of namespace
