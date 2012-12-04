@@ -21,7 +21,6 @@
 
 #include "Server.hh"
 #include "FileServer.hh"
-#include "ScriptServer.hh"
 
 namespace wb {
 
@@ -40,7 +39,6 @@ private :
 
 private :
 	FileServer		m_file ;
-	ScriptServer	m_script ;
 	fs::path		m_wb_root ;
 } ;
 

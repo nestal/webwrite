@@ -34,14 +34,18 @@ Server* RootServer::Work( Request *req, const fs::path& location )
 {
 	fs::path	rel		= Relative( location ) ;
 	std::string	fname	= rel.filename().string() ;
-std::cout << "fname = " << fname << std::endl ;
 
 	std::size_t pos = std::string::npos ;
 	
-// 	if ( fname == "_var.js" )
-// 		return m_script.Work( req, location ) ;
-
-	if ( fname.front() == '_' )
+	if ( fname.empty() || fname == "." )
+	{
+std::cout << "wow.. fun request: " << fname << std::endl ;
+		req->PrintF( "303 See Other\r\nLocation: %s\r\n\r\n",
+			(location/ "main").string().c_str() ) ;
+		return 0 ;
+	}
+	
+	else if ( fname.front() == '_' )
 		return m_file.Work( req, fname.substr(1) ) ;
 	
 	else if ( rel.empty() || req->Query().empty() )
