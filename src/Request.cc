@@ -86,4 +86,9 @@ std::string Request::Referer() const
 	return ::FCGX_GetParam( "HTTP_REFERER", m_req->envp ) ;
 }
 
+std::string Request::Query() const
+{
+	return ::FCGX_GetParam( "QUERY_STRING", m_req->envp ) ;
+}
+
 } // end of namespace

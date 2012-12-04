@@ -40,6 +40,7 @@ public :
 	std::string URI() const ;
 	std::string Method() const ;
 	std::string Referer() const ;
+	std::string Query() const ;
 	
 	std::size_t Recv( char *data, std::size_t size ) ;
 	std::size_t Send( const char *data, std::size_t size ) ;

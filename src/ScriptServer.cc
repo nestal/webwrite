@@ -29,10 +29,12 @@ ScriptServer::ScriptServer()
 {
 }
 
-Server* ScriptServer::Work( Request *req, const fs::path& location )
+Server* ScriptServer::Work( Request *req, const fs::path& )
 {
-	if ( location == "var.js" )
+// 	if ( location == "var.js" )
 	{
+		req->PrintEnv() ;
+		
 		boost::format js( "\r\n\r\nvar post_url = \"%1%\";\n" ) ;
 		std::string s = (js % req->Referer() ).str() ;
 		

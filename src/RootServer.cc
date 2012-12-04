@@ -33,22 +33,29 @@ RootServer::RootServer( const Config& cfg ) :
 Server* RootServer::Work( Request *req, const fs::path& location ) 
 {
 	fs::path	rel		= Relative( location ) ;
-	std::string	rel_str	= rel.string() ;
-	
+	std::string	fname	= rel.filename().string() ;
+std::cout << "fname = " << fname << std::endl ;
+
 	std::size_t pos = std::string::npos ;
 	
-	if ( rel.empty() )
-		return m_file.Work( req, "lib/index.html" ) ;
-	
-	else if ( rel.begin()->string() == "_lib" )
-		return m_file.Work( req, MakePath( ++rel.begin(), rel.end() ) ) ;
+// 	if ( fname == "_var.js" )
+// 		return m_script.Work( req, location ) ;
 
-	else if ( rel.begin()->string() == "_bin" )
-		return m_script.Work( req, MakePath( ++rel.begin(), rel.end() ) ) ;
-		
+	if ( fname.front() == '_' )
+		return m_file.Work( req, fname.substr(1) ) ;
+	
+	else if ( rel.empty() || req->Query().empty() )
+		return m_file.Work( req, "index.html" ) ;
+	
 	else
 	{
-// 		req->PrintEnv() ;
+		char buf[80] ;
+		std::size_t c ;
+		while ( (c = req->Recv(buf, sizeof(buf)) ) > 0 )
+		{
+			fwrite( buf, 1, c, stdout ) ;
+		}
+	
 		return m_file.Work( req, "index.html" ) ;
 	}
 }
