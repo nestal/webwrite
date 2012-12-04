@@ -17,32 +17,32 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#pragma once
-
-#include "Server.hh"
-#include "FileServer.hh"
 #include "ContentServer.hh"
+
+#include "Request.hh"
+
+#include "util/File.hh"
 
 namespace wb {
 
-class Config ;
-class Request ;
-
-class RootServer : public Server
+ContentServer::ContentServer( const fs::path& data_path ) :
+	m_path( data_path )
 {
-public :
-	RootServer( const Config& cfg ) ;
-	
-	Server* Work( Request *req, const fs::path& location ) ;
+}
 
-private :
-	fs::path Relative( const fs::path& loc ) const ;
+Server* ContentServer::Work( Request *req, const fs::path& rel )
+{
+	if ( req->Method() == "POST" && req->Query() == "save" )
+	{
+		std::string last  = rel.filename().string() ;
+		std::string fname = last.substr( 0, last.find('?') ) ;
+		
+std::cout << "writing to " << (m_path/rel.parent_path()/fname) << std::endl ;
+// 		File f( m_path / rel ) ;
+	}
 
-private :
-	FileServer		m_file ;
-	ContentServer	m_data ;
-	
-	fs::path		m_wb_root ;
-} ;
+	return 0 ;
+}
+
 
 } // end of namespace

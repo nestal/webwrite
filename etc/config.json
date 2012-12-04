@@ -2,6 +2,7 @@
 	"socket"	: ":9000",
 	"wb-root"	: "/webwrite",
 	"lib-path"	: "lib",
+	"data-path"	: "data",
 	"mime"		:
 	{
 		".html"	: "text/html",

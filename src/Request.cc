@@ -31,28 +31,9 @@ m_req( req )
 {
 }
 
-std::size_t Request::SendFile( const fs::path& file, const std::string& mime )
+void Request::XSendFile( const fs::path& file )
 {
-	// content type header
-	FCGX_FPrintF( m_req->out,
-		"Content-type: %s\r\n"
-		"\r\n",
-		mime.c_str() ) ;
-
-	File f( file ) ;
-
-	char buf[buf_size] ;
-	std::size_t count, total = 0 ;
-	while ( (count = f.Read( buf, sizeof(buf) )) > 0 )
-	{
-		int r = ::FCGX_PutStr( buf, count, m_req->out ) ;
-		if ( r == -1 )
-			throw Exception() ;
-		
-		total += r ;
-	}
-	
-	return total ;
+	FCGX_FPrintF( m_req->out, "X-Sendfile: %s\r\n\r\n", file.string().c_str() ) ;
 }
 
 std::size_t Request::Recv( char *data, std::size_t size )

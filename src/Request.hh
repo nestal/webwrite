@@ -56,7 +56,7 @@ public :
 	template <typename P1, typename P2, typename P3>
 	std::size_t PrintF( const char *fmt, const P1& p1, const P2& p2, const P3& p3 ) ;
 
-	std::size_t SendFile( const fs::path& file, const std::string& mime ) ;
+	void XSendFile( const fs::path& file ) ;
 	
 	// for debugging
 	void PrintEnv() const ;

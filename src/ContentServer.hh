@@ -20,29 +20,21 @@
 #pragma once
 
 #include "Server.hh"
-#include "FileServer.hh"
-#include "ContentServer.hh"
 
 namespace wb {
 
 class Config ;
 class Request ;
 
-class RootServer : public Server
+class ContentServer : public Server
 {
 public :
-	RootServer( const Config& cfg ) ;
+	ContentServer( const fs::path& data_path ) ;
 	
-	Server* Work( Request *req, const fs::path& location ) ;
+	Server* Work( Request *req, const fs::path& rel ) ;
 
 private :
-	fs::path Relative( const fs::path& loc ) const ;
-
-private :
-	FileServer		m_file ;
-	ContentServer	m_data ;
-	
-	fs::path		m_wb_root ;
+	fs::path	m_path ;
 } ;
 
 } // end of namespace

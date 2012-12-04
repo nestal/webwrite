@@ -31,8 +31,7 @@ FileServer::FileServer( const fs::path& lib_path ) :
 Server* FileServer::Work( Request *req, const fs::path& rel )
 {
 	fs::path file = m_lib / rel ;
-	req->PrintF( "X-Sendfile: %s\r\n\r\n", file.string().c_str() ) ;
-
+	req->XSendFile( file ) ;
 	return 0 ;
 }
 
