@@ -72,4 +72,9 @@ std::string Request::Query() const
 	return ::FCGX_GetParam( "QUERY_STRING", m_req->envp ) ;
 }
 
+std::size_t Request::PrintF( const char *fmt )
+{
+	return FCGX_FPrintF( m_req->out, fmt ) ;
+}
+
 } // end of namespace

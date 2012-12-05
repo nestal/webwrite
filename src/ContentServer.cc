@@ -32,14 +32,14 @@ ContentServer::ContentServer( const fs::path& data_path ) :
 
 Server* ContentServer::Work( Request *req, const fs::path& rel )
 {
+	std::string last  = rel.filename().string() ;
+	std::string fname = last.substr( 0, last.find('?') ) ;
+	
+	fs::path file	= m_path / rel.parent_path() / fname ;
+	
 	if ( req->Method() == "POST" && req->Query() == "save" )
 	{
-		std::string last  = rel.filename().string() ;
-		std::string fname = last.substr( 0, last.find('?') ) ;
-		
-		fs::path file	= m_path / rel.parent_path() / fname ;
-		
-std::cout << "writing to " << (m_path/rel.parent_path()/fname) << std::endl ;
+std::cout << "writing to " << file << std::endl ;
 		
 		fs::create_directories( file.parent_path() ) ;
 		File f( file, 0600 ) ;
@@ -48,6 +48,26 @@ std::cout << "writing to " << (m_path/rel.parent_path()/fname) << std::endl ;
 		std::size_t c ;
 		while ( (c = req->Recv(buf, sizeof(buf)) ) > 0 )
 			f.Write( buf, c ) ;
+	}
+	
+	else if ( req->Method() == "GET" && req->Query() == "load" )
+	{
+std::cout << "reading from " << file << std::endl ;
+		req->XSendFile( file ) ;
+// 		File f( file ) ;
+// 		
+// 		// end of header
+// 		req->PrintF( "\r\n\r\n" ) ;
+// 		
+// 		char buf[80] ;
+// 		std::size_t c ;
+// 		while ( (c = f.Read(buf, sizeof(buf)) ) > 0 )
+// 		{
+// std::cout << "read " << c << " bytes " << std::endl ;
+// 			req->Send( buf, c ) ;
+// 
+// 		}
+// 		req->PrintF( "\r\n", c ) ;
 	}
 
 	return 0 ;

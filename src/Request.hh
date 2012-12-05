@@ -46,6 +46,7 @@ public :
 	std::size_t Send( const char *data, std::size_t size ) ;
 	
 	// templated version of printf
+	std::size_t PrintF( const char *fmt ) ;
 	
 	template <typename P1>
 	std::size_t PrintF( const char *fmt, const P1& p1 ) ;
