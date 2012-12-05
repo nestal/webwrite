@@ -54,14 +54,6 @@ std::cout << "wow.. fun request: " << fname << std::endl ;
 	
 	else
 	{
-// 		char buf[80] ;
-// 		std::size_t c ;
-// 		while ( (c = req->Recv(buf, sizeof(buf)) ) > 0 )
-// 		{
-// 			fwrite( buf, 1, c, stdout ) ;
-// 		}
-// 	
-// 		return m_file.Work( req, "index.html" ) ;
 		return m_data.Work( req, rel ) ;
 	}
 }

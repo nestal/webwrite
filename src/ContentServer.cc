@@ -37,8 +37,17 @@ Server* ContentServer::Work( Request *req, const fs::path& rel )
 		std::string last  = rel.filename().string() ;
 		std::string fname = last.substr( 0, last.find('?') ) ;
 		
+		fs::path file	= m_path / rel.parent_path() / fname ;
+		
 std::cout << "writing to " << (m_path/rel.parent_path()/fname) << std::endl ;
-// 		File f( m_path / rel ) ;
+		
+		fs::create_directories( file.parent_path() ) ;
+		File f( file, 0600 ) ;
+		
+		char buf[80] ;
+		std::size_t c ;
+		while ( (c = req->Recv(buf, sizeof(buf)) ) > 0 )
+			f.Write( buf, c ) ;
 	}
 
 	return 0 ;
