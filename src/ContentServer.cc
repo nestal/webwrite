@@ -54,24 +54,14 @@ std::cout << "writing to " << file << std::endl ;
 	{
 std::cout << "reading from " << file << std::endl ;
 		req->XSendFile( file ) ;
-// 		File f( file ) ;
-// 		
-// 		// end of header
-// 		req->PrintF( "\r\n\r\n" ) ;
-// 		
-// 		char buf[80] ;
-// 		std::size_t c ;
-// 		while ( (c = f.Read(buf, sizeof(buf)) ) > 0 )
-// 		{
-// std::cout << "read " << c << " bytes " << std::endl ;
-// 			req->Send( buf, c ) ;
-// 
-// 		}
-// 		req->PrintF( "\r\n", c ) ;
 	}
 
 	return 0 ;
 }
 
+fs::path ContentServer::LocalPath( const fs::path& rel_url ) const
+{
+	 return m_path / rel_url ;
+}
 
 } // end of namespace

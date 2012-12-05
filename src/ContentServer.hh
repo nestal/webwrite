@@ -33,6 +33,8 @@ public :
 	
 	Server* Work( Request *req, const fs::path& rel ) ;
 
+	fs::path LocalPath( const fs::path& rel_url ) const ;
+	
 private :
 	fs::path	m_path ;
 } ;

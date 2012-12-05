@@ -50,8 +50,16 @@ std::cout << "wow.. fun request: " << fname << std::endl ;
 		return m_file.Work( req, fname.substr(1) ) ;
 	
 	else if ( rel.empty() || req->Query().empty() )
-		return m_file.Work( req, "index.html" ) ;
-	
+	{
+		if ( fs::is_directory( m_data.LocalPath(rel) ) )
+		{
+			req->PrintF( "303 See Other\r\nLocation: %s\r\n\r\n",
+				(location/"main").string().c_str() ) ;
+			return 0 ;
+		}
+		else
+			return m_file.Work( req, "index.html" ) ;
+	}
 	else
 	{
 		return m_data.Work( req, rel ) ;
