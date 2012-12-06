@@ -28,7 +28,7 @@ class Request ;
 class Server
 {
 protected :
-	~Server() = default ;
+	~Server() {} ;
 	
 public :
 	virtual Server* Work( Request *req, const fs::path& location ) = 0 ;

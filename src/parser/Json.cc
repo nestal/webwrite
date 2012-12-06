@@ -226,7 +226,7 @@ void Json::Add( const Json& json )
 bool Json::Bool() const
 {
 	assert( m_json != 0 ) ;
-	return ::json_object_get_boolean( m_json ) ;
+	return ::json_object_get_boolean( m_json ) == TRUE ;
 }
 
 template <>

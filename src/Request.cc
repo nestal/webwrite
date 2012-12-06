@@ -22,6 +22,8 @@
 #include "util/Exception.hh"
 #include "util/File.hh"
 
+#include <iostream>
+
 namespace wb {
 
 const std::size_t buf_size = 8 * 1024 ;

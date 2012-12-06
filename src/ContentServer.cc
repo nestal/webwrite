@@ -23,6 +23,8 @@
 
 #include "util/File.hh"
 
+#include <iostream>
+
 namespace wb {
 
 ContentServer::ContentServer( const fs::path& data_path ) :

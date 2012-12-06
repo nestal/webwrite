@@ -22,6 +22,8 @@
 #include "Config.hh"
 #include "Request.hh"
 
+#include <iostream>
+
 namespace wb {
 
 RootServer::RootServer( const Config& cfg ) :

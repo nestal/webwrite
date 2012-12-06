@@ -36,6 +36,7 @@
 
 #ifdef WIN32
 	#include <io.h>
+	typedef int ssize_t ;
 #else
 	#include <sys/mman.h>
 #endif
@@ -82,11 +83,15 @@ File::File( ) : m_fd( -1 )
 {
 }
 
+/*!	opens the file for reading.
+*/
 File::File( const fs::path& path ) : m_fd( -1 )
 {
 	OpenForRead( path ) ;
 }
 
+/*!	opens the file for writing
+*/
 File::File( const fs::path& path, int mode ) : m_fd( -1 )
 {
 	OpenForWrite( path, mode ) ;

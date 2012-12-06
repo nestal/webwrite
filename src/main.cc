@@ -31,9 +31,9 @@
 #include "fcgiapp.h"
 
 #include <algorithm>
-#include <map>
 #include <cstdlib>
 #include <cstdio>
+#include <iostream>
 
 int main( int argc, char **argv )
 {

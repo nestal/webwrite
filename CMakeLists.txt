@@ -25,13 +25,13 @@ set(Boost_USE_STATIC_LIBS 1)
 
 find_package(Boost COMPONENTS filesystem system REQUIRED)
 find_package(JSONC REQUIRED)
+find_package(FCGI REQUIRED)
 find_package(BFD)
-
-ADD_DEFINITIONS("-std=c++0x")
 
 include_directories(
 	${JSONC_INCLUDE_DIR}
 	${Boost_INCLUDE_DIR}
+	${FCGI_INCLUDE_DIR}
 	${webwrite_SOURCE_DIR}/src
 )
 
@@ -59,10 +59,10 @@ add_executable( webwrite
 )
 
 target_link_libraries( webwrite
-	fcgi
 	${OPT_LIBS}
 	${Boost_LIBRARIES}
 	${JSONC_LIBRARY}
+	${FCGI_LIBRARY}
 )
 
 install(TARGETS webwrite RUNTIME DESTINATION bin)
