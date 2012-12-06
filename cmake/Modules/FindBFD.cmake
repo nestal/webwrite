@@ -8,6 +8,5 @@ endif (DL_LIBRARY AND BFD_LIBRARY)
 if ( BFD_FOUND )
 
 	message( STATUS "Found libbfd: ${BFD_LIBRARY}")
-
-
+	
 endif ( BFD_FOUND )
