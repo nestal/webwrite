@@ -48,7 +48,7 @@ std::cout << "wow.. fun request: " << fname << std::endl ;
 		return 0 ;
 	}
 	
-	else if ( fname.front() == '_' )
+	else if ( fname[0] == '_' )
 		return m_file.Work( req, fname.substr(1) ) ;
 	
 	else if ( rel.empty() || req->Query().empty() )
