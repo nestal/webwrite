@@ -8,6 +8,15 @@ body {
 	font-size: 100%;
 }
 
+table {
+	border-collapse:collapse;
+	border: 1pt solid black;
+}
+
+table td {
+	border: 1pt solid black;
+}
+
 #rich_editor {
 	font-family: Helvetica, Arial, Verdana;
 }
