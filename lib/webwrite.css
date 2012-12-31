@@ -15,3 +15,23 @@ body {
 #source_editor {
 	font-family: monospace;
 }
+
+.wysiwyg-font-size-smaller {
+	font-size: 80%;
+}
+
+.wysiwyg-font-size-small {
+	font-size: 90%;
+}
+
+.wysiwyg-font-size-medium {
+	font-size: 100%;
+}
+
+.wysiwyg-font-size-large {
+	font-size: 110%;
+}
+
+.wysiwyg-font-size-larger {
+	font-size: 120%;
+}
