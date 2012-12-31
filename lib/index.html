@@ -25,46 +25,29 @@ $(document).ready( OnLoad ) ;
 </script>
 </head>
 <body>
-	<div id="tabs" class="content">
-		<ul>
-			<li><a href="#rich_tab">Rich Text</a></li>
-			<li><a href="#source_tab">Source</a></li>
-		</ul>
-		<div id="rich_tab">
-			<div id="rich_toolbar" style="display: none;">
-				
-				<button id="save_button">Save</button>
-				<button id="bold_button"><b>B</b></button>
-				<button id="italic_button"><em>I</em></button>
-				
-				<button id="red_button">R</button>
-				<button id="red_button">G</button>
-				<button id="red_button">B</button>
-				
-				<a data-wysihtml5-command="bold">bold</a>
-				<a data-wysihtml5-command="italic">italic</a>
+	<div id="rich_toolbar" style="display: none;">
+		
+		<button id="save_button">Save</button>
+		<button id="switch_button">Toggle HTML</button>
+		
+		
+		<button id="bold_button"><b>B</b></button>
+		<button id="italic_button"><em>I</em></button>
+		
+		
 
-				<!-- Some wysihtml5 commands require extra parameters -->
-				<a data-wysihtml5-command="foreColor" data-wysihtml5-command-value="red">red</a>
-				<a data-wysihtml5-command="foreColor" data-wysihtml5-command-value="green">green</a>
-				<a data-wysihtml5-command="foreColor" data-wysihtml5-command-value="blue">blue</a>
-
-				<!-- Some wysihtml5 commands like 'createLink' require extra paramaters specified by the user (eg. href) -->
-				<a data-wysihtml5-command="createLink">insert link</a>
-				<div data-wysihtml5-dialog="createLink" style="display: none;">
-					<label>
-						Link:
-						<input data-wysihtml5-dialog-field="href" value="http://" class="text">
-					</label>
-					<a data-wysihtml5-dialog-action="save">OK</a> <a data-wysihtml5-dialog-action="cancel">Cancel</a>
-				</div>
-			</div>
-
-			<form><textarea id="rich_editor" class="rich editor"></textarea></form>
-		</div>
-		<div id="source_tab">
-			<form><textarea id="source_editor" class="source editor"></textarea></form>
+		<!-- Some wysihtml5 commands like 'createLink' require extra paramaters specified by the user (eg. href) -->
+		<button class="make_button" data-wysihtml5-command="createLink">insert link</button>
+		<div data-wysihtml5-dialog="createLink" style="display: none;">
+			<label>
+				Link:
+				<input data-wysihtml5-dialog-field="href" value="http://" class="text">
+			</label>
+			<button class="make_button" data-wysihtml5-dialog-action="save">OK</button>
+			<button class="make_button" data-wysihtml5-dialog-action="cancel">Cancel</button>
 		</div>
 	</div>
+
+	<textarea id="rich_editor" class="rich editor"></textarea>
 </body>
 </html>
