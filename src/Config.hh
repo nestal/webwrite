@@ -35,6 +35,8 @@ public :
 	
 	fs::path Base() const ;
 	
+	std::string MainPage() const ;
+	
 private :
 	Json		m_cfg ;
 	

@@ -43,6 +43,7 @@ private :
 	ContentServer	m_data ;
 	
 	fs::path		m_wb_root ;
+	std::string		m_main_page ;
 } ;
 
 } // end of namespace

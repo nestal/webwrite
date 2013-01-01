@@ -29,7 +29,8 @@ namespace wb {
 RootServer::RootServer( const Config& cfg ) :
 	m_file( cfg.Base() / cfg.Str("lib-path") ),
 	m_data( cfg.Base() / cfg.Str("data-path") ),
-	m_wb_root( cfg.Str("wb-root") )
+	m_wb_root( cfg.Str("wb-root") ),
+	m_main_page( cfg.MainPage() )
 {
 }
 	
@@ -40,11 +41,10 @@ Server* RootServer::Work( Request *req, const fs::path& location )
 
 	std::size_t pos = std::string::npos ;
 	
+	// no filename in request, redirect to main page
 	if ( fname.empty() || fname == "." )
 	{
-std::cout << "wow.. fun request: " << fname << std::endl ;
-		req->PrintF( "303 See Other\r\nLocation: %s\r\n\r\n",
-			(location/"main").string().c_str() ) ;
+		req->SeeOther( (location/m_main_page).string() ) ;
 		return 0 ;
 	}
 	
@@ -55,8 +55,7 @@ std::cout << "wow.. fun request: " << fname << std::endl ;
 	{
 		if ( fs::is_directory( m_data.LocalPath(rel) ) )
 		{
-			req->PrintF( "303 See Other\r\nLocation: %s\r\n\r\n",
-				(location/"main").string().c_str() ) ;
+			req->SeeOther( (location/m_main_page).string() ) ;
 			return 0 ;
 		}
 		else

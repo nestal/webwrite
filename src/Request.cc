@@ -79,4 +79,12 @@ std::size_t Request::PrintF( const char *fmt )
 	return FCGX_FPrintF( m_req->out, fmt ) ;
 }
 
+void Request::SeeOther( const std::string& location )
+{
+	FCGX_FPrintF(
+		m_req->out,
+		"303 See Other\r\nLocation: %s\r\n\r\n",
+		location.c_str() ) ;
+}
+
 } // end of namespace

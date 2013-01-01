@@ -29,6 +29,11 @@ namespace wb {
 
 class Config ;
 
+/*!	\brief HTTP request object
+
+	This class encapsulates all HTTP related stuff, including formatting the message
+	body; returning status code; and other HTTP headers.
+*/
 class Request
 {
 public :
@@ -57,7 +62,11 @@ public :
 	template <typename P1, typename P2, typename P3>
 	std::size_t PrintF( const char *fmt, const P1& p1, const P2& p2, const P3& p3 ) ;
 
+	// tell the web server to send this file
 	void XSendFile( const fs::path& file ) ;
+	
+	// HTTP status return
+	void SeeOther( const std::string& location ) ;
 	
 	// for debugging
 	void PrintEnv() const ;

@@ -41,4 +41,12 @@ fs::path Config::Base() const
 	return m_cfg.Has("base") ? fs::path(m_cfg["base"].Str()) : m_base ;
 }
 
+/*!	This configuration parameter contains the name of the default page in a
+	directory. Default value: "main".
+*/
+std::string Config::MainPage() const
+{
+	return m_cfg.Has("main_page") ? m_cfg["main_page"].Str() : "main" ;
+}
+
 } // end of namespace
