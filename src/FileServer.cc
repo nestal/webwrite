@@ -34,19 +34,10 @@ FileServer::FileServer( const fs::path& lib_path ) :
 
 Server* FileServer::Work( Request *req, const Resource& res )
 {
-	fs::path	rel		= res.Path() ;
 	std::string	fname	= res.Filename() ;
-
 	assert( !fname.empty() ) ;
 	
-	ServeFile( req, fname[0] == '_' ? fname.substr(1) : "index.html" ) ;
-	
-	return 0 ;
-}
-
-void FileServer::ServeFile( Request *req, const std::string& file )
-{
-	fs::path path = m_lib / file ;
+	fs::path path = m_lib / ( fname[0] == '_' ? fname.substr(1) : "index.html" ) ;
 	std::cout << "serving: " << path << std::endl ;
 	
 	req->XSendFile( path ) ;
