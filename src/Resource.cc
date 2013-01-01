@@ -56,7 +56,7 @@ bool Resource::IsDir() const
 fs::path Resource::ContentPath() const
 {
 	assert( m_cfg != 0 ) ;
-	return m_cfg->Str("data-path") / m_path ;
+	return m_cfg->Base() / m_cfg->Str("data-path") / m_path ;
 }
 
 } // end of namespace
