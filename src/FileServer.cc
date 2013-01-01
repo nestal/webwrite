@@ -20,6 +20,9 @@
 #include "FileServer.hh"
 
 #include "Request.hh"
+#include "Resource.hh"
+
+#include <cassert>
 
 namespace wb {
 
@@ -28,10 +31,18 @@ FileServer::FileServer( const fs::path& lib_path ) :
 {
 }
 
-Server* FileServer::Work( Request *req, const fs::path& rel )
+Server* FileServer::Work( Request *req, const Resource& res )
 {
-	fs::path file = m_lib / rel ;
-	req->XSendFile( file ) ;
+	fs::path	rel		= res.Path() ;
+	std::string	fname	= res.Filename() ;
+
+	assert( !fname.empty() ) ;
+	
+	if ( fname[0] == '_' )
+		req->XSendFile( m_lib / fname.substr(1) ) ;
+	else
+		req->XSendFile( m_lib / "index.html" ) ;
+	
 	return 0 ;
 }
 

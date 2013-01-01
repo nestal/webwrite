@@ -27,16 +27,14 @@ namespace wb {
 
 class Config ;
 class Request ;
+class Resource ;
 
 class RootServer : public Server
 {
 public :
 	RootServer( const Config& cfg ) ;
 	
-	Server* Work( Request *req, const fs::path& location ) ;
-
-private :
-	fs::path Relative( const fs::path& loc ) const ;
+	Server* Work( Request *req, const Resource& res ) ;
 
 private :
 	FileServer		m_file ;

@@ -17,22 +17,33 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#pragma once
+#include "Resource.hh"
+#include "Config.hh"
 
-#include "util/FileSystem.hh"
+#include "util/Exception.hh"
+
+#include <iostream>
 
 namespace wb {
 
-class Request ;
-class Resource ;
-
-class Server
+Resource::Resource( const std::string& uri, const Config& cfg )
 {
-protected :
-	~Server() {} ;
+	std::string wb_root = cfg.Str("wb-root") ;
 	
-public :
-	virtual Server* Work( Request *req, const Resource& res ) = 0 ;
-} ;
+	if ( uri.substr( 0, wb_root.size() ) != wb_root )
+		throw Exception() ;
+	
+	m_path = uri.substr( wb_root.size() ) ;
+}
+
+const fs::path& Resource::Path() const
+{
+	return m_path ;
+}
+
+std::string Resource::Filename() const
+{
+	return m_path.filename().string() ;
+}
 
 } // end of namespace

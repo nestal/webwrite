@@ -31,7 +31,7 @@ class FileServer : public Server
 public :
 	FileServer( const fs::path& lib_path ) ;
 	
-	Server* Work( Request *req, const fs::path& rel ) ;
+	Server* Work( Request *req, const Resource& res ) ;
 
 private :
 	fs::path	m_lib ;

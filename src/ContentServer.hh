@@ -31,7 +31,7 @@ class ContentServer : public Server
 public :
 	ContentServer( const fs::path& data_path ) ;
 	
-	Server* Work( Request *req, const fs::path& rel ) ;
+	Server* Work( Request *req, const Resource& res ) ;
 
 	fs::path LocalPath( const fs::path& rel_url ) const ;
 	

@@ -20,6 +20,7 @@
 #include "ContentServer.hh"
 
 #include "Request.hh"
+#include "Resource.hh"
 
 #include "util/File.hh"
 
@@ -32,10 +33,11 @@ ContentServer::ContentServer( const fs::path& data_path ) :
 {
 }
 
-Server* ContentServer::Work( Request *req, const fs::path& rel )
+Server* ContentServer::Work( Request *req, const Resource& res )
 {
-	std::string last  = rel.filename().string() ;
-	std::string fname = last.substr( 0, last.find('?') ) ;
+	fs::path	rel		= res.Path() ;
+	std::string	last	= res.Filename() ;
+	std::string fname	= last.substr( 0, last.find('?') ) ;
 	
 	fs::path file	= m_path / rel.parent_path() / fname ;
 	

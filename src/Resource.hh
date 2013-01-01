@@ -23,16 +23,21 @@
 
 namespace wb {
 
-class Request ;
-class Resource ;
+class Config ;
 
-class Server
+class Resource
 {
-protected :
-	~Server() {} ;
-	
 public :
-	virtual Server* Work( Request *req, const Resource& res ) = 0 ;
+	explicit Resource( const std::string& uri, const Config& cfg ) ;
+	
+	/// a path to the resource relative to the "wb-root"
+	const fs::path& Path() const ;
+
+	/// filename of the resource
+	std::string Filename() const ;
+	
+private :
+	fs::path	m_path ;
 } ;
 
 } // end of namespace

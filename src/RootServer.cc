@@ -21,6 +21,7 @@
 
 #include "Config.hh"
 #include "Request.hh"
+#include "Resource.hh"
 
 #include <iostream>
 
@@ -34,52 +35,37 @@ RootServer::RootServer( const Config& cfg ) :
 {
 }
 	
-Server* RootServer::Work( Request *req, const fs::path& location ) 
+Server* RootServer::Work( Request *req, const Resource& res ) 
 {
-	fs::path	rel		= Relative( location ) ;
-	std::string	fname	= rel.filename().string() ;
+	fs::path	rel		= res.Path() ;
+	std::string	fname	= res.Filename() ;
 
 	std::size_t pos = std::string::npos ;
 	
 	// no filename in request, redirect to main page
 	if ( fname.empty() || fname == "." )
 	{
-		req->SeeOther( (location/m_main_page).string() ) ;
+		req->SeeOther( (res.Path()/m_main_page).string() ) ;
 		return 0 ;
 	}
 	
 	else if ( fname[0] == '_' )
-		return m_file.Work( req, fname.substr(1) ) ;
+		return m_file.Work( req, res ) ;
 	
 	else if ( rel.empty() || req->Query().empty() )
 	{
 		if ( fs::is_directory( m_data.LocalPath(rel) ) )
 		{
-			req->SeeOther( (location/m_main_page).string() ) ;
+			req->SeeOther( (res.Path()/m_main_page).string() ) ;
 			return 0 ;
 		}
 		else
-			return m_file.Work( req, "index.html" ) ;
+			return m_file.Work( req, res ) ;
 	}
 	else
 	{
-		return m_data.Work( req, rel ) ;
+		return m_data.Work( req, res ) ;
 	}
-}
-
-fs::path RootServer::Relative( const fs::path& loc ) const
-{
-	std::pair<fs::path::const_iterator, fs::path::const_iterator> r =
-		std::mismatch( m_wb_root.begin(), m_wb_root.end(), loc.begin() ) ;
-
-	fs::path result ;
-	while ( r.second != loc.end() )
-	{
-		result /= *r.second ;
-		r.second++ ;
-	}
-	
-	return result ;
 }
 
 } // end of namespace

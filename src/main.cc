@@ -19,6 +19,7 @@
 
 #include "Config.hh"
 #include "Request.hh"
+#include "Resource.hh"
 #include "RootServer.hh"
 
 #include "util/Exception.hh"
@@ -53,8 +54,8 @@ int main( int argc, char **argv )
 		{
 			Request req( &request ) ;
 			std::cerr << "requesting: " << req.URI() << std::endl ;
-
-			srv.Work( &req, req.URI() ) ;
+			
+			srv.Work( &req, Resource( req.URI(), cfg ) ) ;
 
 			FCGX_Finish_r( &request ) ;
 		}
