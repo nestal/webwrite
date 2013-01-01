@@ -53,9 +53,9 @@ int main( int argc, char **argv )
 		while ( (r = FCGX_Accept_r( &request )) == 0 )
 		{
 			Request req( &request ) ;
-			std::cerr << "requesting: " << req.URI() << std::endl ;
+			std::cout << "requesting: " << req.URI() << std::endl ;
 			
-			srv.Work( &req, Resource( req.URI(), cfg ) ) ;
+			srv.Work( &req, Resource( req.SansQueryURI(), cfg ) ) ;
 
 			FCGX_Finish_r( &request ) ;
 		}

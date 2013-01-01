@@ -35,11 +35,8 @@ ContentServer::ContentServer( const fs::path& data_path ) :
 
 Server* ContentServer::Work( Request *req, const Resource& res )
 {
-	fs::path	rel		= res.Path() ;
-	std::string	last	= res.Filename() ;
-	std::string fname	= last.substr( 0, last.find('?') ) ;
-	
-	fs::path file	= m_path / rel.parent_path() / fname ;
+	std::string	fname	= res.Filename() ;
+	fs::path 	file	= res.ContentPath() ;
 	
 	if ( req->Method() == "POST" && req->Query() == "save" )
 	{

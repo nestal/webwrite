@@ -48,18 +48,12 @@ Server* RootServer::Work( Request *req, const Resource& res )
 		req->SeeOther( (res.Path()/m_main_page).string() ) ;
 		return 0 ;
 	}
-	
-	else if ( fname[0] == '_' )
-		return m_file.Work( req, res ) ;
-	
-	else if ( rel.empty() || req->Query().empty() )
-	{
-		return m_file.Work( req, res ) ;
-	}
-	else
-	{
+
+	else if ( !req->Query().empty() )
 		return m_data.Work( req, res ) ;
-	}
+	
+	else
+		return m_file.Work( req, res ) ;
 }
 
 } // end of namespace

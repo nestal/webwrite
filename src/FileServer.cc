@@ -23,6 +23,7 @@
 #include "Resource.hh"
 
 #include <cassert>
+#include <iostream>
 
 namespace wb {
 
@@ -38,12 +39,17 @@ Server* FileServer::Work( Request *req, const Resource& res )
 
 	assert( !fname.empty() ) ;
 	
-	if ( fname[0] == '_' )
-		req->XSendFile( m_lib / fname.substr(1) ) ;
-	else
-		req->XSendFile( m_lib / "index.html" ) ;
+	ServeFile( req, fname[0] == '_' ? fname.substr(1) : "index.html" ) ;
 	
 	return 0 ;
+}
+
+void FileServer::ServeFile( Request *req, const std::string& file )
+{
+	fs::path path = m_lib / file ;
+	std::cout << "serving: " << path << std::endl ;
+	
+	req->XSendFile( path ) ;
 }
 
 } // end of namespace

@@ -87,4 +87,17 @@ void Request::SeeOther( const std::string& location )
 		location.c_str() ) ;
 }
 
+std::string Request::SansQueryURI() const
+{
+	std::string uri		= URI() ;
+	std::string	query	= Query() ;
+	std::string result	= uri.substr( 0, uri.size() - query.size() ) ;
+	
+	// remove the '?' if any
+	if ( !query.empty() && !result.empty() && result[result.size()-1] == '?' )
+		result.erase( result.size()-1 ) ;
+	
+	return result ;
+}
+
 } // end of namespace

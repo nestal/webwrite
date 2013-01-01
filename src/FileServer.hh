@@ -34,6 +34,9 @@ public :
 	Server* Work( Request *req, const Resource& res ) ;
 
 private :
+	void ServeFile( Request *req, const std::string& file ) ;
+	
+private :
 	fs::path	m_lib ;
 } ;
 

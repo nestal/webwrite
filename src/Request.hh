@@ -43,6 +43,7 @@ public :
 	
 	// request environment
 	std::string URI() const ;
+	std::string SansQueryURI() const ;
 	std::string Method() const ;
 	std::string Referer() const ;
 	std::string Query() const ;
