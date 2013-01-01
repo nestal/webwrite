@@ -43,7 +43,7 @@ Server* RootServer::Work( Request *req, const Resource& res )
 	std::size_t pos = std::string::npos ;
 	
 	// no filename in request, redirect to main page
-	if ( fname.empty() || fname == "." )
+	if ( res.IsDir() || fname == "_" )
 	{
 		req->SeeOther( (res.Path()/m_main_page).string() ) ;
 		return 0 ;
@@ -54,13 +54,7 @@ Server* RootServer::Work( Request *req, const Resource& res )
 	
 	else if ( rel.empty() || req->Query().empty() )
 	{
-		if ( fs::is_directory( m_data.LocalPath(rel) ) )
-		{
-			req->SeeOther( (res.Path()/m_main_page).string() ) ;
-			return 0 ;
-		}
-		else
-			return m_file.Work( req, res ) ;
+		return m_file.Work( req, res ) ;
 	}
 	else
 	{

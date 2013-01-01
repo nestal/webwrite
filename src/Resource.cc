@@ -23,10 +23,12 @@
 #include "util/Exception.hh"
 
 #include <iostream>
+#include <cassert>
 
 namespace wb {
 
-Resource::Resource( const std::string& uri, const Config& cfg )
+Resource::Resource( const std::string& uri, const Config& cfg ) :
+	m_cfg( &cfg )
 {
 	std::string wb_root = cfg.Str("wb-root") ;
 	
@@ -44,6 +46,17 @@ const fs::path& Resource::Path() const
 std::string Resource::Filename() const
 {
 	return m_path.filename().string() ;
+}
+
+bool Resource::IsDir() const
+{
+	return Filename().empty() || Filename() == "." || fs::is_directory(ContentPath()) ;
+}
+
+fs::path Resource::ContentPath() const
+{
+	assert( m_cfg != 0 ) ;
+	return m_cfg->Str("data-path") / m_path ;
 }
 
 } // end of namespace

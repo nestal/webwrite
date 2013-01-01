@@ -33,11 +33,17 @@ public :
 	/// a path to the resource relative to the "wb-root"
 	const fs::path& Path() const ;
 
+	fs::path ContentPath() const ;
+	
 	/// filename of the resource
 	std::string Filename() const ;
+
+	bool IsDir() const ;
 	
 private :
-	fs::path	m_path ;
+	fs::path		m_path ;
+	
+	const Config	*m_cfg ;
 } ;
 
 } // end of namespace
