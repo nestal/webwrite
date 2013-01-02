@@ -44,3 +44,11 @@ table td {
 .wysiwyg-font-size-larger {
 	font-size: 120%;
 }
+
+#drop {
+  min-height: 100px;
+  width: 200px;
+  border: 3px dashed #ccc;
+  margin: 10px;
+  padding: 10px;
+}
