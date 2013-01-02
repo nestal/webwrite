@@ -50,6 +50,7 @@ public :
 	
 	std::size_t Recv( char *data, std::size_t size ) ;
 	std::size_t Send( const char *data, std::size_t size ) ;
+	std::string ReadLine( std::size_t max = 1000 ) ;
 	
 	// templated version of printf
 	std::size_t PrintF( const char *fmt ) ;

@@ -100,4 +100,16 @@ std::string Request::SansQueryURI() const
 	return result ;
 }
 
+std::string Request::ReadLine( std::size_t max )
+{
+	std::string result(max, '\0') ;
+	if ( FCGX_GetLine( &result[0], result.size(), m_req->in ) != 0 )
+	{
+		result.resize( std::strlen( result.c_str() ) ) ;
+		return result ;
+	}
+	else
+		return "" ;
+}
+
 } // end of namespace

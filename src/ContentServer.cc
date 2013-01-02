@@ -51,6 +51,17 @@ std::cout << "writing to " << file << std::endl ;
 			f.Write( buf, c ) ;
 	}
 	
+	if ( req->Method() == "POST" && req->Query() == "upload" )
+	{
+		std::string line ;
+		do
+		{
+			line = req->ReadLine( ) ;
+			std::cout << " >\"" << line << "\"<" << std::endl ;
+		
+		} while ( line != "\r\n" && !line.empty() ) ;
+	}
+	
 	else if ( req->Method() == "GET" && req->Query() == "load" )
 	{
 std::cout << "reading from " << file << std::endl ;
