@@ -26,6 +26,7 @@ set(Boost_USE_STATIC_LIBS 1)
 find_package(Boost COMPONENTS filesystem system REQUIRED)
 find_package(JSONC REQUIRED)
 find_package(FCGI REQUIRED)
+find_package(CppUnit)
 find_package(BFD)
 
 include_directories(
@@ -33,14 +34,6 @@ include_directories(
 	${Boost_INCLUDE_DIR}
 	${FCGI_INCLUDE_DIR}
 	${webwrite_SOURCE_DIR}/src
-)
-
-file (GLOB WEBWRITE_SRC
-    ${webwrite_SOURCE_DIR}/src/*.hh
-    ${webwrite_SOURCE_DIR}/src/*.cc
-    ${webwrite_SOURCE_DIR}/src/util/*.hh
-    ${webwrite_SOURCE_DIR}/src/util/*.cc
-    ${webwrite_SOURCE_DIR}/src/parser/*.cc
 )
 
 # build bfd classes if libbfd is found
@@ -53,8 +46,20 @@ if ( BFD_FOUND )
         
 endif ( BFD_FOUND )
 
-add_executable( webwrite
+file (GLOB WEBWRITE_LIB_SRC
 	${OPT_SRC}
+    ${webwrite_SOURCE_DIR}/src/util/*.hh
+    ${webwrite_SOURCE_DIR}/src/util/*.cc
+    ${webwrite_SOURCE_DIR}/src/parser/*.cc
+)
+
+file (GLOB WEBWRITE_SRC
+	${WEBWRITE_LIB_SRC}
+    ${webwrite_SOURCE_DIR}/src/*.hh
+    ${webwrite_SOURCE_DIR}/src/*.cc
+)
+
+add_executable( webwrite
 	${WEBWRITE_SRC}
 )
 
@@ -67,3 +72,28 @@ target_link_libraries( webwrite
 
 install(TARGETS webwrite RUNTIME DESTINATION bin)
 #install(FILES doc/grive.1 DESTINATION share/man/man1 )
+
+IF ( CPPUNIT_FOUND )
+	message("-- Building unit tests")
+    
+    # list of test source files here
+	file(GLOB TEST_SRC
+		test/*.cc
+		test/parser/*.cc
+		src/parser/*.cc
+	)
+
+	add_executable( unittest
+		test/UnitTest.cc
+		${TEST_SRC}
+		${WEBWRITE_LIB_SRC}
+	)
+
+	target_link_libraries( unittest
+		${CPPUNIT_LIBRARY}
+		${JSONC_LIBRARY}
+		${Boost_LIBRARIES}
+		${OPT_LIBS}
+	)
+        
+ENDIF ( CPPUNIT_FOUND )
