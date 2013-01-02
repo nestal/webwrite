@@ -1,8 +1,7 @@
 <html>
 <head>
 	<meta charset="utf-8" />
-	<link href="_webwrite.css" rel="stylesheet" text="text/css" />
-	
+		
 	<title>Editor</title>
 	
 	<!-- Load jQuery -->
@@ -18,43 +17,51 @@
 	<script type="text/javascript" src="http://xing.github.com/wysihtml5/parser_rules/advanced.js"></script>
 	<script type="text/javascript" src="http://xing.github.com/wysihtml5/dist/wysihtml5-0.3.0.js"></script>
 	
+  <!-- our own script and stylesheet -->
 	<script type="text/javascript" src="_webwrite.js"></script>
+  <link href="_webwrite.css" rel="stylesheet" text="text/css" />
 
-<script type="text/javascript">
-$(document).ready( OnLoad ) ;
-</script>
+  <script type="text/javascript">
+  $(document).ready( OnLoad ) ;
+  </script>
+
 </head>
 <body>
-	<div id="rich_toolbar" style="display: none;">
-		
-		<button id="save_button">Save</button>
-		<button id="switch_button">Toggle HTML</button>
+  <div class="header row">
+  	<div id="rich_toolbar" style="display: none;">
+		  <button id="save_button">Save</button>
+		  <button id="switch_button">Toggle HTML</button>
 				
-		<button id="bold_button"><b>B</b></button>
-		<button id="italic_button"><em>I</em></button>
+		  <button id="bold_button"><b>B</b></button>
+		  <button id="italic_button"><em>I</em></button>
 		
-		<button id="h1_button">H1</button>
-		<button id="h2_button">H2</button>
-		<button id="h3_button">H3</button>
-		<button id="h4_button">H4</button>
+		  <button id="h1_button">H1</button>
+		  <button id="h2_button">H2</button>
+		  <button id="h3_button">H3</button>
+		  <button id="h4_button">H4</button>
 		
-		<button id="ordered_list_button">1.</button>
-		<button id="unordered_list_button">&bull;</button>
+		  <button id="ordered_list_button">1.</button>
+		  <button id="unordered_list_button">&bull;</button>
 		
-		<!-- Some wysihtml5 commands like 'createLink' require extra paramaters specified by the user (eg. href) -->
-		<button class="make_button" data-wysihtml5-command="createLink">insert link</button>
-		<div data-wysihtml5-dialog="createLink" style="display: none;">
-			<label>
-				Link:
-				<input data-wysihtml5-dialog-field="href" value="http://" class="text">
-			</label>
-			<button class="make_button" data-wysihtml5-dialog-action="save">OK</button>
-			<button class="make_button" data-wysihtml5-dialog-action="cancel">Cancel</button>
-		</div>
-	</div>
+		  <!-- Some wysihtml5 commands like 'createLink' require extra paramaters specified by the user (eg. href) -->
+		  <button class="make_button" data-wysihtml5-command="createLink">insert link</button>
+		  <div data-wysihtml5-dialog="createLink" style="display: none;">
+			  <label>
+				  Link:
+				  <input data-wysihtml5-dialog-field="href" value="http://" class="text">
+			  </label>
+			  <button class="make_button" data-wysihtml5-dialog-action="save">OK</button>
+			  <button class="make_button" data-wysihtml5-dialog-action="cancel">Cancel</button>
+		  </div>
+	  </div>
+  </div>
 
-  <div id="drop"></div>
+  <div class="body row scroll-y">
+	  <textarea id="rich_editor" class="rich editor"></textarea>
+  </div>
 
-	<textarea id="rich_editor" class="rich editor"></textarea>
+  <div class="footer row">
+    <div id="drop"></div>
+  </div>
 </body>
 </html>

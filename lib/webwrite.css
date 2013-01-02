@@ -1,11 +1,27 @@
 body {
+    margin: 0
 }
 
+.row, .col { overflow: hidden; position: absolute; }
+.row { left: 0; right: 0; }
+.col { top: 0; bottom: 0; }
+.scroll-x { overflow-x: auto; }
+.scroll-y { overflow-y: auto; }
+.header.row { height: 75px; top: 0; }
+.body.row { top: 75px; bottom: 50px; }
+.footer.row { height: 50px; bottom: 0; }
+
 .editor {
-	width: 100%;
-	height: 90%;
-	
+	margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    width: 100%;
+    height: 100%;
 	font-size: 100%;
+}
+
+.ui-button-text-only .ui-button-text {
+    padding: .2em .5em;
+    font-size: 50%;
 }
 
 table {
@@ -19,10 +35,6 @@ table td {
 
 #rich_editor {
 	font-family: Helvetica, Arial, Verdana;
-}
-
-#source_editor {
-	font-family: monospace;
 }
 
 .wysiwyg-font-size-smaller {
@@ -46,9 +58,9 @@ table td {
 }
 
 #drop {
-  min-height: 100px;
-  width: 200px;
+  width: 100%;
+  height: 100%;
   border: 3px dashed #ccc;
-  margin: 10px;
-  padding: 10px;
+  margin: 2px;
+  padding: 2px;
 }
