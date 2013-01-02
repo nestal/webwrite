@@ -27,41 +27,50 @@
 
 </head>
 <body>
-  <div class="header row">
-  	<div id="rich_toolbar" style="display: none;">
-		  <button id="save_button">Save</button>
-		  <button id="switch_button">Toggle HTML</button>
-				
-		  <button id="bold_button"><b>B</b></button>
-		  <button id="italic_button"><em>I</em></button>
-		
-		  <button id="h1_button">H1</button>
-		  <button id="h2_button">H2</button>
-		  <button id="h3_button">H3</button>
-		  <button id="h4_button">H4</button>
-		
-		  <button id="ordered_list_button">1.</button>
-		  <button id="unordered_list_button">&bull;</button>
-		
-		  <!-- Some wysihtml5 commands like 'createLink' require extra paramaters specified by the user (eg. href) -->
-		  <button class="make_button" data-wysihtml5-command="createLink">insert link</button>
-		  <div data-wysihtml5-dialog="createLink" style="display: none;">
-			  <label>
-				  Link:
-				  <input data-wysihtml5-dialog-field="href" value="http://" class="text">
-			  </label>
-			  <button class="make_button" data-wysihtml5-dialog-action="save">OK</button>
-			  <button class="make_button" data-wysihtml5-dialog-action="cancel">Cancel</button>
-		  </div>
-	  </div>
+  <div class="left col">
+    <div>Quick Links:</div>
+    <ul>
+      <li><a href="/webwrite/main">Main Page</a></li>
+      <li>two</li>
+    </ul>
   </div>
+  <div class="right col">
+	<div class="header row">
+		<div id="rich_toolbar" style="display: none;">
+			<button id="save_button">Save</button>
+			<button id="switch_button">Toggle HTML</button>
+					
+			<button id="bold_button"><b>B</b></button>
+			<button id="italic_button"><em>I</em></button>
+			
+			<button id="h1_button">H1</button>
+			<button id="h2_button">H2</button>
+			<button id="h3_button">H3</button>
+			<button id="h4_button">H4</button>
+			
+			<button id="ordered_list_button">1.</button>
+			<button id="unordered_list_button">&bull;</button>
+			
+			<!-- Some wysihtml5 commands like 'createLink' require extra paramaters specified by the user (eg. href) -->
+			<button class="make_button" data-wysihtml5-command="createLink">insert link</button>
+			<div data-wysihtml5-dialog="createLink" style="display: none;">
+				<label>
+					Link:
+					<input data-wysihtml5-dialog-field="href" value="http://" class="text">
+				</label>
+				<button class="make_button" data-wysihtml5-dialog-action="save">OK</button>
+				<button class="make_button" data-wysihtml5-dialog-action="cancel">Cancel</button>
+			</div>
+		</div>
+	</div>
 
-  <div class="body row scroll-y">
-	  <textarea id="rich_editor" class="rich editor"></textarea>
-  </div>
+	<div class="body row scroll-y">
+		<textarea id="rich_editor" class="rich editor"></textarea>
+	</div>
 
-  <div class="footer row">
-    <div id="drop"></div>
+	<div class="footer row">
+		<div id="drop"></div>
+	</div>
   </div>
 </body>
 </html>

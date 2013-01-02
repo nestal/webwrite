@@ -5,6 +5,8 @@ body {
 .row, .col { overflow: hidden; position: absolute; }
 .row { left: 0; right: 0; }
 .col { top: 0; bottom: 0; }
+.left.col { width: 200px; }
+.right.col { left: 200px; right: 0; }
 .scroll-x { overflow-x: auto; }
 .scroll-y { overflow-y: auto; }
 .header.row { height: 75px; top: 0; }
