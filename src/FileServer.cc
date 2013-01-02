@@ -41,6 +41,7 @@ Server* FileServer::Work( Request *req, const Resource& res )
 	std::cout << "serving: " << path << std::endl ;
 	
 	req->XSendFile( path ) ;
+	return 0 ;
 }
 
 } // end of namespace

@@ -45,7 +45,7 @@ Server* RootServer::Work( Request *req, const Resource& res )
 	// no filename in request, redirect to main page
 	if ( res.IsDir() || fname == "_" )
 	{
-		req->SeeOther( (res.Path()/m_main_page).string() ) ;
+		req->SeeOther( (m_wb_root/res.Path()/m_main_page).string() ) ;
 		return 0 ;
 	}
 
