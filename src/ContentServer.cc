@@ -48,7 +48,7 @@ std::cout << "writing to " << file << std::endl ;
 		
 		char buf[80] ;
 		std::size_t c ;
-		while ( (c = req->In()->Recv(buf, sizeof(buf)) ) > 0 )
+		while ( (c = req->In()->Read(buf, sizeof(buf)) ) > 0 )
 			f.Write( buf, c ) ;
 	}
 	

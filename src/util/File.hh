@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "DataStream.hh"
 #include "Exception.hh"
 #include "FileSystem.hh"
 #include "Types.hh"
@@ -35,7 +36,7 @@ namespace wb {
 
 	It will throw exceptions when encountered errors.
 */
-class File
+class File : public DataStream
 {
 public :
 	struct Error : virtual Exception {} ;
@@ -51,8 +52,9 @@ public :
 	void Close() ;
 	bool IsOpened() const ;
 	
-	std::size_t Read( void *ptr, std::size_t size ) ;
-	std::size_t Write( const void *ptr, std::size_t size ) ;
+	std::size_t Read( char *ptr, std::size_t size ) ;
+	std::string ReadLine( std::size_t max ) ;
+	std::size_t Write( const char *ptr, std::size_t size ) ;
 
 	off_t Seek( off_t offset, int whence ) ;
 	off_t Tell() const ;

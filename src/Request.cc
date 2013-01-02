@@ -37,9 +37,9 @@ public :
 	{
 	}
 	
-	std::size_t Recv( char *data, std::size_t size ) ;
-	std::size_t Send( const char *data, std::size_t size ) ;
+	std::size_t Read( char *data, std::size_t size ) ;
 	std::string ReadLine( std::size_t max ) ;
+	std::size_t Write( const char *data, std::size_t size ) ;
 
 
 private :
@@ -68,12 +68,12 @@ void Request::XSendFile( const fs::path& file )
 	FCGX_FPrintF( m_req->out, "X-Sendfile: %s\r\n\r\n", file.string().c_str() ) ;
 }
 
-std::size_t Request::StreamWrapper::Recv( char *data, std::size_t size )
+std::size_t Request::StreamWrapper::Read( char *data, std::size_t size )
 {
 	return ::FCGX_GetStr( data, size, m_str ) ;
 }
 
-std::size_t Request::StreamWrapper::Send( const char *data, std::size_t size )
+std::size_t Request::StreamWrapper::Write( const char *data, std::size_t size )
 {
 	return ::FCGX_PutStr( data, size, m_str ) ;
 }

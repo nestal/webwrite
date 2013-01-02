@@ -144,7 +144,7 @@ bool File::IsOpened() const
 	return m_fd != -1 ;
 }
 
-std::size_t File::Read( void *ptr, std::size_t size )
+std::size_t File::Read( char *ptr, std::size_t size )
 {
 	assert( IsOpened() ) ;
 	ssize_t count = ::read( m_fd, ptr, size ) ;
@@ -159,7 +159,7 @@ std::size_t File::Read( void *ptr, std::size_t size )
 	return count ;
 }
 
-std::size_t File::Write( const void *ptr, std::size_t size )
+std::size_t File::Write( const char *ptr, std::size_t size )
 {
 	assert( IsOpened() ) ;
 	ssize_t count = ::write( m_fd, ptr, size ) ;
@@ -243,6 +243,23 @@ void File::UnMap( void *addr, std::size_t length )
 		) ;
 	}
 #endif
+}
+
+/// \warning This function is very inefficient and should be used in unit test only!
+std::string File::ReadLine( std::size_t max )
+{
+	std::string result ;
+	
+	char byte ;
+	while ( Read( &byte, sizeof(byte) ) == sizeof(byte) )
+	{
+		result.push_back( byte ) ;
+	
+		if ( byte == '\n' )
+			break ;
+	}
+	
+	return result ;
 }
 
 } // end of namespace
