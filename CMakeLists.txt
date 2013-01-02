@@ -46,6 +46,11 @@ if ( BFD_FOUND )
         
 endif ( BFD_FOUND )
 
+add_definitions(
+	-DTEST_DATA="${webwrite_SOURCE_DIR}/test/data/"
+	-DSRC_DIR="${webwrite_SOURCE_DIR}/src"
+)
+
 file (GLOB WEBWRITE_LIB_SRC
 	${OPT_SRC}
     ${webwrite_SOURCE_DIR}/src/util/*.hh

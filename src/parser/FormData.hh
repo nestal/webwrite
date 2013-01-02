@@ -19,10 +19,21 @@
 
 #pragma once
 
+#include "util/FileSystem.hh"
+
 namespace wb {
+
+class DataStream ;
 
 class FormData
 {
+public :
+	FormData( DataStream *in ) ;
+
+	void Save( const fs::path& file ) ;
+	
+private :
+	DataStream *m_in ;
 } ;
 
 } // end of namespace

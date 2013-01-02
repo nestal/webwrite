@@ -18,7 +18,9 @@
 */
 
 #include "FormDataTest.hh"
+
 #include "parser/FormData.hh"
+#include "util/File.hh"
 
 namespace wbut {
 
@@ -30,7 +32,11 @@ FormDataTest::FormDataTest( )
 
 void FormDataTest::Test( )
 {
-	FormData fd ;
+	File form_data( TEST_DATA "test.pdf.form" ) ;
+	FormData subject( &form_data ) ;
+	
+	std::string line = form_data.ReadLine(1000) ;
+	std::cout << line << std::endl ;
 }
 
 } // end of namespace
