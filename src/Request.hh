@@ -24,10 +24,12 @@
 #include "fcgiapp.h"
 
 #include <cstddef>
+#include <memory>
 
 namespace wb {
 
 class Config ;
+class DataStream ;
 
 /*!	\brief HTTP request object
 
@@ -48,10 +50,9 @@ public :
 	std::string Referer() const ;
 	std::string Query() const ;
 	
-	std::size_t Recv( char *data, std::size_t size ) ;
-	std::size_t Send( const char *data, std::size_t size ) ;
-	std::string ReadLine( std::size_t max = 1000 ) ;
-	
+	DataStream* In() ;
+	DataStream* Out() ;
+
 	// templated version of printf
 	std::size_t PrintF( const char *fmt ) ;
 	
@@ -75,6 +76,9 @@ public :
 	
 private :
 	FCGX_Request	*m_req ;
+	
+	class StreamWrapper ;
+	std::auto_ptr<StreamWrapper> m_in, m_out ;
 } ;
 
 template <typename P1>

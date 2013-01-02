@@ -19,6 +19,7 @@
 
 #include "Request.hh"
 
+#include "util/DataStream.hh"
 #include "util/Exception.hh"
 #include "util/File.hh"
 
@@ -28,9 +29,38 @@ namespace wb {
 
 const std::size_t buf_size = 8 * 1024 ;
 
-Request::Request( FCGX_Request *req ) :
-m_req( req )
+class Request::StreamWrapper : public DataStream
 {
+public :
+	explicit StreamWrapper( FCGX_Stream *str ) :
+		m_str( str )
+	{
+	}
+	
+	std::size_t Recv( char *data, std::size_t size ) ;
+	std::size_t Send( const char *data, std::size_t size ) ;
+	std::string ReadLine( std::size_t max ) ;
+
+
+private :
+	FCGX_Stream	*m_str ;
+} ;
+
+Request::Request( FCGX_Request *req ) :
+	m_req( req ),
+	m_in( new StreamWrapper( m_req->in ) ),
+	m_out( new StreamWrapper( m_req->out ) )
+{
+}
+
+DataStream* Request::In()
+{
+	return m_in.get() ;
+}
+
+DataStream* Request::Out()
+{
+	return m_out.get() ;
 }
 
 void Request::XSendFile( const fs::path& file )
@@ -38,14 +68,14 @@ void Request::XSendFile( const fs::path& file )
 	FCGX_FPrintF( m_req->out, "X-Sendfile: %s\r\n\r\n", file.string().c_str() ) ;
 }
 
-std::size_t Request::Recv( char *data, std::size_t size )
+std::size_t Request::StreamWrapper::Recv( char *data, std::size_t size )
 {
-	return ::FCGX_GetStr( data, size, m_req->in ) ;
+	return ::FCGX_GetStr( data, size, m_str ) ;
 }
 
-std::size_t Request::Send( const char *data, std::size_t size )
+std::size_t Request::StreamWrapper::Send( const char *data, std::size_t size )
 {
-	return ::FCGX_PutStr( data, size, m_req->out ) ;
+	return ::FCGX_PutStr( data, size, m_str ) ;
 }
 
 std::string Request::URI() const
@@ -100,10 +130,10 @@ std::string Request::SansQueryURI() const
 	return result ;
 }
 
-std::string Request::ReadLine( std::size_t max )
+std::string Request::StreamWrapper::ReadLine( std::size_t max )
 {
 	std::string result(max, '\0') ;
-	if ( FCGX_GetLine( &result[0], result.size(), m_req->in ) != 0 )
+	if ( FCGX_GetLine( &result[0], result.size(), m_str ) != 0 )
 	{
 		result.resize( std::strlen( result.c_str() ) ) ;
 		return result ;
