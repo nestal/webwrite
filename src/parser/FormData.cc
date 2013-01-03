@@ -21,12 +21,61 @@
 
 #include "util/DataStream.hh"
 
+#include <algorithm>
 #include <cassert>
+#include <cstring>
 #include <string>
 
 #include <iostream>
 
 namespace wb {
+
+class StreamReader
+{
+public :
+	StreamReader( DataStream *in ) : m_in(in), m_ptr(m_buf) {}
+
+	std::size_t ReadUntil( DataStream *out, const std::string& target )
+	{
+		char buf[1024], *ptr = buf;
+
+		while ( true )
+		{
+			std::size_t size = m_in->Read(ptr, sizeof(buf) - (ptr-buf) ) ;
+			if ( size == 0 )
+				break ;
+
+			ptr = buf ;
+
+			const char *r = std::search( ptr, ptr+size, target.begin(), target.end() ) ;
+			out->Write( ptr, r - ptr ) ;
+
+			if ( r != ptr + size )
+			{
+			}
+		}
+	}
+
+	bool Refill()
+	{
+		// already fill, no need to fill
+		if ( CachedSize() == sizeof(m_buf) )
+			return true ;
+
+		std::size_t size = m_in->Read( m_ptr, sizeof(m_buf) - CachedSize() ) ;
+		return size > 0 ;
+	}
+
+	std::size_t CachedSize() const
+	{
+		return m_ptr - m_buf ;
+	}
+
+private :
+	DataStream	*m_in ;
+	char		m_buf[1024] ;
+	char		*m_ptr ;
+} ;
 
 /*!	\brief	initialize the form data
 */
@@ -40,38 +89,16 @@ FormData::FormData( DataStream *in, const std::string& ctype ) :
 
 void FormData::Save( const fs::path& path )
 {
-	std::string line ;
-	do
-	{
-		line = m_in->ReadLine( ) ;
-		std::cout << " >\"" << line << "\"<" << std::endl ;
-		
-	} while ( line != "\r\n" && !line.empty() ) ;
-}
+	char buf[1024], *ptr = buf;
 
-bool FormData::ReadHyphens( DataStream *out )
-{
-	char hyphens[2] = {} ;
-	if ( m_in->GetChar(hyphens[0]) )
+	while ( true )
 	{
-		if ( hyphens[0] != '-' )
-		{
-			out->Write( &hyphens[0], 1 ) ;
-			return false ;
-		}
+		std::size_t size = m_in->Read(ptr, sizeof(buf) - (ptr-buf) ) ;
+		if ( size == 0 )
+			break ;
 
-		if ( m_in->GetChar(hyphens[1]) )
-		{
-			if ( hyphens[1] != '-' )
-			{
-				out->Write( &hyphens[0], sizeof(hyphens) ) ;
-				return false ;
-			}
-			else
-				return true ;
-		}
+		ptr = buf ;
 	}
-	return false ;
 }
 
 } // end of namespace

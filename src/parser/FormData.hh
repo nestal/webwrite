@@ -35,7 +35,7 @@ public :
 	void Save( const fs::path& path ) ;
 
 private :
-	bool ReadHyphens( DataStream *out ) ;
+	static std::size_t ReadUntil( DataStream *out, const std::string& target ) ;
 	
 private :
 	DataStream *m_in ;
