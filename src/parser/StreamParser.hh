@@ -17,41 +17,29 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "FormData.hh"
+#pragma once
 
-#include "util/DataStream.hh"
-
-#include <algorithm>
-#include <cassert>
-#include <cstring>
 #include <string>
-
-#include <iostream>
 
 namespace wb {
 
-/*!	\brief	initialize the form data
-*/
-FormData::FormData( DataStream *in, const std::string& ctype ) :
-	m_in( in )
-{
-	assert( m_in != 0 ) ;
+class DataStream ;
 
+class StreamReader
+{
+public :
+	explicit StreamReader( DataStream *in ) ;
+
+	std::size_t ReadUntil( DataStream *out, const std::string& target ) ;
 	
-}
-
-void FormData::Save( const fs::path& path )
-{
-	char buf[1024], *ptr = buf;
-
-	while ( true )
-	{
-		std::size_t size = m_in->Read(ptr, sizeof(buf) - (ptr-buf) ) ;
-		if ( size == 0 )
-			break ;
-
-		ptr = buf ;
-	}
-}
+	bool Refill() ;
+	std::size_t Size() const ;
+	std::size_t Capacity() const ;
+	
+private :
+	DataStream	*m_in ;
+	char		m_cache[1024] ;
+	char		*m_end ;
+} ;
 
 } // end of namespace

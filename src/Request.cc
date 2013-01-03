@@ -24,6 +24,7 @@
 #include "util/File.hh"
 
 #include <iostream>
+#include <cstdio>
 
 namespace wb {
 
