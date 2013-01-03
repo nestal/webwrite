@@ -20,6 +20,7 @@
 #include <cppunit/ui/text/TestRunner.h>
 
 #include "parser/FormDataTest.hh"
+#include "parser/StreamParserTest.hh"
 
 int main( int argc, char **argv )
 {
@@ -27,6 +28,7 @@ int main( int argc, char **argv )
 
 	CppUnit::TextUi::TestRunner runner;
 	runner.addTest( FormDataTest::suite() ) ;
+	runner.addTest( StreamParserTest::suite() ) ;
 	
 	// run the test cases!
 	runner.run();

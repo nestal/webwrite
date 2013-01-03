@@ -17,29 +17,36 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#pragma once
+#include "StreamParserTest.hh"
+#include "Assert.hh"
 
-#include <string>
+#include "parser/StreamParser.hh"
+#include "util/StringStream.hh"
 
-namespace wb {
+namespace wbut {
 
-class DataStream ;
+using namespace wb ;
 
-class StreamParser
+StreamParserTest::StreamParserTest( )
 {
-public :
-	explicit StreamParser( DataStream *in ) ;
+}
 
-	std::size_t ReadUntil( const std::string& target, DataStream *out ) ;
+void StreamParserTest::Test( )
+{
+	StringStream input( "line 1\r\nline 2--something--\r\n" ), output ;
+	StreamParser subject( &input ) ;
 	
-	bool Refill() ;
-	std::size_t Size() const ;
-	std::size_t Capacity() const ;
+	WBUT_ASSERT_EQUAL( subject.ReadUntil( "\r\n", &output ), sizeof("line 1\r\n")-1 ) ;
+	WBUT_ASSERT_EQUAL( output.Str(), "line 1" ) ;
+
+	output.Str("") ;
 	
-private :
-	DataStream	*m_in ;
-	char		m_cache[1024] ;
-	char		*m_end ;
-} ;
+	WBUT_ASSERT_EQUAL(
+		subject.ReadUntil( "--something--", &output ),
+		sizeof("line 2--something--")-1 ) ;
+		
+	WBUT_ASSERT_EQUAL( output.Str(), "line 2" ) ;
+
+}
 
 } // end of namespace

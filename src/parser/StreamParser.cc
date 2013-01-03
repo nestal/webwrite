@@ -27,14 +27,14 @@
 
 namespace wb {
 
-StreamReader::StreamReader( DataStream *in ) :
+StreamParser::StreamParser( DataStream *in ) :
 	m_in(in),
 	m_end(m_cache)
 {
 	assert( in != 0 ) ;
 }
 
-std::size_t StreamReader::ReadUntil( DataStream *out, const std::string& target )
+std::size_t StreamParser::ReadUntil( const std::string& target, DataStream *out )
 {
 	std::size_t skipped = 0 ;
 	
@@ -72,7 +72,7 @@ std::size_t StreamReader::ReadUntil( DataStream *out, const std::string& target 
 }
 
 ///	tries to read more data from input and fill the cache.
-bool StreamReader::Refill()
+bool StreamParser::Refill()
 {
 	// already fill, no need to fill
 	if ( Size() == Capacity() )
@@ -84,12 +84,12 @@ bool StreamReader::Refill()
 }
 
 ///	returns the number of bytes stored in the cache
-std::size_t StreamReader::Size() const
+std::size_t StreamParser::Size() const
 {
 	return m_end - m_cache ;
 }
 
-std::size_t StreamReader::Capacity() const
+std::size_t StreamParser::Capacity() const
 {
 	return sizeof(m_cache) ;
 }

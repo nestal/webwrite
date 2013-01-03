@@ -1,5 +1,5 @@
 /*
-	webwrite: an GPL wiki-like website with in-place editing
+	webwrite: an GPL program to sync a local directory with Google Drive
 	Copyright (C) 2012  Wan Wai Ho
 
 	This program is free software; you can redistribute it and/or
@@ -19,27 +19,27 @@
 
 #pragma once
 
+#include "DataStream.hh"
+
 #include <string>
 
 namespace wb {
 
-class DataStream ;
-
-class StreamParser
+/*!	\brief	encapsulations of data streams. Useful for unit tests.
+*/
+class StringStream : public DataStream
 {
 public :
-	explicit StreamParser( DataStream *in ) ;
+	explicit StringStream( const std::string& init = std::string() ) ;
 
-	std::size_t ReadUntil( const std::string& target, DataStream *out ) ;
-	
-	bool Refill() ;
-	std::size_t Size() const ;
-	std::size_t Capacity() const ;
+	std::size_t Read( char *data, std::size_t size ) ;
+	std::size_t Write( const char *data, std::size_t size ) ;
+
+	const std::string& Str() const ;
+	void Str( const std::string& str ) ;
 	
 private :
-	DataStream	*m_in ;
-	char		m_cache[1024] ;
-	char		*m_end ;
+	std::string	m_str ;
 } ;
 
 } // end of namespace

@@ -19,27 +19,23 @@
 
 #pragma once
 
-#include <string>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
 
-namespace wb {
+namespace wbut {
 
-class DataStream ;
-
-class StreamParser
+class StreamParserTest : public CppUnit::TestFixture
 {
 public :
-	explicit StreamParser( DataStream *in ) ;
+	StreamParserTest( ) ;
 
-	std::size_t ReadUntil( const std::string& target, DataStream *out ) ;
-	
-	bool Refill() ;
-	std::size_t Size() const ;
-	std::size_t Capacity() const ;
-	
+	// declare suit function
+	CPPUNIT_TEST_SUITE( StreamParserTest ) ;
+		CPPUNIT_TEST( Test ) ;
+	CPPUNIT_TEST_SUITE_END();
+
 private :
-	DataStream	*m_in ;
-	char		m_cache[1024] ;
-	char		*m_end ;
+	void Test( ) ;
 } ;
 
 } // end of namespace

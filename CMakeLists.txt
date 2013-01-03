@@ -34,6 +34,7 @@ include_directories(
 	${Boost_INCLUDE_DIR}
 	${FCGI_INCLUDE_DIR}
 	${webwrite_SOURCE_DIR}/src
+	${webwrite_SOURCE_DIR}/test
 )
 
 # build bfd classes if libbfd is found
