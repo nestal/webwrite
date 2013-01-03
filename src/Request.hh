@@ -40,6 +40,7 @@ class Request
 {
 public :
 	explicit Request( FCGX_Request *req ) ;
+	~Request() ;
 
 	bool IsPost() const ;
 	
@@ -49,6 +50,7 @@ public :
 	std::string Method() const ;
 	std::string Referer() const ;
 	std::string Query() const ;
+	std::string ContentType() const ;
 	
 	DataStream* In() ;
 	DataStream* Out() ;

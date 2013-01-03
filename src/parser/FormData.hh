@@ -25,12 +25,17 @@ namespace wb {
 
 class DataStream ;
 
+/*!	\brief	HTTP multi-part form data. Defined in RFC2388.
+*/
 class FormData
 {
 public :
-	FormData( DataStream *in ) ;
+	FormData( DataStream *in, const std::string& ctype ) ;
 
-	void Save( const fs::path& file ) ;
+	void Save( const fs::path& path ) ;
+
+private :
+	bool ReadHyphens( DataStream *out ) ;
 	
 private :
 	DataStream *m_in ;

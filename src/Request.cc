@@ -40,7 +40,7 @@ public :
 	std::size_t Read( char *data, std::size_t size ) ;
 	std::string ReadLine( std::size_t max ) ;
 	std::size_t Write( const char *data, std::size_t size ) ;
-
+	bool GetChar( char& ch ) ;
 
 private :
 	FCGX_Stream	*m_str ;
@@ -50,6 +50,10 @@ Request::Request( FCGX_Request *req ) :
 	m_req( req ),
 	m_in( new StreamWrapper( m_req->in ) ),
 	m_out( new StreamWrapper( m_req->out ) )
+{
+}
+
+Request::~Request()
 {
 }
 
@@ -78,6 +82,14 @@ std::size_t Request::StreamWrapper::Write( const char *data, std::size_t size )
 	return ::FCGX_PutStr( data, size, m_str ) ;
 }
 
+bool Request::StreamWrapper::GetChar( char& result )
+{
+	int ch = ::FCGX_GetChar( m_str ) ;
+	if ( ch != EOF )
+		result = static_cast<char>(ch) ;
+	return ch != EOF ;
+}
+
 std::string Request::URI() const
 {
 	return ::FCGX_GetParam( "REQUEST_URI", m_req->envp ) ;
@@ -102,6 +114,11 @@ std::string Request::Referer() const
 std::string Request::Query() const
 {
 	return ::FCGX_GetParam( "QUERY_STRING", m_req->envp ) ;
+}
+
+std::string Request::ContentType() const
+{
+	return ::FCGX_GetParam( "CONTENT_TYPE", m_req->envp ) ;
 }
 
 std::size_t Request::PrintF( const char *fmt )

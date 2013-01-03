@@ -22,17 +22,56 @@
 #include "util/DataStream.hh"
 
 #include <cassert>
+#include <string>
+
+#include <iostream>
 
 namespace wb {
 
-FormData::FormData( DataStream *in ) :
+/*!	\brief	initialize the form data
+*/
+FormData::FormData( DataStream *in, const std::string& ctype ) :
 	m_in( in )
 {
 	assert( m_in != 0 ) ;
+
+	
 }
 
-void FormData::Save( const fs::path& file )
+void FormData::Save( const fs::path& path )
 {
+	std::string line ;
+	do
+	{
+		line = m_in->ReadLine( ) ;
+		std::cout << " >\"" << line << "\"<" << std::endl ;
+		
+	} while ( line != "\r\n" && !line.empty() ) ;
+}
+
+bool FormData::ReadHyphens( DataStream *out )
+{
+	char hyphens[2] = {} ;
+	if ( m_in->GetChar(hyphens[0]) )
+	{
+		if ( hyphens[0] != '-' )
+		{
+			out->Write( &hyphens[0], 1 ) ;
+			return false ;
+		}
+
+		if ( m_in->GetChar(hyphens[1]) )
+		{
+			if ( hyphens[1] != '-' )
+			{
+				out->Write( &hyphens[0], sizeof(hyphens) ) ;
+				return false ;
+			}
+			else
+				return true ;
+		}
+	}
+	return false ;
 }
 
 } // end of namespace

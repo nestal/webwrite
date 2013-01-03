@@ -34,6 +34,7 @@ public :
 	virtual std::size_t Read( char *data, std::size_t size ) = 0 ;
 	virtual std::string ReadLine( std::size_t max = 1000 ) = 0 ;
 	virtual std::size_t Write( const char *data, std::size_t size ) = 0 ;
+	virtual bool GetChar( char& ch ) = 0 ;
 } ;
 
 } // end of namespace

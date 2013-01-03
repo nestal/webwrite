@@ -266,4 +266,9 @@ std::string File::ReadLine( std::size_t max )
 	return result ;
 }
 
+bool File::GetChar( char& ch )
+{
+	return Read( &ch, sizeof(ch) ) == sizeof(ch) ;
+}
+
 } // end of namespace

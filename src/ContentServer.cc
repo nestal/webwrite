@@ -22,6 +22,7 @@
 #include "Request.hh"
 #include "Resource.hh"
 #include "util/DataStream.hh"
+#include "parser/FormData.hh"
 
 #include "util/File.hh"
 
@@ -54,13 +55,10 @@ std::cout << "writing to " << file << std::endl ;
 	
 	if ( req->Method() == "POST" && req->Query() == "upload" )
 	{
-		std::string line ;
-		do
-		{
-			line = req->In()->ReadLine( ) ;
-			std::cout << " >\"" << line << "\"<" << std::endl ;
-		
-		} while ( line != "\r\n" && !line.empty() ) ;
+std::cout << req->ContentType() << std::endl ;
+
+		FormData form( req->In(), req->ContentType() ) ;
+		form.Save( res.Path() ) ;
 	}
 	
 	else if ( req->Method() == "GET" && req->Query() == "load" )
