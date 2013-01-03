@@ -233,7 +233,7 @@ template <>
 bool Json::Is<bool>() const
 {
 	assert( m_json != 0 ) ;
-	return ::json_object_is_type( m_json, json_type_boolean ) ;
+	return ::json_object_is_type( m_json, json_type_boolean ) == TRUE ;
 }
 
 std::string Json::Str() const
@@ -246,7 +246,7 @@ template <>
 bool Json::Is<std::string>() const
 {
 	assert( m_json != 0 ) ;
-	return ::json_object_is_type( m_json, json_type_string ) ;
+	return ::json_object_is_type( m_json, json_type_string ) == TRUE ;
 }
 
 int Json::Int() const
@@ -259,7 +259,7 @@ template <>
 bool Json::Is<int>() const
 {
 	assert( m_json != 0 ) ;
-	return ::json_object_is_type( m_json, json_type_int ) ;
+	return ::json_object_is_type( m_json, json_type_int ) == TRUE ;
 }
 
 std::ostream& operator<<( std::ostream& os, const Json& json )
@@ -296,7 +296,7 @@ template <>
 bool Json::Is<Json::Object>() const
 {
 	assert( m_json != 0 ) ;
-	return ::json_object_is_type( m_json, json_type_object ) ;
+	return ::json_object_is_type( m_json, json_type_object ) == TRUE ;
 }
 
 Json::Array Json::AsArray() const
@@ -314,7 +314,7 @@ template <>
 bool Json::Is<Json::Array>() const
 {
 	assert( m_json != 0 ) ;
-	return ::json_object_is_type( m_json, json_type_array ) ;
+	return ::json_object_is_type( m_json, json_type_array ) == TRUE ;
 }
 
 Json Json::FindInArray( const std::string& key, const std::string& value ) const

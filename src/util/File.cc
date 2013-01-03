@@ -127,7 +127,11 @@ void File::OpenForRead( const fs::path& path )
 
 void File::OpenForWrite( const fs::path& path, int mode )
 {
-	Open( path, O_CREAT|O_RDWR|O_TRUNC, mode ) ;
+	int flags = O_CREAT|O_RDWR|O_TRUNC ;
+#ifdef WIN32
+	flags |= O_BINARY ;
+#endif
+	Open( path, flags, mode ) ;
 }
 
 void File::Close()
