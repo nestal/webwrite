@@ -38,7 +38,7 @@ public :
 	
 private :
 	DataStream	*m_in ;
-	char		m_cache[1024] ;
+	char		m_cache[80] ;
 	char		*m_end ;
 } ;
 

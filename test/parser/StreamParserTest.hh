@@ -31,11 +31,13 @@ public :
 
 	// declare suit function
 	CPPUNIT_TEST_SUITE( StreamParserTest ) ;
-		CPPUNIT_TEST( Test ) ;
+		CPPUNIT_TEST( TestString ) ;
+		CPPUNIT_TEST( TestFile ) ;
 	CPPUNIT_TEST_SUITE_END();
 
 private :
-	void Test( ) ;
+	void TestString( ) ;
+	void TestFile( ) ;
 } ;
 
 } // end of namespace

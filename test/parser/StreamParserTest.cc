@@ -22,6 +22,7 @@
 
 #include "parser/StreamParser.hh"
 #include "util/StringStream.hh"
+#include "util/File.hh"
 
 namespace wbut {
 
@@ -31,12 +32,12 @@ StreamParserTest::StreamParserTest( )
 {
 }
 
-void StreamParserTest::Test( )
+void StreamParserTest::TestString( )
 {
-	StringStream input( "line 1\r\nline 2--something--\r\n" ), output ;
+	StringStream input( "line 1$#line 2--something--???###" ), output ;
 	StreamParser subject( &input ) ;
 	
-	WBUT_ASSERT_EQUAL( subject.ReadUntil( "\r\n", &output ), sizeof("line 1\r\n")-1 ) ;
+	WBUT_ASSERT_EQUAL( subject.ReadUntil( "$#", &output ), sizeof("line 1$#")-1 ) ;
 	WBUT_ASSERT_EQUAL( output.Str(), "line 1" ) ;
 
 	output.Str("") ;
@@ -47,6 +48,31 @@ void StreamParserTest::Test( )
 		
 	WBUT_ASSERT_EQUAL( output.Str(), "line 2" ) ;
 
+}
+
+void StreamParserTest::TestFile( )
+{
+	File input( TEST_DATA "textures.form" ) ;
+	StringStream output ;
+	
+	StreamParser subject( &input ) ;
+	
+	std::string boundary( "-----------------------------11351845291583120309948566114" ) ;
+	WBUT_ASSERT_EQUAL( subject.ReadUntil( "\r\n", &output ), boundary.size() + 2 ) ;
+	WBUT_ASSERT_EQUAL( output.Str(), boundary ) ;
+	
+	// skip content-disposition. too long to check
+	output.Str("") ;
+	subject.ReadUntil( "\r\n", &output ) ;
+	
+	// content-type
+	output.Str("") ;
+	subject.ReadUntil( "\r\n\r\n", &output ) ;
+	WBUT_ASSERT_EQUAL( output.Str(), "Content-Type: image/jpeg" ) ;
+	
+	// extract the file
+	File first( "brick.jpg", 0600 ) ;
+	subject.ReadUntil( "\r\n" + boundary, &first ) ;
 }
 
 } // end of namespace

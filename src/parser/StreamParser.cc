@@ -25,6 +25,8 @@
 #include <cassert>
 #include <cstring>
 
+#include <iostream>
+
 namespace wb {
 
 StreamParser::StreamParser( DataStream *in ) :
@@ -36,37 +38,69 @@ StreamParser::StreamParser( DataStream *in ) :
 
 std::size_t StreamParser::ReadUntil( const std::string& target, DataStream *out )
 {
-	std::size_t skipped = 0 ;
+	assert( !target.empty() ) ;
+	assert( Capacity() >= target.size() ) ;
+
+	std::size_t total = 0 ;
 	
 	while ( true )
 	{
 		// no more input, nothing we can do
 		if ( Size() == 0 && !Refill() )
-			return skipped ;
+			return total ;
 
-		const char *r = std::search( m_cache, m_end, target.begin(), target.end() ) ;
+		// if Refill() returns true there must be some bytes here
+		assert( Size() > 0 ) ;
 		
+		const char *r = std::find( m_cache, m_end, target[0] ) ;
+
 		// no matter we found the target or not, we should write the skipped bytes
 		// to output
-		out->Write( m_cache, r - m_cache ) ;
-		skipped += (r - m_cache) ;
+		std::size_t skipped = r - m_cache ;
+// std::cout << "writing: \"" << std::string( m_cache, skipped ) << "\"" << std::endl ;
+		out->Write( m_cache, skipped ) ;
+		total += skipped ;
 
 		// not found... try again
 		if ( r == m_end )
 			m_end = m_cache ;
 		
-		// found! now r points to the chars which is exactly equal to target
+		// found! now see if "r" really points to the chars which is exactly equal to target
 		else
 		{
-			assert( std::string( r, target.size() ) == target ) ;
-			skipped += target.size() ;
-			
-			const char *next	= r + target.size() ;
-			std::size_t remain	= Capacity() - (next - m_cache) ;
-			std::memmove( m_cache, next, remain ) ;
+			std::size_t remain	= Size() - skipped ;
+
+// std::cout << "before move: m_cache = \"" << std::string( m_cache, m_end ) << "\" remain = " << remain << std::endl ;
+			std::memmove( m_cache, r, remain ) ;
 			m_end = m_cache + remain ;
+// std::cout << "m_cache = \"" << std::string( m_cache, m_end ) << "\"" << std::endl ;
+
+			Refill() ;
+// std::cout << "filled: m_cache = \"" << std::string( m_cache, m_end ) << "\"" << std::endl ;
 			
-			return skipped ;
+			assert( m_cache[0] == target[0] ) ;
+			r = std::search( m_cache, m_end, target.begin(), target.end() ) ;
+			std::size_t skipped = r - m_cache ;
+// std::cout << "writing2: \"" << std::string( m_cache, skipped ) << "\"" << std::endl ;
+			out->Write( m_cache, skipped ) ;
+			total += skipped ;
+			
+			if ( r == m_end )
+				m_end = m_cache ;
+			
+			else
+			{
+// std::cout << "found! " << target.size() << " bytes" << std::endl ;
+				const char *next = r + target.size() ;
+				remain = Size() - (next - m_cache) ;
+
+				std::memmove( m_cache, next, remain ) ;
+				total += target.size() ;
+				m_end  = m_cache + remain ;
+// std::cout << "found m_cache = \"" << std::string( m_cache, m_end ) << "\"" << std::endl ;
+				
+				return total ;
+			}
 		}
 	}
 }

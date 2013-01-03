@@ -89,7 +89,7 @@ namespace wbut {
 	                       CPPUNIT_SOURCELINE(),	\
 	                       "["#actualFirst","#actualLast") == "#expectFirst) )
 
-#define WBUT_ASSERT_EQUAL(expected, actual)	\
+#define WBUT_ASSERT_EQUAL(actual, expected)		\
   ( wbut::AssertEquals( (expected),				\
                        (actual),				\
                        CPPUNIT_SOURCELINE(),	\
