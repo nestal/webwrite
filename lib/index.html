@@ -1,7 +1,26 @@
+<!--
+	webwrite: an GPL wiki-like website with in-place editing
+	Copyright (C) 2012  Wan Wai Ho
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation version 2
+	of the License.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+
 <html>
 <head>
-	<meta charset="utf-8" />
-		
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
 	<title>Editor</title>
 	
 	<!-- Load jQuery -->
@@ -12,17 +31,17 @@
 	
 	<!-- load the jQuery and require.js libraries -->
 	<script type="text/javascript" src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
-	<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"></link>
 
 	<script type="text/javascript" src="http://xing.github.com/wysihtml5/parser_rules/advanced.js"></script>
 	<script type="text/javascript" src="http://xing.github.com/wysihtml5/dist/wysihtml5-0.3.0.js"></script>
 	
   <!-- our own script and stylesheet -->
 	<script type="text/javascript" src="_webwrite.js"></script>
-  <link href="_webwrite.css" rel="stylesheet" text="text/css" />
+  <link href="_webwrite.css" rel="stylesheet" type="text/css"></link>
 
   <script type="text/javascript">
-  $(document).ready( OnLoad ) ;
+    $(document).ready( main ) ;
   </script>
 
 </head>
@@ -35,42 +54,42 @@
     </ul>
   </div>
   <div class="right col">
-	<div class="header row">
-		<div id="rich_toolbar" style="display: none;">
-			<button id="save_button">Save</button>
-			<button id="switch_button">Toggle HTML</button>
+	  <div class="header row">
+		  <div id="rich_toolbar" style="display: none;">
+			  <button id="save_button">Save</button>
+			  <button id="switch_button">Toggle HTML</button>
 					
-			<button id="bold_button"><b>B</b></button>
-			<button id="italic_button"><em>I</em></button>
+			  <button id="bold_button"><b>B</b></button>
+			  <button id="italic_button"><em>I</em></button>
 			
-			<button id="h1_button">H1</button>
-			<button id="h2_button">H2</button>
-			<button id="h3_button">H3</button>
-			<button id="h4_button">H4</button>
+			  <button id="h1_button">H1</button>
+			  <button id="h2_button">H2</button>
+			  <button id="h3_button">H3</button>
+			  <button id="h4_button">H4</button>
 			
-			<button id="ordered_list_button">1.</button>
-			<button id="unordered_list_button">&bull;</button>
+			  <button id="ordered_list_button">1.</button>
+			  <button id="unordered_list_button">&bull;</button>
 			
-			<!-- Some wysihtml5 commands like 'createLink' require extra paramaters specified by the user (eg. href) -->
-			<button class="make_button" data-wysihtml5-command="createLink">insert link</button>
-			<div data-wysihtml5-dialog="createLink" style="display: none;">
-				<label>
-					Link:
-					<input data-wysihtml5-dialog-field="href" value="http://" class="text">
-				</label>
-				<button class="make_button" data-wysihtml5-dialog-action="save">OK</button>
-				<button class="make_button" data-wysihtml5-dialog-action="cancel">Cancel</button>
-			</div>
-		</div>
-	</div>
+			  <!-- Some wysihtml5 commands like 'createLink' require extra paramaters specified by the user (eg. href) -->
+			  <button class="make_button" data-wysihtml5-command="createLink">insert link</button>
+			  <div data-wysihtml5-dialog="createLink" style="display: none;">
+				  <label>
+					  Link:
+					  <input data-wysihtml5-dialog-field="href" value="http://" class="text">
+				  </label>
+				  <button class="make_button" data-wysihtml5-dialog-action="save">OK</button>
+				  <button class="make_button" data-wysihtml5-dialog-action="cancel">Cancel</button>
+			  </div>
+		  </div>
+	  </div>
 
-	<div class="body row scroll-y">
-		<textarea id="rich_editor" class="rich editor"></textarea>
-	</div>
+	  <div class="body row scroll-y">
+		  <textarea id="rich_editor" class="rich editor"></textarea>
+	  </div>
 
-	<div class="footer row">
-		<div id="drop"></div>
-	</div>
+	  <div class="footer row">
+		  <div id="drop"></div>
+	  </div>
   </div>
 </body>
 </html>
