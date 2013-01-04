@@ -19,11 +19,11 @@
 
 #include "FormData.hh"
 
-#include "util/DataStream.hh"
+#include "parser/StreamParser.hh"
+#include "util/File.hh"
+#include "util/StringStream.hh"
 
-#include <algorithm>
 #include <cassert>
-#include <cstring>
 #include <string>
 
 #include <iostream>
@@ -36,22 +36,23 @@ FormData::FormData( DataStream *in, const std::string& ctype ) :
 	m_in( in )
 {
 	assert( m_in != 0 ) ;
-
-	
 }
 
 void FormData::Save( const fs::path& path )
 {
-	char buf[1024], *ptr = buf;
+	StreamParser p( m_in ) ;
 
-	while ( true )
-	{
-		std::size_t size = m_in->Read(ptr, sizeof(buf) - (ptr-buf) ) ;
-		if ( size == 0 )
-			break ;
+	StringStream boundary ;
+	p.ReadUntil( "\r\n", &boundary ) ;
+std::cout << "boundary = " << boundary.Str() << std::endl ;
 
-		ptr = buf ;
-	}
+	StringStream headers ;
+	p.ReadUntil( "\r\n\r\n", &headers ) ;
+std::cout << "headers = " << headers.Str() << std::endl ;
+
+std::cout << "saving to : " << (path / "outfile.jpg" ) << std::endl ;
+	File f( path / "outfile.jpg", 0600 ) ;
+	p.ReadUntil( "\r\n" + boundary.Str(), &f ) ;
 }
 
 } // end of namespace

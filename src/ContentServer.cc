@@ -58,7 +58,7 @@ std::cout << "writing to " << file << std::endl ;
 std::cout << req->ContentType() << std::endl ;
 
 		FormData form( req->In(), req->ContentType() ) ;
-		form.Save( res.Path() ) ;
+		form.Save( res.ContentPath().parent_path() ) ;
 	}
 	
 	else if ( req->Method() == "GET" && req->Query() == "load" )
