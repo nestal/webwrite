@@ -28,15 +28,17 @@ namespace wbut {
 	template <typename T1, typename T2>
 	void AssertEquals(
 		const T1&				expected,
+		const std::string&		expected_str,
 		const T2& 				actual,
+		const std::string&		actual_str,
 		CPPUNIT_NS::SourceLine	sourceLine,
 		const std::string&		message )
 	{
 		if ( expected != actual )
 		{
 			CPPUNIT_NS::Asserter::failNotEqual(
-				CPPUNIT_NS::assertion_traits<T1>::toString(expected),
-				CPPUNIT_NS::assertion_traits<T2>::toString(actual),
+				CPPUNIT_NS::assertion_traits<T1>::toString(expected) + "\t(" + expected_str + ")",
+				CPPUNIT_NS::assertion_traits<T2>::toString(actual)   + "\t(" + actual_str + ")",
 				sourceLine,
 				message );
 		}
@@ -69,13 +71,17 @@ namespace wbut {
 	
 	inline void AssertEquals(
 		const std::wstring&		expected,
+		const std::string&		expected_str,
 		const std::wstring& 	actual,
+		const std::string&		actual_str,
 		CPPUNIT_NS::SourceLine	sourceLine,
 		const std::string&		message )
 	{
 		AssertEquals(
 			std::string(expected.begin(), expected.end() ),
+			expected_str,
 			std::string(actual.begin(), actual.end() ),
+			actual_str,
 			sourceLine,
 			message ) ;
 	}
@@ -91,8 +97,10 @@ namespace wbut {
 
 #define WBUT_ASSERT_EQUAL(actual, expected)		\
   ( wbut::AssertEquals( (expected),				\
-                       (actual),				\
-                       CPPUNIT_SOURCELINE(),	\
+                       (#expected),				\
+					   (actual),				\
+                       (#actual),				\
+					   CPPUNIT_SOURCELINE(),	\
                        #actual" == "#expected) )
 
 #define WBUT_ASSERT_NULL(actual)				\
