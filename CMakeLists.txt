@@ -81,6 +81,7 @@ install(TARGETS webwrite RUNTIME DESTINATION bin)
 
 IF ( CPPUNIT_FOUND )
 	message("-- Building unit tests")
+	include_directories( ${CPPUNIT_INCLUDE_DIR} )
     
     # list of test source files here
 	file(GLOB TEST_SRC
