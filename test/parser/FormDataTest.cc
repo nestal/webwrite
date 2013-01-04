@@ -33,7 +33,7 @@ FormDataTest::FormDataTest( )
 void FormDataTest::Test( )
 {
 	File form_data( TEST_DATA "test.pdf.form" ) ;
-	FormData subject( &form_data, "" ) ;
+	FormData subject( &form_data, "multipart/form-data; boundary=---------------------------272731879216193" ) ;
 	
 	std::string line = form_data.ReadLine(1000) ;
 	std::cout << line << std::endl ;

@@ -20,6 +20,7 @@
 #pragma once
 
 #include "util/FileSystem.hh"
+#include <string>
 
 namespace wb {
 
@@ -38,7 +39,8 @@ private :
 	static std::size_t ReadUntil( DataStream *out, const std::string& target ) ;
 	
 private :
-	DataStream *m_in ;
+	DataStream	*m_in ;
+	std::string	m_boundary ;
 } ;
 
 } // end of namespace

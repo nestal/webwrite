@@ -23,6 +23,8 @@
 #include "util/File.hh"
 #include "util/StringStream.hh"
 
+#include <boost/regex.hpp>
+
 #include <cassert>
 #include <string>
 
@@ -36,6 +38,11 @@ FormData::FormData( DataStream *in, const std::string& ctype ) :
 	m_in( in )
 {
 	assert( m_in != 0 ) ;
+	
+	static const boost::regex e( ".*; *boundary=(.+)" ) ;
+	boost::smatch m ;
+	if ( boost::regex_match( ctype.begin(), ctype.end(), m, e ) )
+		m_boundary = m[1] ;
 }
 
 void FormData::Save( const fs::path& path )
