@@ -21,7 +21,12 @@ project( webwrite )
 cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-set(Boost_USE_STATIC_LIBS 1)
+set(Boost_USE_MULTITHREADED ON )
+
+# don't use shared library in win32
+if ( WIN32 )
+	set(Boost_USE_STATIC_LIBS 	1)
+endif ( WIN32 )
 
 find_package(Boost COMPONENTS filesystem system regex REQUIRED)
 find_package(JSONC REQUIRED)
@@ -59,9 +64,12 @@ file (GLOB WEBWRITE_LIB_SRC
     ${webwrite_SOURCE_DIR}/src/parser/*.cc
 )
 
-file (GLOB WEBWRITE_SRC
+add_library( wb_core
 	${WEBWRITE_LIB_SRC}
-    ${webwrite_SOURCE_DIR}/src/*.hh
+)
+
+file (GLOB WEBWRITE_SRC
+	${webwrite_SOURCE_DIR}/src/*.hh
     ${webwrite_SOURCE_DIR}/src/*.cc
 )
 
@@ -70,6 +78,7 @@ add_executable( webwrite
 )
 
 target_link_libraries( webwrite
+	wb_core
 	${OPT_LIBS}
 	${Boost_LIBRARIES}
 	${JSONC_LIBRARY}
@@ -77,9 +86,8 @@ target_link_libraries( webwrite
 )
 
 install(TARGETS webwrite RUNTIME DESTINATION bin)
-#install(FILES doc/grive.1 DESTINATION share/man/man1 )
 
-IF ( CPPUNIT_FOUND )
+if ( CPPUNIT_FOUND )
 	message("-- Building unit tests")
 	include_directories( ${CPPUNIT_INCLUDE_DIR} )
     
@@ -87,7 +95,6 @@ IF ( CPPUNIT_FOUND )
 	file(GLOB TEST_SRC
 		test/*.cc
 		test/parser/*.cc
-		src/parser/*.cc
 	)
 
 	add_executable( unittest
@@ -97,10 +104,11 @@ IF ( CPPUNIT_FOUND )
 	)
 
 	target_link_libraries( unittest
+		wb_core
 		${CPPUNIT_LIBRARY}
 		${JSONC_LIBRARY}
 		${Boost_LIBRARIES}
 		${OPT_LIBS}
 	)
         
-ENDIF ( CPPUNIT_FOUND )
+endif ( CPPUNIT_FOUND )
