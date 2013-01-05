@@ -31,11 +31,14 @@ public :
 	explicit StreamParser( DataStream *in ) ;
 
 	std::size_t ReadUntil( const std::string& target, DataStream *out ) ;
+	std::size_t ReadUntil( char target, DataStream *out ) ;
+	std::size_t Read( std::size_t count, DataStream *out = 0 ) ;
+	std::size_t Consume( std::size_t count, DataStream *out = 0 ) ;
 	
 	bool Refill() ;
 	std::size_t Size() const ;
 	std::size_t Capacity() const ;
-	
+
 private :
 	DataStream	*m_in ;
 	char		m_cache[80] ;

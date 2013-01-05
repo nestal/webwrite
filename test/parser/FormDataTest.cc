@@ -34,17 +34,10 @@ FormDataTest::FormDataTest( )
 
 void FormDataTest::Test( )
 {
-	try
-	{
-		File form_data( TEST_DATA "test.pdf.form" ) ;
-		FormData subject( &form_data, "multipart/form-data; boundary="
-			"---------------------------101378736882613805899358823" ) ;
-		subject.Save( "./" ) ;
-	}
-	catch ( Exception& e )
-	{
-		std::cout << boost::diagnostic_information( e ) << std::endl ;
-	}
+	File form_data( TEST_DATA "test.pdf.form" ) ;
+	FormData subject( &form_data, "multipart/form-data; boundary="
+		"---------------------------101378736882613805899358823" ) ;
+	subject.Save( "./" ) ;
 }
 
 } // end of namespace

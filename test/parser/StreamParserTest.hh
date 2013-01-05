@@ -31,11 +31,15 @@ public :
 
 	// declare suit function
 	CPPUNIT_TEST_SUITE( StreamParserTest ) ;
+		CPPUNIT_TEST( TestConsume ) ;
+		CPPUNIT_TEST( TestChar ) ;
 		CPPUNIT_TEST( TestString ) ;
 		CPPUNIT_TEST( TestFile ) ;
 	CPPUNIT_TEST_SUITE_END();
 
 private :
+	void TestConsume( ) ;
+	void TestChar( ) ;
 	void TestString( ) ;
 	void TestFile( ) ;
 } ;

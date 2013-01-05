@@ -36,6 +36,68 @@ StreamParser::StreamParser( DataStream *in ) :
 	assert( in != 0 ) ;
 }
 
+std::size_t StreamParser::Read( std::size_t count, DataStream *out )
+{
+	std::size_t total = 0 ;
+	while ( Size() < count && Refill() )
+	{
+		if ( out != 0 )
+			out->Write( m_cache, Size() ) ;
+		
+		total += Size() ; 
+		m_end = m_cache ;
+	}
+	
+	total += Consume( count, out ) ;
+	return total ;
+}
+
+std::size_t StreamParser::Consume( std::size_t count, DataStream *out )
+{
+	if ( Size() < count )
+		Refill() ;
+
+	std::size_t actual = std::min( Size(), count ) ;
+
+	if ( out != 0 )
+		out->Write( m_cache, actual ) ;
+	
+	std::size_t remain	= Size() - actual ;
+
+	std::memmove( m_cache, m_cache + actual, remain ) ;
+	m_end = m_cache + remain ;
+	
+	return actual ;
+}
+
+std::size_t StreamParser::ReadUntil( char target, DataStream *out )
+{
+	std::size_t total = 0 ;
+
+	while ( true )
+	{
+		// no more input, nothing we can do
+		if ( Size() == 0 && !Refill() )
+			return total ;
+
+		// if Refill() returns true there must be some bytes here
+		assert( Size() > 0 ) ;
+		
+		const char *r = std::find( m_cache, m_end, target ) ;
+		bool found = ( r != m_end ) ;
+		
+		// no matter we found the target or not, we should write the skipped bytes
+		// to output
+		total += Consume( r - m_cache, out ) ;
+
+		// found! now see if "r" really points to the target char
+		if ( found )
+			break ;
+	}
+	
+	return total ;
+}
+
 std::size_t StreamParser::ReadUntil( const std::string& target, DataStream *out )
 {
 	assert( !target.empty() ) ;
@@ -52,57 +114,22 @@ std::size_t StreamParser::ReadUntil( const std::string& target, DataStream *out 
 		// if Refill() returns true there must be some bytes here
 		assert( Size() > 0 ) ;
 		
-		const char *r = std::find( m_cache, m_end, target[0] ) ;
-
-		// no matter we found the target or not, we should write the skipped bytes
-		// to output
-		std::size_t skipped = r - m_cache ;
-// std::cout << "writing: \"" << std::string( m_cache, skipped ) << "\"" << std::endl ;
-		out->Write( m_cache, skipped ) ;
-		total += skipped ;
-
-		// not found... try again
-		if ( r == m_end )
-			m_end = m_cache ;
+		total += ReadUntil( target[0], out ) ;
+		Refill() ;
 		
-		// found! now see if "r" really points to the chars which is exactly equal to target
-		else
+		const char *r = std::search( m_cache, m_end, target.begin(), target.end() ) ;
+		bool found = ( r != m_end ) ;
+		
+		total += Consume( r - m_cache, out ) ;
+		
+		if ( found )
 		{
-			std::size_t remain	= Size() - skipped ;
-
-// std::cout << "before move: m_cache = \"" << std::string( m_cache, m_end ) << "\" remain = " << remain << std::endl ;
-			std::memmove( m_cache, r, remain ) ;
-			m_end = m_cache + remain ;
-// std::cout << "m_cache = \"" << std::string( m_cache, m_end ) << "\"" << std::endl ;
-
-			Refill() ;
-// std::cout << "filled: m_cache = \"" << std::string( m_cache, m_end ) << "\"" << std::endl ;
-			
-			assert( m_cache[0] == target[0] ) ;
-			r = std::search( m_cache, m_end, target.begin(), target.end() ) ;
-			std::size_t skipped = r - m_cache ;
-// std::cout << "writing2: \"" << std::string( m_cache, skipped ) << "\"" << std::endl ;
-			out->Write( m_cache, skipped ) ;
-			total += skipped ;
-			
-			if ( r == m_end )
-				m_end = m_cache ;
-			
-			else
-			{
-// std::cout << "found! " << target.size() << " bytes" << std::endl ;
-				const char *next = r + target.size() ;
-				remain = Size() - (next - m_cache) ;
-
-				std::memmove( m_cache, next, remain ) ;
-				total += target.size() ;
-				m_end  = m_cache + remain ;
-// std::cout << "found m_cache = \"" << std::string( m_cache, m_end ) << "\"" << std::endl ;
-				
-				return total ;
-			}
+			total += Consume( target.size(), 0 ) ;
+			break ;
 		}
 	}
+	
+	return total ;
 }
 
 ///	tries to read more data from input and fill the cache.

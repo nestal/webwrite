@@ -39,4 +39,11 @@ Exception::Exception( )
 #endif
 }
 
+const char* Exception::what() const throw()
+{
+	static std::string ewhat ;
+	ewhat = boost::diagnostic_information( *this ) ;
+	return ewhat.c_str() ;
+}
+
 } // end of namespace

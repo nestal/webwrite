@@ -62,7 +62,6 @@ void FormData::Save( const fs::path& path )
 	
 	StringStream headers ;
 	p.ReadUntil( "\r\n\r\n", &headers ) ;
-std::cout << "headers = " << headers.Str() << std::endl ;
 
 	std::string fname = "outfile", hstr = headers.Str() ;
 	static const boost::regex e( ".*filename=\"(.+)\"" ) ;
@@ -70,8 +69,7 @@ std::cout << "headers = " << headers.Str() << std::endl ;
 	if ( boost::regex_search( hstr, m, e ) )
 		fname = m[1] ;
 
-std::cout << "saving to : " << (path / fname ) << std::endl ;
-	File f( path / "outfile.jpg", 0600 ) ;
+	File f( path / fname, 0600 ) ;
 	p.ReadUntil( "\r\n" + boundary.Str(), &f ) ;
 }
 

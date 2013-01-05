@@ -32,6 +32,24 @@ StreamParserTest::StreamParserTest( )
 {
 }
 
+void StreamParserTest::TestConsume( )
+{
+	StringStream input( "12345" ), output ;
+	StreamParser subject( &input ) ;
+	
+	WBUT_ASSERT_EQUAL( subject.Consume( 3, &output ), 3 ) ;
+	WBUT_ASSERT_EQUAL( output.Str(), "123" ) ;
+}
+
+void StreamParserTest::TestChar( )
+{
+	StringStream input( "line 1$#line 2--something--???###" ), output ;
+	StreamParser subject( &input ) ;
+	
+	WBUT_ASSERT_EQUAL( subject.ReadUntil( "1", &output ), 6 ) ;
+	WBUT_ASSERT_EQUAL( output.Str(), "line " ) ;
+}
+
 void StreamParserTest::TestString( )
 {
 	StringStream input( "line 1$#line 2--something--???###" ), output ;
