@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "util/Exception.hh"
 #include "util/FileSystem.hh"
 #include <string>
 
@@ -30,6 +31,12 @@ class DataStream ;
 */
 class FormData
 {
+public :
+	class Error : public Exception {} ;
+	
+	typedef boost::error_info<struct ExpB, std::string>	ExpectedBoundary ;
+	typedef boost::error_info<struct ActB, std::string>	ActualBoundary ;
+
 public :
 	FormData( DataStream *in, const std::string& ctype ) ;
 

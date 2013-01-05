@@ -22,6 +22,7 @@
 #include "parser/StreamParser.hh"
 #include "util/File.hh"
 #include "util/StringStream.hh"
+#include "util/Exception.hh"
 
 #include <boost/regex.hpp>
 
@@ -41,7 +42,7 @@ FormData::FormData( DataStream *in, const std::string& ctype ) :
 	
 	static const boost::regex e( ".*; *boundary=(.+)" ) ;
 	boost::smatch m ;
-	if ( boost::regex_match( ctype.begin(), ctype.end(), m, e ) )
+	if ( boost::regex_match( ctype, m, e ) )
 		m_boundary = m[1] ;
 }
 
@@ -51,13 +52,25 @@ void FormData::Save( const fs::path& path )
 
 	StringStream boundary ;
 	p.ReadUntil( "\r\n", &boundary ) ;
-std::cout << "boundary = " << boundary.Str() << std::endl ;
-
+	if ( boundary.Str() != ( "--" + m_boundary ) )
+		BOOST_THROW_EXCEPTION(
+			Exception( )
+				<< expt::ErrMsg("invalid boundary")
+				<< ExpectedBoundary( m_boundary )
+				<< ActualBoundary( boundary.Str() )
+		) ;
+	
 	StringStream headers ;
 	p.ReadUntil( "\r\n\r\n", &headers ) ;
 std::cout << "headers = " << headers.Str() << std::endl ;
 
-std::cout << "saving to : " << (path / "outfile.jpg" ) << std::endl ;
+	std::string fname = "outfile", hstr = headers.Str() ;
+	static const boost::regex e( ".*filename=\"(.+)\"" ) ;
+	boost::smatch m ;
+	if ( boost::regex_search( hstr, m, e ) )
+		fname = m[1] ;
+
+std::cout << "saving to : " << (path / fname ) << std::endl ;
 	File f( path / "outfile.jpg", 0600 ) ;
 	p.ReadUntil( "\r\n" + boundary.Str(), &f ) ;
 }

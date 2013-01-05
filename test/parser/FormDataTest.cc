@@ -22,6 +22,8 @@
 #include "parser/FormData.hh"
 #include "util/File.hh"
 
+#include <boost/exception/diagnostic_information.hpp>
+
 namespace wbut {
 
 using namespace wb ;
@@ -32,11 +34,17 @@ FormDataTest::FormDataTest( )
 
 void FormDataTest::Test( )
 {
-	File form_data( TEST_DATA "test.pdf.form" ) ;
-	FormData subject( &form_data, "multipart/form-data; boundary=---------------------------272731879216193" ) ;
-	
-	std::string line = form_data.ReadLine(1000) ;
-	std::cout << line << std::endl ;
+	try
+	{
+		File form_data( TEST_DATA "test.pdf.form" ) ;
+		FormData subject( &form_data, "multipart/form-data; boundary="
+			"---------------------------101378736882613805899358823" ) ;
+		subject.Save( "./" ) ;
+	}
+	catch ( Exception& e )
+	{
+		std::cout << boost::diagnostic_information( e ) << std::endl ;
+	}
 }
 
 } // end of namespace

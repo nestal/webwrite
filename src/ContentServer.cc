@@ -55,8 +55,6 @@ std::cout << "writing to " << file << std::endl ;
 	
 	if ( req->Method() == "POST" && req->Query() == "upload" )
 	{
-std::cout << req->ContentType() << std::endl ;
-
 		FormData form( req->In(), req->ContentType() ) ;
 		form.Save( res.ContentPath().parent_path() ) ;
 	}
