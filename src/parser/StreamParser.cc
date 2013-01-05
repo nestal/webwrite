@@ -20,6 +20,7 @@
 #include "StreamParser.hh"
 
 #include "util/DataStream.hh"
+#include "util/NullDataStream.hh"
 
 #include <algorithm>
 #include <cassert>
@@ -34,51 +35,48 @@ StreamParser::StreamParser( DataStream *in ) :
 	m_end(m_cache)
 {
 	assert( in != 0 ) ;
-}
-
-std::size_t StreamParser::Read( std::size_t count, DataStream *out )
-{
-	std::size_t total = 0 ;
-	while ( Size() < count && Refill() )
-	{
-		if ( out != 0 )
-			out->Write( m_cache, Size() ) ;
-		
-		total += Size() ; 
-		m_end = m_cache ;
-	}
 	
-	total += Consume( count, out ) ;
-	return total ;
+	// first, try to fill up the cache
+	Refill() ;
 }
 
 std::size_t StreamParser::Consume( std::size_t count, DataStream *out )
 {
-	if ( Size() < count )
-		Refill() ;
+	assert( out != 0 ) ;
 
-	std::size_t actual = std::min( Size(), count ) ;
-
-	if ( out != 0 )
+	std::size_t total = 0 ;
+	
+	while ( count > 0 )
+	{
+		std::size_t actual = std::min( Size(), count ) ;
 		out->Write( m_cache, actual ) ;
+				
+		std::size_t remain	= Size() - actual ;
+		std::memmove( m_cache, m_cache + actual, remain ) ;
+		m_end = m_cache + remain ;
+		
+		total += actual ;
+		count -= actual ;
+		
+		// we are done when no more bytes
+		if ( Size() == 0 && !Refill() )
+			break ;
+	}
 	
-	std::size_t remain	= Size() - actual ;
-
-	std::memmove( m_cache, m_cache + actual, remain ) ;
-	m_end = m_cache + remain ;
-	
-	return actual ;
+	return total ;
 }
 
 std::size_t StreamParser::ReadUntil( char target, DataStream *out )
 {
+	assert( out != 0 ) ;
+	
 	std::size_t total = 0 ;
 
 	while ( true )
 	{
 		// no more input, nothing we can do
 		if ( Size() == 0 && !Refill() )
-			return total ;
+			break ;
 
 		// if Refill() returns true there must be some bytes here
 		assert( Size() > 0 ) ;
@@ -109,7 +107,7 @@ std::size_t StreamParser::ReadUntil( const std::string& target, DataStream *out 
 	{
 		// no more input, nothing we can do
 		if ( Size() == 0 && !Refill() )
-			return total ;
+			break ;
 
 		// if Refill() returns true there must be some bytes here
 		assert( Size() > 0 ) ;
@@ -124,7 +122,7 @@ std::size_t StreamParser::ReadUntil( const std::string& target, DataStream *out 
 		
 		if ( found )
 		{
-			total += Consume( target.size(), 0 ) ;
+			total += Consume( target.size(), &NullDataStream::instance ) ;
 			break ;
 		}
 	}

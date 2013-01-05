@@ -41,6 +41,15 @@ void StreamParserTest::TestConsume( )
 	WBUT_ASSERT_EQUAL( output.Str(), "123" ) ;
 }
 
+void StreamParserTest::TestConsume2( )
+{
+	StringStream input( "12345" ), output ;
+	StreamParser subject( &input ) ;
+	
+	WBUT_ASSERT_EQUAL( subject.Consume( 100, &output ), 5 ) ;
+	WBUT_ASSERT_EQUAL( output.Str(), "12345" ) ;
+}
+
 void StreamParserTest::TestChar( )
 {
 	StringStream input( "line 1$#line 2--something--???###" ), output ;

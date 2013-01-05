@@ -28,7 +28,7 @@ namespace wb {
 class DataStream
 {
 protected :
-	~DataStream() {}
+	virtual ~DataStream() {}
 	
 public :
 	virtual std::size_t Read( char *data, std::size_t size ) = 0 ;

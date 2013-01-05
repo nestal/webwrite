@@ -32,6 +32,7 @@ public :
 	// declare suit function
 	CPPUNIT_TEST_SUITE( StreamParserTest ) ;
 		CPPUNIT_TEST( TestConsume ) ;
+		CPPUNIT_TEST( TestConsume2 ) ;
 		CPPUNIT_TEST( TestChar ) ;
 		CPPUNIT_TEST( TestString ) ;
 		CPPUNIT_TEST( TestFile ) ;
@@ -39,6 +40,7 @@ public :
 
 private :
 	void TestConsume( ) ;
+	void TestConsume2( ) ;
 	void TestChar( ) ;
 	void TestString( ) ;
 	void TestFile( ) ;
