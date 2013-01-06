@@ -22,6 +22,7 @@ body {
     height: 	100%;
 	font-size:	100%;
 	box-sizing:	border-box;
+	font-family: Helvetica, Arial, Verdana;
 }
 
 .header-links
@@ -62,10 +63,6 @@ table {
 
 table td {
 	border: 1pt solid black;
-}
-
-#rich_editor {
-	font-family: Helvetica, Arial, Verdana;
 }
 
 .wysiwyg-font-size-smaller {
