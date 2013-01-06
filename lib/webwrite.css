@@ -24,14 +24,19 @@ body {
 	box-sizing:	border-box;
 }
 
-#rich_toolbar ul
+.header-links
+{
+	float:	right;
+}
+
+.wb-toolbar ul
 {
 	margin:0 auto;
     padding: 0;
     height: 100%;
 }
 
-#rich_toolbar li {
+.wb-toolbar li {
     text-align: left;
     float: 		left;
     list-style: none;
@@ -45,7 +50,7 @@ body {
     background-color:	lightblue;
 }
 
-#rich_toolbar li > * {
+.wb-toolbar li > * {
 	display: table-cell;
     vertical-align:middle;
 }

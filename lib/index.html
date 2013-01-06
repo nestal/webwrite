@@ -21,7 +21,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-  <title>Editor</title>
+  <title>WebWrite</title>
   
   <!-- Load jQuery -->
   <script type="text/javascript" src="http://www.google.com/jsapi"></script>
@@ -46,7 +46,14 @@
 
 </head>
 <body>
-  <div class="header row">Welcome to webwrite!</div>
+  <div class="header row">
+    <span>Welcome to webwrite!</span>
+    <div class="wb-toolbar header-links">
+      <ul>
+        <li id="toogle-edit"><span>Edit</span></li>
+      </ul>
+    </div>
+  </div>
   <div class="body row">
     <div class="left col">
       <div>Quick Links:</div>
@@ -55,7 +62,7 @@
         <li>two</li>
       </ul>
     </div>
-    <div class="right col" id="dynamic">
+    <div class="right col" id="content">
     </div>
   </div>
 </body>
