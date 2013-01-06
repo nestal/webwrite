@@ -17,6 +17,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+/*!
+	REST API of webwrite:
+	
+	Assumed that webwrite is installed at http://example.com/webwrite/
+	
+*/
+
 #include "Config.hh"
 #include "Request.hh"
 #include "Resource.hh"

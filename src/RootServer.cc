@@ -22,38 +22,83 @@
 #include "Config.hh"
 #include "Request.hh"
 #include "Resource.hh"
+#include "util/File.hh"
+#include "parser/FormData.hh"
+
+#include <boost/regex.hpp>
 
 #include <iostream>
 
 namespace wb {
 
 RootServer::RootServer( const Config& cfg ) :
-	m_file( cfg.Base() / cfg.Str("lib-path") ),
-	m_data( cfg.Base() / cfg.Str("data-path") ),
-	m_wb_root( cfg.Str("wb-root") ),
-	m_main_page( cfg.MainPage() )
+	m_lib_path	( cfg.Base() / cfg.Str("lib-path") ),
+	m_data_path	( cfg.Base() / cfg.Str("data-path") ),
+	m_wb_root	( cfg.Str("wb-root") ),
+	m_main_page	( cfg.MainPage() )
 {
 }
 	
-Server* RootServer::Work( Request *req, const Resource& res ) 
+void RootServer::Work( Request *req, const Resource& res ) 
 {
 	fs::path	rel		= res.Path() ;
 	std::string	fname	= res.Filename() ;
-
-	std::size_t pos = std::string::npos ;
 	
 	// no filename in request, redirect to main page
-	if ( res.IsDir() || fname == "_" )
+	if ( res.IsDir() )
 	{
 		req->SeeOther( (m_wb_root/res.Path()/m_main_page).string() ) ;
-		return 0 ;
 	}
 
 	else if ( !req->Query().empty() )
-		return m_data.Work( req, res ) ;
+		return ServeContent( req, res ) ;
 	
 	else
-		return m_file.Work( req, res ) ;
+	{
+		std::cout << "serving home page for " << res.Path() << std::endl ;
+		req->XSendFile( m_lib_path / "index.html" ) ;
+	}
+}
+
+void RootServer::ServeContent( Request *req, const Resource& res )
+{
+	std::string	fname	= res.Filename() ;
+	fs::path 	file	= res.ContentPath() ;
+	
+	static const boost::regex lib( "lib=(.+)" ) ;
+	boost::smatch m ;
+
+	if ( req->Method() == "POST" && req->Query() == "save" )
+	{
+std::cout << "writing to " << file << std::endl ;
+		
+		fs::create_directories( file.parent_path() ) ;
+		File f( file, 0600 ) ;
+		
+		char buf[80] ;
+		std::size_t c ;
+		while ( (c = req->In()->Read(buf, sizeof(buf)) ) > 0 )
+			f.Write( buf, c ) ;
+	}
+	
+	if ( req->Method() == "POST" && req->Query() == "upload" )
+	{
+		FormData form( req->In(), req->ContentType() ) ;
+		form.Save( res.ContentPath().parent_path() ) ;
+	}
+	
+	else if ( req->Method() == "GET" && req->Query() == "load" )
+	{
+std::cout << "reading from " << file << std::endl ;
+		req->XSendFile( file ) ;
+	}
+	
+	else if ( req->Method() == "GET" && boost::regex_search( req->Query(), m, lib ) )
+	{
+		fs::path path = m_lib_path / m[1].str() ;
+		std::cout << "serving lib file: " << path << std::endl ;
+		req->XSendFile( path ) ;
+	}
 }
 
 } // end of namespace

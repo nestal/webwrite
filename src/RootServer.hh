@@ -19,9 +19,7 @@
 
 #pragma once
 
-#include "Server.hh"
-#include "FileServer.hh"
-#include "ContentServer.hh"
+#include "util/FileSystem.hh"
 
 namespace wb {
 
@@ -29,19 +27,23 @@ class Config ;
 class Request ;
 class Resource ;
 
-class RootServer : public Server
+class RootServer
 {
 public :
 	RootServer( const Config& cfg ) ;
 	
-	Server* Work( Request *req, const Resource& res ) ;
+	void Work( Request *req, const Resource& res ) ;
 
 private :
-	FileServer		m_file ;
-	ContentServer	m_data ;
+	void ServeContent( Request *req, const Resource& res ) ;
+
+private :
+	// configuration parameters
+	fs::path	m_lib_path ;
+	fs::path	m_data_path ;
+	fs::path	m_wb_root ;
 	
-	fs::path		m_wb_root ;
-	std::string		m_main_page ;
+	std::string	m_main_page ;
 } ;
 
 } // end of namespace
