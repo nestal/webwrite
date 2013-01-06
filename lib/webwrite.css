@@ -10,11 +10,10 @@ body {
 .scroll-x { overflow-x: auto; }
 .scroll-y { overflow-y: auto; }
 
-.header.row		{ height:	75px;	top:	0px;	}
-.toolbar.row	{ height:	40px;	top:	75px;	}
-.editor_box.row	{ top:		120px;	bottom: 50px;	}
-.content.row	{ top:		75px;	bottom: 50px;	}
-.footer.row		{ height:	50px;	bottom: 0px;	}
+.header.row		{ height:	25px;	top:	0px;	}
+.body.row		{ top:		25px;	bottom: 0px;	}
+.toolbar.row	{ height:	40px;	top:	0px;	}
+.editor_box.row	{ top:		40px;	bottom:	0px;	}
 
 .editor {
 	margin:		0 0 0 0;
