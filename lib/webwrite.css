@@ -12,7 +12,7 @@ body {
 
 .header.row		{ height:	75px;	top:	0px;	}
 .toolbar.row	{ height:	40px;	top:	75px;	}
-.editor.row		{ top:		120px;	bottom: 50px;	}
+.editor_box.row	{ top:		120px;	bottom: 50px;	}
 .content.row	{ top:		75px;	bottom: 50px;	}
 .footer.row		{ height:	50px;	bottom: 0px;	}
 
