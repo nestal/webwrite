@@ -47,7 +47,11 @@ void RootServer::Work( Request *req, const Resource& res )
 	// no filename in request, redirect to main page
 	if ( res.IsDir() )
 	{
-		req->SeeOther( (m_wb_root/res.Path()/m_main_page).string() ) ;
+		std::string path = (m_wb_root/res.Path()/m_main_page).string() ;
+		if ( !req->Query().empty() )
+			path += ("?" + req->Query()) ;
+		
+		req->SeeOther( path ) ;
 	}
 
 	else if ( !req->Query().empty() )
@@ -94,10 +98,23 @@ std::cout << "reading from " << file << std::endl ;
 	}
 	
 	else if ( req->Method() == "GET" && boost::regex_search( req->Query(), m, lib ) )
+		ServeLibFile( req, res.Path(), m[1].str() ) ;
+}
+
+void RootServer::ServeLibFile( Request *req, const fs::path& res_path, const std::string& libfile )
+{
+	// only serve file if it is in the root path
+	if ( res_path.parent_path() == "/" )
 	{
-		fs::path path = m_lib_path / m[1].str() ;
+		fs::path path = m_lib_path / libfile ;
 		std::cout << "serving lib file: " << path << std::endl ;
 		req->XSendFile( path ) ;
+	}
+	else
+	{
+		fs::path path = m_wb_root / ("main?lib=" + libfile) ;
+		std::cout << "redirecting to: " << path << std::endl ;
+		req->SeeOther( path.string() ) ;
 	}
 }
 
