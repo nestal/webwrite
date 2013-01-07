@@ -22,58 +22,71 @@ body {
     margin: 0
 }
 
-.row, .col { overflow: hidden; position: absolute; }
-.row { left: 0; right: 0; }
-.col { top: 0; bottom: 0; }
-.left.col { width: 200px; }
-.right.col { left: 200px; right: 0; }
-.scroll-x { overflow-x: auto; }
-.scroll-y { overflow-y: auto; }
-
-.header.row		{ height:	40px;	top:	0px;	}
-.body.row		{ top:		40px;	bottom: 0px;	}
-.toolbar.row	{ height:	40px;	top:	0px;	}
-.editor_box.row	{ top:		40px;	bottom:	0px;	}
-
-.editor {
-	margin:		0 0 0 0;
-    padding:	0 0 0 0;
-    width:		100%;
-    height: 	100%;
-	font-size:	100%;
-	box-sizing:	border-box;
-	font-family: Helvetica, Arial, Verdana;
+body > div
+{
+	width:	98%;
+	margin: 0 auto;
 }
 
-.header-links
+body > div > div
 {
-	float:	right;
+	padding-right:	20px;
+	padding-left:	20px;
+	background-color:	white;
+}
+
+body div.sidebar
+{
+	width:	18%;
+	float:	left;
+}
+
+body div.torso
+{
+	width:		78%;
+	float:		right;
+	overflow:	auto;
+}
+
+.rich
+{
+	margin:			0 0 0 0;
+    padding:		0 0 0 0;
+	font-size:		100%;
+	font-family: 	Helvetica, Arial, Verdana;
+	overflow:		auto;
+}
+
+.editor
+{
+	width:	98%;
+	height:	95%;
+}
+
+.wb-toolbar
+{
+	width:				100%;
+	overflow:			auto;
+	background-color:	yellow;
 }
 
 .wb-toolbar ul
 {
-	margin:0 auto;
-    padding: 0;
-    height: 100%;
+	margin:		0 auto;
+    padding: 	0;
+    display:	block;
 }
 
 .wb-toolbar li {
     text-align: left;
     float: 		left;
     list-style: none;
-    height:		100%;
     border:		1px solid #CCC;
 	padding:	0 .5em 0 .5em;
     margin:		0 .3em 0 .3em;
-    display: 	table;
     cursor:		pointer;
     
     background-color:	lightblue;
-}
-
-.wb-toolbar li > * {
-	display: table-cell;
-    vertical-align:middle;
 }
 
 table {
