@@ -68,11 +68,12 @@ void RootServer::ServeContent( Request *req, const Resource& res )
 {
 	std::string	fname	= res.Filename() ;
 	fs::path 	file	= res.ContentPath() ;
+	std::string qstr	= req->Query() ;
 	
 	static const boost::regex lib( "lib=(.+)" ) ;
 	boost::smatch m ;
 
-	if ( req->Method() == "POST" && req->Query() == "save" )
+	if ( req->Method() == "POST" && qstr == "save" )
 	{
 std::cout << "writing to " << file << std::endl ;
 		
@@ -85,19 +86,19 @@ std::cout << "writing to " << file << std::endl ;
 			f.Write( buf, c ) ;
 	}
 	
-	if ( req->Method() == "POST" && req->Query() == "upload" )
+	if ( req->Method() == "POST" && qstr == "upload" )
 	{
 		FormData form( req->In(), req->ContentType() ) ;
 		form.Save( res.ContentPath().parent_path() ) ;
 	}
 	
-	else if ( req->Method() == "GET" && req->Query() == "load" )
+	else if ( req->Method() == "GET" && qstr == "load" )
 	{
 std::cout << "reading from " << file << std::endl ;
 		req->XSendFile( file ) ;
 	}
 	
-	else if ( req->Method() == "GET" && boost::regex_search( req->Query(), m, lib ) )
+	else if ( req->Method() == "GET" && boost::regex_search( qstr, m, lib ) )
 		ServeLibFile( req, res.Path(), m[1].str() ) ;
 }
 
@@ -110,6 +111,8 @@ void RootServer::ServeLibFile( Request *req, const fs::path& res_path, const std
 		std::cout << "serving lib file: " << path << std::endl ;
 		req->XSendFile( path ) ;
 	}
+
+	// request for lib file using non-root paths will get a redirect
 	else
 	{
 		fs::path path = m_wb_root / ("main?lib=" + libfile) ;

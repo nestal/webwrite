@@ -23,9 +23,12 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(Boost_USE_MULTITHREADED ON )
 
-# don't use shared library in win32
 if ( WIN32 )
+	# don't use shared library in win32
 	set(Boost_USE_STATIC_LIBS 	1)
+
+	# disable msvc stupid warnings
+	add_definitions( -D_SCL_SECURE_NO_WARNINGS )
 endif ( WIN32 )
 
 find_package(Boost COMPONENTS filesystem system regex REQUIRED)
