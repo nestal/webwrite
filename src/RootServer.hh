@@ -37,6 +37,7 @@ public :
 private :
 	void ServeContent( Request *req, const Resource& res ) ;
 	void ServeLibFile( Request *req, const fs::path& path, const std::string& libfile ) ;
+	void ServeVar( Request *req ) ;
 
 private :
 	// configuration parameters

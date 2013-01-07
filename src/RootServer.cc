@@ -70,7 +70,7 @@ void RootServer::ServeContent( Request *req, const Resource& res )
 	fs::path 	file	= res.ContentPath() ;
 	std::string qstr	= req->Query() ;
 	
-	static const boost::regex lib( "lib=(.+)" ) ;
+	static const boost::regex re( "lib=(.+)" ) ;
 	boost::smatch m ;
 
 	if ( req->Method() == "POST" && qstr == "save" )
@@ -98,7 +98,10 @@ std::cout << "reading from " << file << std::endl ;
 		req->XSendFile( file ) ;
 	}
 	
-	else if ( req->Method() == "GET" && boost::regex_search( qstr, m, lib ) )
+	else if ( req->Method() == "GET" && qstr == "var" )
+		ServeVar( req ) ;
+	
+	else if ( req->Method() == "GET" && boost::regex_search( qstr, m, re ) )
 		ServeLibFile( req, res.Path(), m[1].str() ) ;
 }
 
@@ -119,6 +122,16 @@ void RootServer::ServeLibFile( Request *req, const fs::path& res_path, const std
 		std::cout << "redirecting to: " << path << std::endl ;
 		req->SeeOther( path.string() ) ;
 	}
+}
+
+void RootServer::ServeVar( Request *req )
+{
+	Json var ;
+	var.Add( "wb_root", Json( (m_wb_root/m_main_page).string() ) ) ;
+	
+	std::string s = var.Str() ;
+	
+	req->PrintF( "Content-length: %d\r\n\r\n%s", s.size(), s.c_str() ) ;
 }
 
 } // end of namespace

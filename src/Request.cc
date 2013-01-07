@@ -39,9 +39,7 @@ public :
 	}
 	
 	std::size_t Read( char *data, std::size_t size ) ;
-	std::string ReadLine( std::size_t max ) ;
 	std::size_t Write( const char *data, std::size_t size ) ;
-	bool GetChar( char& ch ) ;
 
 private :
 	FCGX_Stream	*m_str ;
@@ -81,14 +79,6 @@ std::size_t Request::StreamWrapper::Read( char *data, std::size_t size )
 std::size_t Request::StreamWrapper::Write( const char *data, std::size_t size )
 {
 	return ::FCGX_PutStr( data, size, m_str ) ;
-}
-
-bool Request::StreamWrapper::GetChar( char& result )
-{
-	int ch = ::FCGX_GetChar( m_str ) ;
-	if ( ch != EOF )
-		result = static_cast<char>(ch) ;
-	return ch != EOF ;
 }
 
 std::string Request::URI() const
@@ -146,18 +136,6 @@ std::string Request::SansQueryURI() const
 		result.erase( result.size()-1 ) ;
 	
 	return result ;
-}
-
-std::string Request::StreamWrapper::ReadLine( std::size_t max )
-{
-	std::string result(max, '\0') ;
-	if ( FCGX_GetLine( &result[0], result.size(), m_str ) != 0 )
-	{
-		result.resize( std::strlen( result.c_str() ) ) ;
-		return result ;
-	}
-	else
-		return "" ;
 }
 
 } // end of namespace
