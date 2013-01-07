@@ -70,6 +70,11 @@ body div.torso
 	overflow:		auto;
 }
 
+a.int-link
+{
+	background-color:	#C0FFFF;
+}
+
 .editor
 {
 	width:	98%;
