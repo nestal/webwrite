@@ -24,26 +24,39 @@ body {
 
 body > div
 {
-	width:	98%;
-	margin: 0 auto;
 }
 
 body > div > div
 {
-	padding-right:	20px;
-	padding-left:	20px;
-	background-color:	white;
 }
 
 body div.sidebar
 {
-	width:	18%;
+	width:	20%;
 	float:	left;
+}
+
+body div.sidebar div.logo
+{
+	font-size:	2em;
+	text-align:	center;
+	background-color: #003399;
+	text-decoration: none;
+	color:	white;
+}
+
+body div.sidebar div.logo:hover 
+{
+	text-decoration: none;
+	background-color: white;
+	color:	#003399;
+	font-weight: bold;
+	cursor:	pointer;
 }
 
 body div.torso
 {
-	width:		78%;
+	width:		80%;
 	float:		right;
 	overflow:	auto;
 }
@@ -67,7 +80,7 @@ body div.torso
 {
 	width:				100%;
 	overflow:			auto;
-	background-color:	yellow;
+	background-color:	blue;
 }
 
 .wb-toolbar ul
