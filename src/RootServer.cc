@@ -126,9 +126,11 @@ void RootServer::ServeLibFile( Request *req, const fs::path& res_path, const std
 
 void RootServer::ServeVar( Request *req )
 {
+	// path to URLs should be generic strings
 	Json var ;
-	var.Add( "wb_root", Json( (m_wb_root/m_main_page).string() ) ) ;
-	
+	var.Add( "wb_root", Json( m_wb_root.generic_string() ) ) ;
+	var.Add( "main", Json( m_main_page ) ) ;
+		
 	std::string s = var.Str() ;
 	
 	req->PrintF( "Content-length: %d\r\n\r\n%s", s.size(), s.c_str() ) ;
