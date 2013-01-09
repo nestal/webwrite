@@ -148,6 +148,21 @@ span.edit_cmd:hover
 	cursor: pointer;
 }
 
+li.idx_file
+{
+    list-style: none;
+    cursor: pointer;
+	color: rgb(30,30,128);
+}
+
+li.idx_file:hover
+{
+    list-style: none;
+    cursor: pointer;
+	background-color: rgb(30,30,128);
+	color: white;
+}
+
 #drop {
   width: 100%;
   height: 100%;

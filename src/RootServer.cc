@@ -101,6 +101,9 @@ void RootServer::ServeContent( Request *req, const Resource& res )
 	else if ( req->Method() == "GET" && qstr == "var" )
 		ServeVar( req ) ;
 	
+	else if ( req->Method() == "GET" && qstr == "index" )
+		ServeIndex( req, res ) ;
+	
 	else if ( req->Method() == "GET" && boost::regex_search( qstr, m, re ) )
 		ServeLibFile( req, res.Path(), m[1].str() ) ;
 }
@@ -132,8 +135,21 @@ void RootServer::ServeVar( Request *req )
 	var.Add( "main", Json( m_main_page ) ) ;
 		
 	std::string s = var.Str() ;
-	
-	req->PrintF( "Content-length: %d\r\n\r\n%s", s.size(), s.c_str() ) ;
+	req->PrintF( "Content-type: application/json\r\n\r\n%s\r\n\r\n", s.c_str() ) ;
+}
+
+void RootServer::ServeIndex( Request *req, const Resource& res )
+{
+	req->PrintF( "Content-type: text/html\r\n\r\n" ) ;
+
+	req->PrintF( "<ul>" ) ;
+	fs::directory_iterator di( res.ContentPath().parent_path() ), end ;
+	for ( ; di != end ; ++di )
+	{
+		std::string fname = di->path().filename().string() ;
+		req->PrintF( "<li class=\"idx_file\">%s</li>", fname.c_str() ) ;
+	}
+	req->PrintF( "</ul>\r\n\r\n" ) ;
 }
 
 } // end of namespace
