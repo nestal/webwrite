@@ -7,5 +7,10 @@
 	{
 		".html"	: "text/html",
 		".js"	: "application/javascript"
+	},
+	"log"		:
+	{
+		"level"	: "debug",
+		"file"	: "webwrite.log"
 	}
 }

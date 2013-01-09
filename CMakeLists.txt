@@ -19,6 +19,7 @@
 
 project( webwrite )
 cmake_minimum_required(VERSION 2.8)
+set( WEBWRITE_VERSION "0.1" )
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(Boost_USE_MULTITHREADED ON )
@@ -58,13 +59,13 @@ endif ( BFD_FOUND )
 add_definitions(
 	-DTEST_DATA="${webwrite_SOURCE_DIR}/test/data/"
 	-DSRC_DIR="${webwrite_SOURCE_DIR}/src"
+	-DVERSION="${WEBWRITE_VERSION}"
 )
 
 file (GLOB WEBWRITE_LIB_SRC
 	${OPT_SRC}
-    ${webwrite_SOURCE_DIR}/src/util/*.hh
-    ${webwrite_SOURCE_DIR}/src/util/*.cc
-    ${webwrite_SOURCE_DIR}/src/parser/*.cc
+    ${webwrite_SOURCE_DIR}/src/*/*.hh
+    ${webwrite_SOURCE_DIR}/src/*/*.cc
 )
 
 add_library( wb_core

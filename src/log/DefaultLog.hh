@@ -19,30 +19,24 @@
 
 #pragma once
 
-#include "parser/Json.hh"
-#include "util/FileSystem.hh"
+#include "CommonLog.hh"
 
+#include <fstream>
 #include <string>
 
-namespace wb {
+namespace wb { namespace log {
 
-class Config
+class DefaultLog : public CommonLog
 {
 public :
-	explicit Config( const std::string& filename ) ;
+	DefaultLog() ;
+	explicit DefaultLog( const std::string& filename ) ;
 
-	std::string Str( const std::string& key ) const ;
-	
-	fs::path Base() const ;
-	
-	std::string MainPage() const ;
-	
-	Json Get() const ;
+	void Log( const log::Fmt& msg, log::Serverity s ) ;
 	
 private :
-	Json		m_cfg ;
-	
-	fs::path	m_base ;
+	std::ofstream	m_file ;
+	std::ostream&	m_log ;
 } ;
 
-} // end of namespace
+} } // end of namespace

@@ -22,12 +22,11 @@
 #include "Config.hh"
 #include "Request.hh"
 #include "Resource.hh"
-#include "util/File.hh"
+#include "log/Log.hh"
 #include "parser/FormData.hh"
+#include "util/File.hh"
 
 #include <boost/regex.hpp>
-
-#include <iostream>
 
 namespace wb {
 
@@ -59,7 +58,7 @@ void RootServer::Work( Request *req, const Resource& res )
 	
 	else
 	{
-		std::cout << "serving home page for " << res.Path() << std::endl ;
+		Log( "serving home page for %1%", res.Path(), log::verbose ) ;
 		req->XSendFile( m_lib_path / "index.html" ) ;
 	}
 }
@@ -75,7 +74,7 @@ void RootServer::ServeContent( Request *req, const Resource& res )
 
 	if ( req->Method() == "POST" && qstr == "save" )
 	{
-std::cout << "writing to " << file << std::endl ;
+		Log( "writing to file %1%", file, log::verbose ) ;
 		
 		fs::create_directories( file.parent_path() ) ;
 		File f( file, 0600 ) ;
@@ -94,7 +93,7 @@ std::cout << "writing to " << file << std::endl ;
 	
 	else if ( req->Method() == "GET" && qstr == "load" )
 	{
-std::cout << "reading from " << file << std::endl ;
+		Log( "reading from %1%", file, log::verbose ) ;
 		req->XSendFile( fs::exists( file ) ? file : (m_lib_path / "notfound.html") ) ;
 		
 	}
@@ -112,7 +111,7 @@ void RootServer::ServeLibFile( Request *req, const fs::path& res_path, const std
 	if ( res_path.parent_path() == "/" )
 	{
 		fs::path path = m_lib_path / libfile ;
-		std::cout << "serving lib file: " << path << std::endl ;
+		Log( "serving lib file: %1%", path, log::verbose ) ;
 		req->XSendFile( path ) ;
 	}
 
@@ -120,7 +119,7 @@ void RootServer::ServeLibFile( Request *req, const fs::path& res_path, const std
 	else
 	{
 		fs::path path = m_wb_root / ("main?lib=" + libfile) ;
-		std::cout << "redirecting to: " << path << std::endl ;
+		Log( "redirecting to: %1%", path, log::verbose );
 		req->SeeOther( path.string() ) ;
 	}
 }

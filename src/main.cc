@@ -38,6 +38,8 @@ http://example.com/webwrite/some/long/path/to/the/page?load
 #include "Resource.hh"
 #include "RootServer.hh"
 
+#include "log/CompositeLog.hh"
+#include "log/DefaultLog.hh"
 #include "util/Exception.hh"
 #include "util/FileSystem.hh"
 #include "util/File.hh"
@@ -50,14 +52,50 @@ http://example.com/webwrite/some/long/path/to/the/page?load
 #include <algorithm>
 #include <cstdlib>
 #include <cstdio>
-#include <iostream>
+
+using namespace wb ;
+
+void InitLog( const Config& cfg )
+{
+	std::auto_ptr<log::CompositeLog> comp_log(new log::CompositeLog) ;
+	LogBase* console_log = comp_log->Add( std::auto_ptr<LogBase>( new log::DefaultLog ) ) ;
+	
+	// initialize log object
+	if ( cfg.Get().Has("log") )
+	{
+		std::auto_ptr<LogBase> file_log(new log::DefaultLog( cfg.Get()["log"]["file"].Str() )) ;
+		file_log->Enable( log::debug ) ;
+		file_log->Enable( log::verbose ) ;
+		file_log->Enable( log::info ) ;
+		file_log->Enable( log::warning ) ;
+		file_log->Enable( log::error ) ;
+		file_log->Enable( log::critical ) ;
+		
+		// log grive version to log file
+		file_log->Log( log::Fmt("webwrite" VERSION " " __DATE__ " " __TIME__), log::verbose ) ;
+		
+		comp_log->Add( file_log ) ;
+	}
+	if ( cfg.Get()["log"]["level"].Str() == "debug" )
+	{
+		console_log->Enable( log::verbose ) ;
+		console_log->Enable( log::debug ) ;
+	}
+	else if ( cfg.Get()["log"]["level"].Str() == "verbose" )
+	{
+		console_log->Enable( log::verbose ) ;
+	}
+	
+	LogBase::Inst( std::auto_ptr<LogBase>(comp_log.release()) ) ;
+}
 
 int main( int argc, char **argv )
 {
-	using namespace wb ;
 	try
 	{
 		Config cfg( argc < 2 ? "config.json" : argv[1] ) ;
+		InitLog( cfg ) ;
+		
 		RootServer srv( cfg ) ;
 		
 		FCGX_Request request ;
@@ -69,7 +107,7 @@ int main( int argc, char **argv )
 		while ( (r = FCGX_Accept_r( &request )) == 0 )
 		{
 			Request req( &request ) ;
-			std::cout << "requesting: " << req.URI() << std::endl ;
+			Log( "requesting: %1%", req.URI(), log::verbose ) ;
 			
 			srv.Work( &req, Resource( req.SansQueryURI(), cfg ) ) ;
 
@@ -78,7 +116,7 @@ int main( int argc, char **argv )
 	}
 	catch ( Exception& e )
 	{
-		std::cerr << boost::diagnostic_information(e) << std::endl ;
+		Log( "exception: %1%", boost::diagnostic_information(e), log::critical ) ;
 	}
 
 	return 0 ;

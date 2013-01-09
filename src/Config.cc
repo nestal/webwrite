@@ -49,4 +49,9 @@ std::string Config::MainPage() const
 	return m_cfg.Has("main_page") ? m_cfg["main_page"].Str() : "main" ;
 }
 
+Json Config::Get() const
+{
+	return m_cfg ;
+}
+
 } // end of namespace

@@ -19,30 +19,15 @@
 
 #pragma once
 
-#include "parser/Json.hh"
-#include "util/FileSystem.hh"
-
-#include <string>
-
 namespace wb {
 
-class Config
+struct Destroy
 {
-public :
-	explicit Config( const std::string& filename ) ;
-
-	std::string Str( const std::string& key ) const ;
-	
-	fs::path Base() const ;
-	
-	std::string MainPage() const ;
-	
-	Json Get() const ;
-	
-private :
-	Json		m_cfg ;
-	
-	fs::path	m_base ;
+	template <typename T>
+	void operator()( T *t ) const
+	{
+		delete t ;
+	}
 } ;
 
 } // end of namespace

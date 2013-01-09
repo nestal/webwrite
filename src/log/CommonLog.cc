@@ -17,32 +17,34 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#pragma once
+#include "CommonLog.hh"
 
-#include "parser/Json.hh"
-#include "util/FileSystem.hh"
+namespace wb { namespace log {
 
-#include <string>
-
-namespace wb {
-
-class Config
+CommonLog::CommonLog()
 {
-public :
-	explicit Config( const std::string& filename ) ;
+	m_enabled[log::debug]		= false ;
+	m_enabled[log::verbose]		= false ;
+	m_enabled[log::info]		= true ;
+	m_enabled[log::warning]		= true ;
+	m_enabled[log::error]		= true ;
+	m_enabled[log::critical]	= true ;
+}
 
-	std::string Str( const std::string& key ) const ;
+bool CommonLog::Enable( log::Serverity s, bool enable )
+{
+	assert( s >= debug && s < serverity_count ) ;
 	
-	fs::path Base() const ;
+	bool prev = m_enabled[s] ;
+	m_enabled[s] = enable ;
 	
-	std::string MainPage() const ;
-	
-	Json Get() const ;
-	
-private :
-	Json		m_cfg ;
-	
-	fs::path	m_base ;
-} ;
+	return prev ;
+}
 
-} // end of namespace
+bool CommonLog::IsEnabled( log::Serverity s ) const
+{
+	assert( s >= debug && s < serverity_count ) ;
+	return m_enabled[s] ;
+}
+
+}} // end of namespace

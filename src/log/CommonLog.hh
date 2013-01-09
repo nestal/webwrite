@@ -19,30 +19,22 @@
 
 #pragma once
 
-#include "parser/Json.hh"
-#include "util/FileSystem.hh"
+#include "Log.hh"
 
-#include <string>
+#include <bitset>
 
-namespace wb {
+namespace wb { namespace log {
 
-class Config
+class CommonLog : public LogBase
 {
 public :
-	explicit Config( const std::string& filename ) ;
-
-	std::string Str( const std::string& key ) const ;
+	CommonLog() ;
 	
-	fs::path Base() const ;
-	
-	std::string MainPage() const ;
-	
-	Json Get() const ;
+	bool Enable( log::Serverity s, bool enable = true ) ;
+	bool IsEnabled( log::Serverity s ) const ;
 	
 private :
-	Json		m_cfg ;
-	
-	fs::path	m_base ;
+	std::bitset<serverity_count>	m_enabled ;
 } ;
 
-} // end of namespace
+} } // end of namespace

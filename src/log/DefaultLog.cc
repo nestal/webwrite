@@ -17,32 +17,42 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#pragma once
+#include "DefaultLog.hh"
 
-#include "parser/Json.hh"
-#include "util/FileSystem.hh"
+#include <cassert>
+#include <iostream>
 
-#include <string>
+namespace wb { namespace log {
 
-namespace wb {
-
-class Config
+DefaultLog::DefaultLog() :
+	m_log( std::cerr )
 {
-public :
-	explicit Config( const std::string& filename ) ;
+// 	Enable(log::debug,		true) ;
+// 	Enable(log::verbose,	true) ;
+}
 
-	std::string Str( const std::string& key ) const ;
-	
-	fs::path Base() const ;
-	
-	std::string MainPage() const ;
-	
-	Json Get() const ;
-	
-private :
-	Json		m_cfg ;
-	
-	fs::path	m_base ;
-} ;
+DefaultLog::DefaultLog( const std::string& filename ) :
+	m_file( filename.c_str() ),
+	m_log( m_file )
+{
+}
 
-} // end of namespace
+void DefaultLog::Log( const log::Fmt& msg, log::Serverity s )
+{
+	if ( IsEnabled(s) )
+	{
+		switch ( s )
+		{
+			case log::debug:
+			case log::info:
+				m_log << msg << std::endl ;
+				break ;
+			
+			default:
+				m_log << msg << std::endl ;
+				break ;
+		}
+	}
+}
+
+} } // end of namespace
