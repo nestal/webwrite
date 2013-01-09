@@ -17,11 +17,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-/*!
+/*!	\mainpage
+
 	REST API of webwrite:
 	
 	Assumed that webwrite is installed at http://example.com/webwrite/
 	
+	In general, the URL of webwrite can be decomposed into these parts:
+	
+	\verbatim
+http://example.com/webwrite/some/long/path/to/the/page?load
+                            ^-----resource path------^ ^--^-command
+	\endverbatim
+	
+	The resource path in the URL locates the resource in the server.
 */
 
 #include "Config.hh"

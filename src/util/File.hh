@@ -53,9 +53,7 @@ public :
 	bool IsOpened() const ;
 	
 	std::size_t Read( char *ptr, std::size_t size ) ;
-	std::string ReadLine( std::size_t max ) ;
 	std::size_t Write( const char *ptr, std::size_t size ) ;
-	bool GetChar( char& ch ) ;
 
 	off_t Seek( off_t offset, int whence ) ;
 	off_t Tell() const ;

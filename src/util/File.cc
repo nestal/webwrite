@@ -219,6 +219,7 @@ void File::Chmod( int mode )
 #endif
 }
 
+/// This function is not supported in win32 yet.
 void* File::Map( off_t offset, std::size_t length )
 {
 	assert( IsOpened() ) ;
@@ -251,28 +252,6 @@ void File::UnMap( void *addr, std::size_t length )
 		) ;
 	}
 #endif
-}
-
-/// \warning This function is very inefficient and should be used in unit test only!
-std::string File::ReadLine( std::size_t max )
-{
-	std::string result ;
-	
-	char byte ;
-	while ( Read( &byte, sizeof(byte) ) == sizeof(byte) )
-	{
-		result.push_back( byte ) ;
-	
-		if ( byte == '\n' )
-			break ;
-	}
-	
-	return result ;
-}
-
-bool File::GetChar( char& ch )
-{
-	return Read( &ch, sizeof(ch) ) == sizeof(ch) ;
 }
 
 } // end of namespace
