@@ -95,7 +95,8 @@ std::cout << "writing to " << file << std::endl ;
 	else if ( req->Method() == "GET" && qstr == "load" )
 	{
 std::cout << "reading from " << file << std::endl ;
-		req->XSendFile( file ) ;
+		req->XSendFile( fs::exists( file ) ? file : (m_lib_path / "notfound.html") ) ;
+		
 	}
 	
 	else if ( req->Method() == "GET" && qstr == "var" )
