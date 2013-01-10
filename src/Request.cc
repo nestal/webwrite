@@ -23,7 +23,8 @@
 #include "util/Exception.hh"
 #include "util/File.hh"
 
-#include <iostream>
+#include "log/Log.hh"
+
 #include <cstdio>
 
 namespace wb {
@@ -89,7 +90,7 @@ std::string Request::URI() const
 void Request::PrintEnv() const
 {
 	for ( int i = 0 ; m_req->envp[i] != 0 ; ++i )
-		std::cout << "env: " << m_req->envp[i] << std::endl ;
+		Log( "env: %1%", m_req->envp[i], log::debug );
 }
 
 std::string Request::Method() const
@@ -112,9 +113,9 @@ std::string Request::ContentType() const
 	return ::FCGX_GetParam( "CONTENT_TYPE", m_req->envp ) ;
 }
 
-std::size_t Request::PrintF( const char *fmt )
+int Request::PrintF( const std::string& fmt )
 {
-	return FCGX_FPrintF( m_req->out, fmt ) ;
+	return FCGX_PutS( fmt.c_str(), m_req->out ) ;
 }
 
 void Request::SeeOther( const std::string& location )

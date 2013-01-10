@@ -41,8 +41,9 @@ public :
 	
 private :
 	Json		m_cfg ;
-	
 	fs::path	m_base ;
 } ;
+
+
 
 } // end of namespace

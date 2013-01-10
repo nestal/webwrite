@@ -73,6 +73,11 @@ body div.torso
 	overflow:		auto;
 }
 
+div#menu
+{
+	overflow:	hidden;
+}
+
 .editor
 {
 	width:	98%;
@@ -150,17 +155,22 @@ span.edit_cmd:hover
 
 li.idx_file
 {
-    list-style: none;
-    cursor: pointer;
-	color: rgb(30,30,128);
+	list-style: none;
+	cursor: pointer;
 }
 
-li.idx_file:hover
+li.idx_file > a
 {
-    list-style: none;
-    cursor: pointer;
-	background-color: rgb(30,30,128);
-	color: white;
+	text-decoration: none;
+	color: rgb(30,30,128);
+	display: block;
+}
+
+li.idx_file:hover > a, li.idx_file:hover > a:hover
+{
+	color: 			rgb(30,30,192);
+	display: 		block;
+	text-shadow:	1px 1px 1px rgba(0, 0, 100, 0.5);
 }
 
 #drop {

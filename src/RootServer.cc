@@ -146,8 +146,11 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 	fs::directory_iterator di( res.ContentPath().parent_path() ), end ;
 	for ( ; di != end ; ++di )
 	{
-		std::string fname = di->path().filename().string() ;
-		req->PrintF( "<li class=\"idx_file\">%s</li>", fname.c_str() ) ;
+		Resource sibling( res.Path().parent_path() / di->path().filename(), *res.m_cfg ) ;
+		
+		req->PrintF( "<li class=\"idx_file\"><a href=\"%1%\">%2%</a></li>",
+			sibling.UrlPath().string(),
+			sibling.Filename() ) ;
 	}
 	req->PrintF( "</ul>\r\n\r\n" ) ;
 }

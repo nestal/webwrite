@@ -72,7 +72,7 @@ void InitLog( const Config& cfg )
 		file_log->Enable( log::critical ) ;
 		
 		// log grive version to log file
-		file_log->Log( log::Fmt("webwrite" VERSION " " __DATE__ " " __TIME__), log::verbose ) ;
+		file_log->Log( log::Fmt("webwrite v" VERSION " " __DATE__ " " __TIME__), log::verbose ) ;
 		
 		comp_log->Add( file_log ) ;
 	}

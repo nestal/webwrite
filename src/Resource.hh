@@ -28,21 +28,25 @@ class Config ;
 class Resource
 {
 public :
-	explicit Resource( const std::string& uri, const Config& cfg ) ;
+	Resource( const std::string& uri, const Config& cfg ) ;
+	Resource( const fs::path& res_path, const Config& cfg ) ;
 	
 	/// a path to the resource relative to the "wb-root"
 	const fs::path& Path() const ;
 
 	fs::path ContentPath() const ;
 	
+	fs::path UrlPath() const ;
+	
 	/// filename of the resource
 	std::string Filename() const ;
-
+	
 	bool IsDir() const ;
 	
 private :
 	fs::path		m_path ;
-	
+
+public :
 	const Config	*m_cfg ;
 } ;
 

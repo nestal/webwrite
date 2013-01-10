@@ -38,6 +38,12 @@ Resource::Resource( const std::string& uri, const Config& cfg ) :
 	m_path = uri.substr( wb_root.size() ) ;
 }
 
+Resource::Resource( const fs::path& res_path, const Config& cfg ) :
+	m_cfg( &cfg ),
+	m_path( res_path )
+{
+}
+
 const fs::path& Resource::Path() const
 {
 	return m_path ;
@@ -57,6 +63,12 @@ fs::path Resource::ContentPath() const
 {
 	assert( m_cfg != 0 ) ;
 	return m_cfg->Base() / m_cfg->Str("data-path") / m_path ;
+}
+
+fs::path Resource::UrlPath() const
+{
+	assert( m_cfg != 0 ) ;
+	return m_cfg->Str("wb-root") / m_path ;
 }
 
 } // end of namespace

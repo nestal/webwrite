@@ -20,8 +20,9 @@
 #pragma once
 
 #include "util/FileSystem.hh"
-
 #include "fcgiapp.h"
+
+#include <boost/format.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -56,17 +57,20 @@ public :
 	DataStream* Out() ;
 
 	// templated version of printf
-	std::size_t PrintF( const char *fmt ) ;
+	int PrintF( const std::string& fmt ) ;
 	
 	template <typename P1>
-	std::size_t PrintF( const char *fmt, const P1& p1 ) ;
+	int PrintF( const std::string& fmt, const P1& p1 ) ;
 
 	template <typename P1, typename P2>
-	std::size_t PrintF( const char *fmt, const P1& p1, const P2& p2 ) ;
+	int PrintF( const std::string& fmt, const P1& p1, const P2& p2 ) ;
 
 	template <typename P1, typename P2, typename P3>
-	std::size_t PrintF( const char *fmt, const P1& p1, const P2& p2, const P3& p3 ) ;
+	int PrintF( const std::string& fmt, const P1& p1, const P2& p2, const P3& p3 ) ;
 
+	template <typename P1, typename P2, typename P3, typename P4>
+	int PrintF( const std::string& fmt, const P1& p1, const P2& p2, const P3& p3, const P4& p4 ) ;
+	
 	// tell the web server to send this file
 	void XSendFile( const fs::path& file ) ;
 	
@@ -84,24 +88,36 @@ private :
 } ;
 
 template <typename P1>
-std::size_t Request::PrintF( const char *fmt, const P1& p1 )
+int Request::PrintF( const std::string& fmt, const P1& p1 )
 {
-	return FCGX_FPrintF( m_req->out, fmt, p1 ) ;
-
+	std::string s = (boost::format(fmt) % p1).str() ;
+	return FCGX_PutS( s.c_str(), m_req->out ) ;
 }
 
 template <typename P1, typename P2>
-std::size_t Request::PrintF( const char *fmt, const P1& p1, const P2& p2 )
+int Request::PrintF( const std::string& fmt, const P1& p1, const P2& p2 )
 {
-	return FCGX_FPrintF( m_req->out, fmt, p1, p2 ) ;
-
+	std::string s = (boost::format(fmt) % p1 % p2).str() ;
+	return FCGX_PutS( s.c_str(), m_req->out ) ;
 }
 
 template <typename P1, typename P2, typename P3>
-std::size_t Request::PrintF( const char *fmt, const P1& p1, const P2& p2, const P3& p3 )
+int Request::PrintF( const std::string& fmt, const P1& p1, const P2& p2, const P3& p3 )
 {
-	return FCGX_FPrintF( m_req->out, fmt, p1, p2, p3 ) ;
+	std::string s = (boost::format(fmt) % p1 % p2 % p3).str() ;
+	return FCGX_PutS( s.c_str(), m_req->out ) ;
+}
 
+template <typename P1, typename P2, typename P3, typename P4>
+int Request::PrintF(
+	const std::string& fmt,
+	const P1& p1,
+	const P2& p2,
+	const P3& p3,
+	const P4& p4 )
+{
+	std::string s = (boost::format(fmt) % p1 % p2 % p3 % p4).str() ;
+	return FCGX_PutS( s.c_str(), m_req->out ) ;
 }
 
 } // end of namespace
