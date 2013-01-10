@@ -41,7 +41,6 @@ RootServer::RootServer( const Config& cfg ) :
 void RootServer::Work( Request *req, const Resource& res ) 
 {
 	fs::path	rel		= res.Path() ;
-	std::string	fname	= res.Filename() ;
 	
 	// no filename in request, redirect to main page
 	if ( res.IsDir() )
@@ -65,7 +64,6 @@ void RootServer::Work( Request *req, const Resource& res )
 
 void RootServer::ServeContent( Request *req, const Resource& res )
 {
-	std::string	fname	= res.Filename() ;
 	fs::path 	file	= res.ContentPath() ;
 	std::string qstr	= req->Query() ;
 	
@@ -150,7 +148,7 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 		
 		req->PrintF( "<li class=\"idx_file\"><a href=\"%1%\">%2%</a></li>",
 			sibling.UrlPath().string(),
-			sibling.Filename() ) ;
+			sibling.Name() ) ;
 	}
 	req->PrintF( "</ul>\r\n\r\n" ) ;
 }

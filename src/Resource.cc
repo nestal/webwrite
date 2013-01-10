@@ -49,14 +49,14 @@ const fs::path& Resource::Path() const
 	return m_path ;
 }
 
-std::string Resource::Filename() const
+std::string Resource::Name() const
 {
 	return m_path.filename().string() ;
 }
 
 bool Resource::IsDir() const
 {
-	return Filename().empty() || Filename() == "." || fs::is_directory(ContentPath()) ;
+	return Name().empty() || Name() == "." || fs::is_directory(ContentPath()) ;
 }
 
 fs::path Resource::ContentPath() const

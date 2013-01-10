@@ -38,8 +38,9 @@ public :
 	
 	fs::path UrlPath() const ;
 	
-	/// filename of the resource
-	std::string Filename() const ;
+	/// name of the resource. usually the "filename" in the URL (i.e. the
+	/// string after the last slash)
+	std::string Name() const ;
 	
 	bool IsDir() const ;
 	

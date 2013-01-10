@@ -174,9 +174,9 @@ li.idx_file:hover > a, li.idx_file:hover > a:hover
 }
 
 #drop {
-  width: 100%;
-  height: 100%;
-  border: 3px dashed #ccc;
-  margin: 2px;
-  padding: 2px;
+	width: 100%;
+	height: 100%;
+	border: 3px dashed #ccc;
+	margin: 2px;
+	padding: 2px;
 }
