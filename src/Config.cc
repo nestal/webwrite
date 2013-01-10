@@ -19,39 +19,29 @@
 
 #include "Config.hh"
 
-namespace wb {
+namespace wb { namespace cfg {
 
-Config::Config( const std::string& filename ) :
-	m_cfg( Json::ParseFile( filename ) ),
-	m_base( fs::current_path() )
+Json Init( const Json& json )
 {
+	Json copy( json ) ;
+	if ( !copy.Has("base") )
+		copy.Add( "base", Json(fs::current_path().string()) ) ;
+	
+	if ( !copy.Has("main_page") )
+		copy.Add( "main_page", Json("main") ) ;
+	
+	return copy;
 }
 
-std::string Config::Str( const std::string& key ) const
+const Json& Inst( const Json& json )
 {
-	return m_cfg[key].Str() ;
+	static const Json cfg = Init( json ) ;
+	return cfg ;
 }
 
-/*!	This configuration parameter denotes the base directory. This directory
-	contains all the data files required by webwrite, e.g. "_lib" for the
-	HTML/javascript files and "data" for storing the raw data.
-*/
-fs::path Config::Base() const
+fs::path Path( const std::string& cfg )
 {
-	return m_cfg.Has("base") ? fs::path(m_cfg["base"].Str()) : m_base ;
+	return fs::path(cfg::Inst()[cfg].Str()) ;
 }
 
-/*!	This configuration parameter contains the name of the default page in a
-	directory. Default value: "main".
-*/
-std::string Config::MainPage() const
-{
-	return m_cfg.Has("main_page") ? m_cfg["main_page"].Str() : "main" ;
-}
-
-Json Config::Get() const
-{
-	return m_cfg ;
-}
-
-} // end of namespace
+}} // end of namespace

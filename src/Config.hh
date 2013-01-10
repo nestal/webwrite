@@ -26,24 +26,12 @@
 
 namespace wb {
 
-class Config
+/// webwrite config is base on JSON.
+namespace cfg
 {
-public :
-	explicit Config( const std::string& filename ) ;
-
-	std::string Str( const std::string& key ) const ;
+	const Json& Inst( const Json& json = Json() ) ;
 	
-	fs::path Base() const ;
-	
-	std::string MainPage() const ;
-	
-	Json Get() const ;
-	
-private :
-	Json		m_cfg ;
-	fs::path	m_base ;
+	fs::path Path( const std::string& cfg ) ;
 } ;
-
-
 
 } // end of namespace

@@ -23,13 +23,11 @@
 
 namespace wb {
 
-class Config ;
-
 class Resource
 {
 public :
-	Resource( const std::string& uri, const Config& cfg ) ;
-	Resource( const fs::path& res_path, const Config& cfg ) ;
+	Resource( const std::string& uri ) ;
+	Resource( const fs::path& res_path ) ;
 	
 	/// a path to the resource relative to the "wb-root"
 	const fs::path& Path() const ;
@@ -46,9 +44,6 @@ public :
 	
 private :
 	fs::path		m_path ;
-
-public :
-	const Config	*m_cfg ;
 } ;
 
 } // end of namespace

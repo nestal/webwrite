@@ -23,14 +23,13 @@
 
 namespace wb {
 
-class Config ;
 class Request ;
 class Resource ;
 
 class RootServer
 {
 public :
-	RootServer( const Config& cfg ) ;
+	RootServer( ) ;
 	
 	void Work( Request *req, const Resource& res ) ;
 

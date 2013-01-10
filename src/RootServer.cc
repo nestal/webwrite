@@ -30,11 +30,11 @@
 
 namespace wb {
 
-RootServer::RootServer( const Config& cfg ) :
-	m_lib_path	( cfg.Base() / cfg.Str("lib-path") ),
-	m_data_path	( cfg.Base() / cfg.Str("data-path") ),
-	m_wb_root	( cfg.Str("wb-root") ),
-	m_main_page	( cfg.MainPage() )
+RootServer::RootServer( ) :
+	m_lib_path	( cfg::Path("base") / cfg::Path("lib_path") ),
+	m_data_path	( cfg::Path("base") / cfg::Path("data_path") ),
+	m_wb_root	( cfg::Inst()["wb_root"].Str() ),
+	m_main_page	( cfg::Inst()["main_page"].Str() )
 {
 }
 	
@@ -141,14 +141,17 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 	req->PrintF( "Content-type: text/html\r\n\r\n" ) ;
 
 	req->PrintF( "<ul>" ) ;
-	fs::directory_iterator di( res.ContentPath().parent_path() ), end ;
-	for ( ; di != end ; ++di )
+	if ( fs::is_directory(res.ContentPath().parent_path()) )
 	{
-		Resource sibling( res.Path().parent_path() / di->path().filename(), *res.m_cfg ) ;
-		
-		req->PrintF( "<li class=\"idx_file\"><a href=\"%1%\">%2%</a></li>",
-			sibling.UrlPath().string(),
-			sibling.Name() ) ;
+		fs::directory_iterator di( res.ContentPath().parent_path() ), end ;
+		for ( ; di != end ; ++di )
+		{
+			Resource sibling( res.Path().parent_path() / di->path().filename() ) ;
+			
+			req->PrintF( "<li class=\"idx_file\"><a href=\"%1%\">%2%</a></li>",
+				sibling.UrlPath().string(),
+				sibling.Name() ) ;
+		}
 	}
 	req->PrintF( "</ul>\r\n\r\n" ) ;
 }

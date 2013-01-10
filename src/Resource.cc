@@ -22,15 +22,14 @@
 
 #include "util/Exception.hh"
 
-#include <iostream>
+#include <string>
 #include <cassert>
 
 namespace wb {
 
-Resource::Resource( const std::string& uri, const Config& cfg ) :
-	m_cfg( &cfg )
+Resource::Resource( const std::string& uri )
 {
-	std::string wb_root = cfg.Str("wb-root") ;
+	std::string wb_root = cfg::Inst()["wb_root"].Str() ;
 	
 	if ( uri.substr( 0, wb_root.size() ) != wb_root )
 		throw Exception() ;
@@ -38,8 +37,7 @@ Resource::Resource( const std::string& uri, const Config& cfg ) :
 	m_path = uri.substr( wb_root.size() ) ;
 }
 
-Resource::Resource( const fs::path& res_path, const Config& cfg ) :
-	m_cfg( &cfg ),
+Resource::Resource( const fs::path& res_path ) :
 	m_path( res_path )
 {
 }
@@ -61,14 +59,12 @@ bool Resource::IsDir() const
 
 fs::path Resource::ContentPath() const
 {
-	assert( m_cfg != 0 ) ;
-	return m_cfg->Base() / m_cfg->Str("data-path") / m_path ;
+	return cfg::Path("base") / cfg::Path("data_path") / m_path ;
 }
 
 fs::path Resource::UrlPath() const
 {
-	assert( m_cfg != 0 ) ;
-	return m_cfg->Str("wb-root") / m_path ;
+	return cfg::Path("wb_root") / m_path ;
 }
 
 } // end of namespace

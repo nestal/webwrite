@@ -55,15 +55,15 @@ http://example.com/webwrite/some/long/path/to/the/page?load
 
 using namespace wb ;
 
-void InitLog( const Config& cfg )
+void InitLog( )
 {
 	std::auto_ptr<log::CompositeLog> comp_log(new log::CompositeLog) ;
 	LogBase* console_log = comp_log->Add( std::auto_ptr<LogBase>( new log::DefaultLog ) ) ;
 	
 	// initialize log object
-	if ( cfg.Get().Has("log") )
+	if ( cfg::Inst().Has("log") )
 	{
-		std::auto_ptr<LogBase> file_log(new log::DefaultLog( cfg.Get()["log"]["file"].Str() )) ;
+		std::auto_ptr<LogBase> file_log(new log::DefaultLog( cfg::Inst()["log"]["file"].Str() )) ;
 		file_log->Enable( log::debug ) ;
 		file_log->Enable( log::verbose ) ;
 		file_log->Enable( log::info ) ;
@@ -76,12 +76,12 @@ void InitLog( const Config& cfg )
 		
 		comp_log->Add( file_log ) ;
 	}
-	if ( cfg.Get()["log"]["level"].Str() == "debug" )
+	if ( cfg::Inst()["log"]["level"].Str() == "debug" )
 	{
 		console_log->Enable( log::verbose ) ;
 		console_log->Enable( log::debug ) ;
 	}
-	else if ( cfg.Get()["log"]["level"].Str() == "verbose" )
+	else if ( cfg::Inst()["log"]["level"].Str() == "verbose" )
 	{
 		console_log->Enable( log::verbose ) ;
 	}
@@ -93,15 +93,15 @@ int main( int argc, char **argv )
 {
 	try
 	{
-		Config cfg( argc < 2 ? "config.json" : argv[1] ) ;
-		InitLog( cfg ) ;
+		cfg::Inst( Json::ParseFile( argc < 2 ? "config.json" : argv[1] ) ) ;
+		InitLog( ) ;
 		
-		RootServer srv( cfg ) ;
+		RootServer srv ;
 		
 		FCGX_Request request ;
 
 		FCGX_Init() ;
-		FCGX_InitRequest( &request, FCGX_OpenSocket( cfg.Str("socket").c_str(), 0 ), 0 ) ;
+		FCGX_InitRequest( &request, FCGX_OpenSocket( cfg::Inst()["socket"].Str().c_str(), 0 ), 0 ) ;
 
 		int r ;
 		while ( (r = FCGX_Accept_r( &request )) == 0 )
@@ -109,7 +109,7 @@ int main( int argc, char **argv )
 			Request req( &request ) ;
 			Log( "requesting: %1%", req.URI(), log::verbose ) ;
 			
-			srv.Work( &req, Resource( req.SansQueryURI(), cfg ) ) ;
+			srv.Work( &req, Resource( req.SansQueryURI() ) ) ;
 
 			FCGX_Finish_r( &request ) ;
 		}
