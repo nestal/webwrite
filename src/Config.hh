@@ -32,6 +32,8 @@ namespace cfg
 	const Json& Inst( const Json& json = Json() ) ;
 	
 	fs::path Path( const std::string& cfg ) ;
+	
+	std::string MimeType( const fs::path& file ) ;
 } ;
 
 } // end of namespace

@@ -69,8 +69,7 @@ fs::path Resource::UrlPath() const
 
 std::string Resource::Type() const
 {
-	Json r;
-	return cfg::Inst()["mime"].Get(m_path.extension().string(), r) ? r.Str() : "application/octet" ;
+	return cfg::MimeType( ContentPath() ) ;
 }
 
 } // end of namespace

@@ -44,4 +44,13 @@ fs::path Path( const std::string& cfg )
 	return fs::path(cfg::Inst()[cfg].Str()) ;
 }
 
+std::string MimeType( const fs::path& file )
+{
+	const std::string ext = file.extension().string() ;
+
+	Json r;
+	return ext.empty() ? "text/html" :
+		(cfg::Inst()["mime"].Get(ext, r) ? r.Str() : "application/octet") ;
+}
+
 }} // end of namespace

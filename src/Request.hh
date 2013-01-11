@@ -56,7 +56,7 @@ public :
 	DataStream* In() ;
 	DataStream* Out() ;
 
-	// templated version of printf
+	// template version of printf
 	int PrintF( const std::string& fmt ) ;
 	
 	template <typename P1>
