@@ -67,4 +67,10 @@ fs::path Resource::UrlPath() const
 	return cfg::Path("wb_root") / m_path ;
 }
 
+std::string Resource::Type() const
+{
+	Json r;
+	return cfg::Inst()["mime"].Get(m_path.extension().string(), r) ? r.Str() : "application/octet" ;
+}
+
 } // end of namespace

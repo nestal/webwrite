@@ -28,6 +28,11 @@
 
 #include <boost/regex.hpp>
 
+#ifdef WIN32
+	#include <windows.h>
+	#include <Shellapi.h>
+#endif
+
 namespace wb {
 
 RootServer::RootServer( ) :
@@ -64,7 +69,6 @@ void RootServer::Work( Request *req, const Resource& res )
 
 void RootServer::ServeContent( Request *req, const Resource& res )
 {
-	fs::path 	file	= res.ContentPath() ;
 	std::string qstr	= req->Query() ;
 	
 	static const boost::regex re( "lib=(.+)" ) ;
@@ -72,6 +76,7 @@ void RootServer::ServeContent( Request *req, const Resource& res )
 
 	if ( req->Method() == "POST" && qstr == "save" )
 	{
+		fs::path 	file	= res.ContentPath() ;
 		Log( "writing to file %1%", file, log::verbose ) ;
 		
 		fs::create_directories( file.parent_path() ) ;
@@ -91,11 +96,14 @@ void RootServer::ServeContent( Request *req, const Resource& res )
 	
 	else if ( req->Method() == "GET" && qstr == "load" )
 	{
-		Log( "reading from %1%", file, log::verbose ) ;
+		fs::path 	file	= res.ContentPath() ;
+
+		Log( "reading from %1%, type %2%", file, res.Type(), log::verbose ) ;
+		req->PrintF( "Content-type: %1%\r\n", res.Type() ) ;
+
 		req->XSendFile( fs::exists( file ) ? file : (m_lib_path / "notfound.html") ) ;
-		
 	}
-	
+
 	else if ( req->Method() == "GET" && qstr == "var" )
 		ServeVar( req ) ;
 	

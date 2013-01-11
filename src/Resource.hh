@@ -40,6 +40,8 @@ public :
 	/// string after the last slash)
 	std::string Name() const ;
 	
+	std::string Type() const ;
+
 	bool IsDir() const ;
 	
 private :
