@@ -46,26 +46,30 @@ include_directories(
 	${webwrite_SOURCE_DIR}/test
 )
 
-# build bfd classes if libbfd is found
-if ( BFD_FOUND )
-        set( OPT_LIBS   ${DL_LIBRARY} ${BFD_LIBRARY} )
-        file( GLOB OPT_SRC
-                ${webwrite_SOURCE_DIR}/src/bfd/*.cc
-        )
-        add_definitions( -DHAVE_BFD )
-        
-endif ( BFD_FOUND )
-
 add_definitions(
 	-DTEST_DATA="${webwrite_SOURCE_DIR}/test/data/"
 	-DSRC_DIR="${webwrite_SOURCE_DIR}/src"
 	-DVERSION="${WEBWRITE_VERSION}"
 )
 
+# build bfd classes if libbfd is found
+if ( BFD_FOUND )
+    set( OPT_LIBS   ${DL_LIBRARY} ${BFD_LIBRARY} )
+    file( GLOB OPT_SRC
+            ${webwrite_SOURCE_DIR}/src/bfd/*.cc
+    )
+    add_definitions( -DHAVE_BFD )
+        
+endif ( BFD_FOUND )
+
 file (GLOB WEBWRITE_LIB_SRC
 	${OPT_SRC}
-    ${webwrite_SOURCE_DIR}/src/*/*.hh
-    ${webwrite_SOURCE_DIR}/src/*/*.cc
+    ${webwrite_SOURCE_DIR}/src/log/*.hh
+    ${webwrite_SOURCE_DIR}/src/log/*.cc
+    ${webwrite_SOURCE_DIR}/src/parser/*.hh
+    ${webwrite_SOURCE_DIR}/src/parser/*.cc
+    ${webwrite_SOURCE_DIR}/src/util/*.hh
+    ${webwrite_SOURCE_DIR}/src/util/*.cc
 )
 
 add_library( wb_core
