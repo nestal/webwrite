@@ -36,8 +36,9 @@ public :
 	
 	fs::path UrlPath() const ;
 	
-	/// name of the resource. usually the "filename" in the URL (i.e. the
-	/// string after the last slash)
+	/// The "filename" in the URL (i.e. the string after the last slash)
+	std::string Filename() const ;
+	
 	std::string Name() const ;
 	
 	std::string Type() const ;

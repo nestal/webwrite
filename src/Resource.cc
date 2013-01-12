@@ -22,6 +22,7 @@
 
 #include "util/Exception.hh"
 
+#include <algorithm>
 #include <string>
 #include <cassert>
 
@@ -47,14 +48,21 @@ const fs::path& Resource::Path() const
 	return m_path ;
 }
 
-std::string Resource::Name() const
+std::string Resource::Filename() const
 {
 	return m_path.filename().string() ;
 }
 
+std::string Resource::Name() const
+{
+	std::string name = Filename() ;
+	std::replace( name.begin(), name.end(), '_', ' ' ) ;
+	return name ;
+}
+
 bool Resource::IsDir() const
 {
-	return Name().empty() || Name() == "." || fs::is_directory(ContentPath()) ;
+	return Filename().empty() || Filename() == "." || fs::is_directory(ContentPath()) ;
 }
 
 fs::path Resource::ContentPath() const
