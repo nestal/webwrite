@@ -24,7 +24,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <cstdlib>
 #include <string>
 
 namespace wb {
@@ -57,6 +56,8 @@ std::string Resource::Filename() const
 	return m_path.filename().string() ;
 }
 
+/// name of the resource. This string is NOT encoded in %-format (RFC1738). Assuming
+/// the web server is using UTF8, this string should be in UTF8 encoding.
 std::string Resource::Name() const
 {
 	std::string result, src = Filename() ;
@@ -67,15 +68,13 @@ std::string Resource::Name() const
 			case ' ': result.push_back( '_' );	break ;
 			case '%':
 			{
-				std::size_t pos = i - src.begin() + 1;
-				if ( pos < src.size() )
+				std::string c = src.substr( i-src.begin(), 3 ) ;
+				if ( c.size() == 3 )
 				{
-					std::string c = src.substr( i-src.begin()+1, 2 ) ;
-					if ( c.size() == 2 )
-					{
-						result.push_back( static_cast<char>( ::strtol( c.c_str(), 0, 16 ) ) ) ;
-						i += 2 ;
-					}
+					long r = std::strtol( c.c_str()+1, 0, 16 ) ;
+					if ( r >= 0 && r <= std::numeric_limits<unsigned char>::max() )
+						result.push_back( static_cast<char>( r ) ) ;
+					i += 2 ;
 				}
 				break ;
 			}

@@ -153,24 +153,37 @@ span.edit_cmd:hover
 	cursor: pointer;
 }
 
-li.idx_file
+li.idx_file, li.idx_folder
 {
-	list-style: none;
 	cursor: pointer;
+	list-style: none;
 }
 
-li.idx_file > a
+li.idx_folder
+{
+	background:		url("?lib=icons/folder.png") no-repeat left center;
+	padding-left:	30px; 
+}
+
+li.idx_file
+{
+	background:		url("?lib=icons/text-html.png") no-repeat left center;
+	padding-left:	30px; 
+}
+
+li.idx_file > a, li.idx_folder > a
 {
 	text-decoration: none;
 	color: rgb(30,30,128);
 	display: block;
 }
 
-li.idx_file:hover > a, li.idx_file:hover > a:hover
+li.idx_file:hover > a, li.idx_file:hover > a:hover, li.idx_folder:hover > a, li.idx_folder:hover > a:hover
 {
 	color: 			rgb(30,30,192);
 	display: 		block;
 	text-shadow:	1px 1px 1px rgba(0, 0, 100, 0.5);
+	background-color:	lightgray;
 }
 
 #drop {

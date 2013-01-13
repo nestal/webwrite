@@ -6,7 +6,8 @@
 	"mime"		:
 	{
 		".html"	: "text/html",
-		".js"	: "application/javascript"
+		".js"	: "application/javascript",
+		".css"	: "text/css",
 	},
 	"log"		:
 	{

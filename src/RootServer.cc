@@ -152,9 +152,12 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 		{
 			Resource sibling( res.Path().parent_path() / di->path().filename() ) ;
 
-Log( "file: %1%, %2%", di->path().filename(), sibling.Name() ) ;
+			static const std::string
+				file_class		= "idx_file",
+				folder_class	= "idx_folder" ;
 
-			req->PrintF( "<li class=\"idx_file\"><a href=\"%1%\">%2%</a></li>",
+			req->PrintF( "<li class=\"%1% menu_idx\"><a href=\"%2%\">%3%</a></li>",
+				(fs::is_directory( di->path() ) ? folder_class : file_class),				
 				sibling.UrlPath().string(),
 				sibling.Name() ) ;
 		}
