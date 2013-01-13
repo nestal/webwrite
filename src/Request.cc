@@ -118,12 +118,14 @@ int Request::PrintF( const std::string& fmt )
 	return FCGX_PutS( fmt.c_str(), m_req->out ) ;
 }
 
-void Request::SeeOther( const std::string& location )
+void Request::SeeOther( const std::string& location, bool query )
 {
 	FCGX_FPrintF(
 		m_req->out,
 		"303 See Other\r\nLocation: %s\r\n\r\n",
-		location.c_str() ) ;
+		(query && !Query().empty()) ?
+			(location + '?' + Query() ).c_str() : 
+			location.c_str() ) ;
 }
 
 std::string Request::SansQueryURI() const

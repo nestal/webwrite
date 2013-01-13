@@ -75,7 +75,7 @@ public :
 	void XSendFile( const fs::path& file ) ;
 	
 	// HTTP status return
-	void SeeOther( const std::string& location ) ;
+	void SeeOther( const std::string& location, bool query = false ) ;
 	
 	// for debugging
 	void PrintEnv() const ;

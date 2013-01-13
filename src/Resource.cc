@@ -35,7 +35,13 @@ Resource::Resource( const std::string& uri )
 	if ( uri.substr( 0, wb_root.size() ) != wb_root )
 		throw Exception() ;
 	
-	m_path = uri.substr( wb_root.size() ) ;
+	std::string raw_path = uri.substr( wb_root.size() ) ;
+	std::replace( raw_path.begin(), raw_path.end(), ' ', '_' ) ;
+	
+	m_path = raw_path ;
+	
+	if ( Filename().empty() || Filename() == "." || fs::is_directory(ContentPath()) )
+		m_path /= cfg::Inst()["main_page"].Str() ; 
 }
 
 Resource::Resource( const fs::path& res_path ) :

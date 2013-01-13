@@ -47,16 +47,9 @@ void RootServer::Work( Request *req, const Resource& res )
 {
 	fs::path	rel		= res.Path() ;
 	
-	// no filename in request, redirect to main page
-	if ( res.IsDir() )
-	{
-		std::string path = (m_wb_root/res.Path()/m_main_page).string() ;
-		if ( !req->Query().empty() )
-			path += ("?" + req->Query()) ;
-		
-		req->SeeOther( path ) ;
-	}
-
+	if ( res.UrlPath() != req->SansQueryURI() )
+		req->SeeOther( res.UrlPath().string(), true ) ;
+	
 	else if ( !req->Query().empty() )
 		return ServeContent( req, res ) ;
 	
