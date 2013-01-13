@@ -151,7 +151,9 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 		for ( ; di != end ; ++di )
 		{
 			Resource sibling( res.Path().parent_path() / di->path().filename() ) ;
-			
+
+Log( "file: %1%, %2%", di->path().filename(), sibling.Name() ) ;
+
 			req->PrintF( "<li class=\"idx_file\"><a href=\"%1%\">%2%</a></li>",
 				sibling.UrlPath().string(),
 				sibling.Name() ) ;

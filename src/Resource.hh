@@ -43,8 +43,6 @@ public :
 	
 	std::string Type() const ;
 
-	bool IsDir() const ;
-	
 private :
 	fs::path		m_path ;
 } ;

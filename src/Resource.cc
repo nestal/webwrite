@@ -23,8 +23,9 @@
 #include "util/Exception.hh"
 
 #include <algorithm>
-#include <string>
 #include <cassert>
+#include <cstdlib>
+#include <string>
 
 namespace wb {
 
@@ -35,10 +36,7 @@ Resource::Resource( const std::string& uri )
 	if ( uri.substr( 0, wb_root.size() ) != wb_root )
 		throw Exception() ;
 	
-	std::string raw_path = uri.substr( wb_root.size() ) ;
-	std::replace( raw_path.begin(), raw_path.end(), ' ', '_' ) ;
-	
-	m_path = raw_path ;
+	m_path = uri.substr(wb_root.size()) ;
 	
 	if ( Filename().empty() || Filename() == "." || fs::is_directory(ContentPath()) )
 		m_path /= cfg::Inst()["main_page"].Str() ; 
@@ -61,14 +59,30 @@ std::string Resource::Filename() const
 
 std::string Resource::Name() const
 {
-	std::string name = Filename() ;
-	std::replace( name.begin(), name.end(), '_', ' ' ) ;
-	return name ;
-}
-
-bool Resource::IsDir() const
-{
-	return Filename().empty() || Filename() == "." || fs::is_directory(ContentPath()) ;
+	std::string result, src = Filename() ;
+	for ( std::string::const_iterator i = src.begin() ; i != src.end() ; ++i )
+	{
+		switch ( *i )
+		{
+			case ' ': result.push_back( '_' );	break ;
+			case '%':
+			{
+				std::size_t pos = i - src.begin() + 1;
+				if ( pos < src.size() )
+				{
+					std::string c = src.substr( i-src.begin()+1, 2 ) ;
+					if ( c.size() == 2 )
+					{
+						result.push_back( static_cast<char>( ::strtol( c.c_str(), 0, 16 ) ) ) ;
+						i += 2 ;
+					}
+				}
+				break ;
+			}
+			default: result.push_back( *i );	break ;
+		}
+	}
+	return result ;
 }
 
 fs::path Resource::ContentPath() const
