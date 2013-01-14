@@ -165,8 +165,9 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 		fs::directory_iterator di( res.ContentPath().parent_path() ), end ;
 		for ( ; di != end ; ++di )
 		{
-			Resource sibling( (res.UrlPath().parent_path() / di->path().filename()).string() ) ;
-Log( "path = %1% %2%", di->path(), sibling.Path() ) ;
+			Resource sibling(
+				(res.UrlPath().parent_path() /
+				di->path().filename()).string() ) ;
 
 			static const std::string
 				file_class		= "idx_file",
