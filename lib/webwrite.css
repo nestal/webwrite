@@ -99,9 +99,9 @@ div#menu
 }
 
 .wb-toolbar li {
-    text-align: left;
-    float: 		left;
-    list-style: none;
+    font-size: 		80%;
+    float: 			left;
+    list-style:		none;
 	padding:		0 .5em 0 .5em;
     margin:			0;
     cursor:			pointer;
