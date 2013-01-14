@@ -39,9 +39,13 @@ public :
 	/// The "filename" in the URL (i.e. the string after the last slash)
 	std::string Filename() const ;
 	
+	std::string ParentName() const ;
+
 	std::string Name() const ;
 	
 	std::string Type() const ;
+
+	static std::string DecodeName( const std::string& uri ) ;
 
 private :
 	fs::path		m_path ;

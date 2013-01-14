@@ -165,7 +165,8 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 		fs::directory_iterator di( res.ContentPath().parent_path() ), end ;
 		for ( ; di != end ; ++di )
 		{
-			Resource sibling( res.Path().parent_path() / di->path().filename() ) ;
+			Resource sibling( di->path().string() ) ;
+Log( "path = %1% %2%", di->path(), sibling.ParentName() ) ;
 
 			static const std::string
 				file_class		= "idx_file",
@@ -174,7 +175,7 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 			req->PrintF( "<li class=\"%1% menu_idx\"><a href=\"%2%\">%3%</a></li>",
 				(fs::is_directory( di->path() ) ? folder_class : file_class),				
 				sibling.UrlPath().string(),
-				sibling.Name() ) ;
+				(fs::is_directory( di->path() ) ? sibling.ParentName() : sibling.Name()) ) ;
 		}
 	}
 	req->PrintF( "</ul>\r\n\r\n" ) ;

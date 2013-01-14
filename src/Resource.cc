@@ -60,12 +60,24 @@ std::string Resource::Filename() const
 /// the web server is using UTF8, this string should be in UTF8 encoding.
 std::string Resource::Name() const
 {
-	std::string result, src = Filename() ;
-	for ( std::string::const_iterator i = src.begin() ; i != src.end() ; ++i )
+	// the file name on disk is using the URI encoding. i.e. it has %20 instead of
+	// space. this way there is no need to re-encode the name when reading and writing.
+	return DecodeName( Filename() ) ;
+}
+
+std::string Resource::ParentName() const
+{
+	return DecodeName( m_path.parent_path().filename().string() ) ;
+}
+
+std::string Resource::DecodeName( const std::string& uri )
+{
+	std::string result ;
+	for ( std::string::const_iterator i = uri.begin() ; i != uri.end() ; ++i )
 	{
 		if ( *i == '%' )
 		{
-			std::string c = src.substr( i-src.begin(), 3 ) ;
+			std::string c = uri.substr( i-uri.begin(), 3 ) ;
 			if ( c.size() == 3 )
 			{
 				long r = std::strtol( c.c_str()+1, 0, 16 ) ;
