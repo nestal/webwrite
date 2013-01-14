@@ -40,6 +40,7 @@
   <script type="text/javascript" src="?lib=webwrite.js"></script>
   <link href="?lib=webwrite.css" rel="stylesheet" type="text/css"></link>
 
+  <!-- C programmers prefer to call it "main()" -->
   <script type="text/javascript">
     $(document).ready( main ) ;
   </script>
@@ -56,6 +57,17 @@
         <div id="content"></div>
       </div>
     </div>
-  </div>    
+  </div>
+
+  <!-- dialog overlays. these two are normally hidden. -->  
+  <div id="overlay" style="display: none;"></div>
+  <div id="dialog" style="display: none;">
+    <a id="dialog_xbutton">x</a>
+    <h1>Dialog title!</h1>
+    
+    <div id="dialog_body">
+      <p>Hello! This is a message</p>
+    </div>
+  </div>
 </body>
 </html>
