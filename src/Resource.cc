@@ -63,23 +63,19 @@ std::string Resource::Name() const
 	std::string result, src = Filename() ;
 	for ( std::string::const_iterator i = src.begin() ; i != src.end() ; ++i )
 	{
-		switch ( *i )
+		if ( *i == '%' )
 		{
-			case ' ': result.push_back( '_' );	break ;
-			case '%':
+			std::string c = src.substr( i-src.begin(), 3 ) ;
+			if ( c.size() == 3 )
 			{
-				std::string c = src.substr( i-src.begin(), 3 ) ;
-				if ( c.size() == 3 )
-				{
-					long r = std::strtol( c.c_str()+1, 0, 16 ) ;
-					if ( r >= 0 && r <= std::numeric_limits<unsigned char>::max() )
-						result.push_back( static_cast<char>( r ) ) ;
-					i += 2 ;
-				}
-				break ;
+				long r = std::strtol( c.c_str()+1, 0, 16 ) ;
+				if ( r >= 0 && r <= std::numeric_limits<unsigned char>::max() )
+					result.push_back( static_cast<char>( r ) ) ;
+				i += 2 ;
 			}
-			default: result.push_back( *i );	break ;
 		}
+		else
+			result.push_back( *i );
 	}
 	return result ;
 }

@@ -55,8 +55,13 @@ void RootServer::Work( Request *req, const Resource& res )
 	
 	else
 	{
-		Log( "serving home page for %1%", res.Path(), log::verbose ) ;
-		req->XSendFile( m_lib_path / "index.html" ) ;
+		if ( res.Type() == "text/html" )
+		{
+			Log( "serving home page for %1%", res.Path(), log::verbose ) ;
+			req->XSendFile( m_lib_path / "index.html" ) ;
+		}
+		else
+			ServeDataFile( req, res ) ;
 	}
 }
 
@@ -89,13 +94,8 @@ void RootServer::ServeContent( Request *req, const Resource& res )
 	
 	else if ( req->Method() == "GET" && qstr == "load" )
 	{
-		fs::path file	= res.ContentPath() ;
-		bool good		= fs::exists(file) ;
-
-		Log( "reading from %1%, type %2%", file, res.Type(), log::verbose ) ;
-		req->PrintF( "Content-type: %1%\r\n", (good ? res.Type() : "text/html") ) ;
-
-		req->XSendFile( good ? file : (m_lib_path / "notfound.html") ) ;
+		if ( !ServeDataFile( req, res ) )
+			ServeLibFile( req, res.Path(), "notfound.html" ) ;
 	}
 
 	else if ( req->Method() == "GET" && qstr == "var" )
@@ -106,6 +106,21 @@ void RootServer::ServeContent( Request *req, const Resource& res )
 	
 	else if ( req->Method() == "GET" && boost::regex_search( qstr, m, re ) )
 		ServeLibFile( req, res.Path(), m[1].str() ) ;
+}
+
+bool RootServer::ServeDataFile( Request *req, const Resource& res )
+{
+	fs::path file	= res.ContentPath() ;
+	if ( fs::exists(file) )
+	{
+		Log( "reading from %1%, type %2%", file, res.Type(), log::verbose ) ;
+		req->PrintF( "Content-type: %1%\r\n", res.Type() ) ;
+
+		req->XSendFile( file ) ;
+		return true ;
+	}
+	else
+		return false ;
 }
 
 void RootServer::ServeLibFile( Request *req, const fs::path& res_path, const std::string& libfile )

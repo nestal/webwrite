@@ -38,6 +38,7 @@ private :
 	void ServeLibFile( Request *req, const fs::path& path, const std::string& libfile ) ;
 	void ServeVar( Request *req ) ;
 	void ServeIndex( Request *req, const Resource& res ) ;
+	bool ServeDataFile( Request *req, const Resource& res ) ;
 
 private :
 	// configuration parameters
