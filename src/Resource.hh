@@ -27,7 +27,6 @@ class Resource
 {
 public :
 	Resource( const std::string& uri ) ;
-	Resource( const fs::path& res_path ) ;
 	
 	/// a path to the resource relative to the "wb-root"
 	const fs::path& Path() const ;

@@ -41,11 +41,6 @@ Resource::Resource( const std::string& uri )
 		m_path /= cfg::Inst()["main_page"].Str() ; 
 }
 
-Resource::Resource( const fs::path& res_path ) :
-	m_path( res_path )
-{
-}
-
 const fs::path& Resource::Path() const
 {
 	return m_path ;
