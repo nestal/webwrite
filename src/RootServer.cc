@@ -164,6 +164,13 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 	req->PrintF( "Content-type: text/html\r\n\r\n" ) ;
 
 	req->PrintF( "<ul>" ) ;
+	
+	// show the [parent] entry
+	if ( res.Path().parent_path() != "/" )
+		req->PrintF( "<li class=\"idx_folder menu_idx\"><a href=\"%1%/%2%\">[parent]</a></li>",
+			res.UrlPath().parent_path().parent_path().string(),
+			m_main_page) ;
+	
 	if ( fs::is_directory(res.ContentPath().parent_path()) )
 	{
 		fs::directory_iterator di( res.ContentPath().parent_path() ), end ;
