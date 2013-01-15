@@ -125,10 +125,15 @@ bool RootServer::ServeDataFile( Request *req, const Resource& res )
 
 void RootServer::ServeLibFile( Request *req, const fs::path& res_path, const std::string& libfile )
 {
+	fs::path p( libfile ) ;
+
+	if ( std::find( p.begin(), p.end(), ".." ) != p.end() )
+		req->NotFound() ;
+
 	// only serve file if it is in the root path
-	if ( res_path.parent_path() == "/" )
+	else if ( res_path.parent_path() == "/" )
 	{
-		fs::path path = m_lib_path / libfile ;
+		fs::path path = m_lib_path / p ;
 		Log( "serving lib file: %1% %2%", path, cfg::MimeType(path), log::verbose ) ;
 		
 		req->PrintF( "Content-type: %1%\r\n", cfg::MimeType(path) ) ;
@@ -138,9 +143,8 @@ void RootServer::ServeLibFile( Request *req, const fs::path& res_path, const std
 	// request for lib file using non-root paths will get a redirect
 	else
 	{
-		fs::path path = m_wb_root / ("main?lib=" + libfile) ;
-		Log( "redirecting to: %1%", path, log::verbose );
-		req->SeeOther( path.string() ) ;
+		std::string path = m_wb_root + "main?lib=" + libfile ;
+		req->SeeOther( m_wb_root + "/" + m_main_page + "?lib=" + libfile ) ;
 	}
 }
 
@@ -148,7 +152,7 @@ void RootServer::ServeVar( Request *req )
 {
 	// path to URLs should be generic strings
 	Json var ;
-	var.Add( "wb_root", Json( m_wb_root.generic_string() ) ) ;
+	var.Add( "wb_root", Json( m_wb_root ) ) ;
 	var.Add( "main", Json( m_main_page ) ) ;
 		
 	std::string s = var.Str() ;

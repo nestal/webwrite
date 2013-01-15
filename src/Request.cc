@@ -122,10 +122,15 @@ void Request::SeeOther( const std::string& location, bool query )
 {
 	FCGX_FPrintF(
 		m_req->out,
-		"303 See Other\r\nLocation: %s\r\n\r\n",
+		"Status: 303 See Other\r\nLocation: %s\r\n\r\n",
 		(query && !Query().empty()) ?
 			(location + '?' + Query() ).c_str() : 
 			location.c_str() ) ;
+}
+
+void Request::NotFound()
+{
+	FCGX_FPrintF( m_req->out, "Status: 404 Not Found\r\n\r\n<html><h1>404 Not Found!!!!</h1></html>" ) ;
 }
 
 std::string Request::SansQueryURI() const

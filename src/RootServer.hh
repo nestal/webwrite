@@ -44,7 +44,7 @@ private :
 	// configuration parameters
 	fs::path	m_lib_path ;
 	fs::path	m_data_path ;
-	fs::path	m_wb_root ;
+	std::string	m_wb_root ;
 	
 	std::string	m_main_page ;
 } ;
