@@ -187,11 +187,8 @@ li.idx_file:hover > a, li.idx_file:hover > a:hover, li.idx_folder:hover > a, li.
 }
 
 #drop {
-	width: 100%;
-	height: 100%;
 	border: 3px dashed #ccc;
-	margin: 2px;
-	padding: 2px;
+	padding: 40px;
 }
 
 div#overlay
@@ -209,17 +206,16 @@ div#overlay
 
 div#dialog
 {
-    position:fixed;
-    width: 50%;
+    /* position & size: place the dialog exactly in the center of the screen */
+    position:   fixed;
+    top:	    25%;
+    left:	    25%;   
+    width:      50%;
     
-    margin:	0 auto;
-    top:	25%;
-    left:	25%;   
-    
-    background-color:#fff;
-    color:#7F7F7F;
-    padding:20px;
-    border:2px solid #ccc;
+    background-color:   #fff;
+    color:              #7F7F7F;
+    padding:            20px;
+    border:             2px solid #ccc;
     
     border-radius:			20px;
     -moz-border-radius:		20px;
@@ -242,6 +238,7 @@ div#dialog h1
     background-color:	#EFEFFF;
     color:				#7777EF;
     
+    border-radius:20px 20px 0px 0px;
     -moz-border-radius:20px 20px 0px 0px;
     -webkit-border-top-left-radius: 20px;
     -webkit-border-top-right-radius: 20px;
@@ -251,6 +248,16 @@ div#dialog h1
 
 div#dialog a#dialog_xbutton
 {
-	float: right;
+    /* offset by the radius of the parent */
+    position:   relative;
+    top:    -20px;
+    left:   10px;
+
+	float:  right;
 	cursor: pointer;
+}
+
+div#dialog div#dialog_body
+{
+    margin: 20px 2px 2px 2px; /* top margin need to be the same as border radius in parent */
 }
