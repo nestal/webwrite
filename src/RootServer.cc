@@ -152,6 +152,7 @@ void RootServer::ServeVar( Request *req )
 {
 	// path to URLs should be generic strings
 	Json var ;
+	var.Add( "name", Json( cfg::Inst()["name"] ) ) ;
 	var.Add( "wb_root", Json( m_wb_root ) ) ;
 	var.Add( "main", Json( m_main_page ) ) ;
 		
