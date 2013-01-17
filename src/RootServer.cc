@@ -169,7 +169,7 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 	// show the [parent] entry
 	if ( res.Path().parent_path() != "/" )
 		req->PrintF( "<li class=\"idx_folder menu_idx\"><a href=\"%1%/%2%\">[parent]</a></li>",
-			res.UrlPath().parent_path().parent_path().string(),
+			res.UrlPath().parent_path().parent_path().generic_string(),
 			m_main_page) ;
 	
 	if ( fs::is_directory(res.ContentPath().parent_path()) )
@@ -187,7 +187,7 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 
 			req->PrintF( "<li class=\"%1% menu_idx\"><a href=\"%2%\">%3%</a></li>",
 				(fs::is_directory( di->path() ) ? folder_class : file_class),				
-				sibling.UrlPath().string(),
+				sibling.UrlPath().generic_string(),
 				(fs::is_directory( di->path() ) ? sibling.ParentName() : sibling.Name()) ) ;
 		}
 	}
