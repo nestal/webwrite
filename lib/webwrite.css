@@ -28,25 +28,23 @@ body div.sidebar
 	float:	left;
 }
 
-body div.sidebar div.logo
+body div.sidebar div.logo:hover
 {
-	font-size:	2em;
-	text-align:	center;
-	background-color: #003399;
-	text-decoration: none;
-	color:	white;
-	font-weight: bold;
-	text-shadow:	5px 5px 5px rgba(40, 50, 90, 0.9);
+	background-color:	#003399;
+	color:				white;
+	text-shadow:		5px 5px 5px rgba(40, 50, 90, 0.9);
 }
 
-body div.sidebar div.logo:hover 
+body div.sidebar div.logo 
 {
-	text-decoration: none;
-	background-color: white;
-	color:	#003399;
-	font-weight: bold;
-	cursor:	pointer;
-	text-shadow:	5px 5px 5px rgba(150, 150, 255, 0.9);
+	font-size:			2em;
+	text-align:			center;
+	text-decoration:	none;
+	background-color:	white;
+	color:				#003399;
+	font-weight: 		bold;
+	cursor:				pointer;
+	text-shadow:		5px 5px 5px rgba(150, 150, 255, 0.9);
 }
 
 body div.torso
