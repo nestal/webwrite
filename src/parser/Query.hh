@@ -34,7 +34,7 @@ public :
 	
 	void Add( const std::string& param, const Callback& cb ) ;
 	
-	void Parse( const std::string& qstr ) const ;
+	bool Parse( const std::string& qstr ) const ;
 
 private :
 	std::map<std::string, Callback>	m_cb ;

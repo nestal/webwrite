@@ -33,6 +33,7 @@ void Query::Add( const std::string& param, const Callback& cb )
 
 bool Query::Parse( const std::string& qstr ) const
 {
+	return false ;
 }
 
 } // end of namespace
