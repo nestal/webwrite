@@ -20,6 +20,9 @@
 #pragma once
 
 #include "util/FileSystem.hh"
+#include "parser/Query.hh"
+
+#include <boost/function.hpp>
 
 namespace wb {
 
@@ -40,13 +43,19 @@ private :
 	void ServeIndex( Request *req, const Resource& res ) ;
 	bool ServeDataFile( Request *req, const Resource& res ) ;
 
+	void ServeMimeCss( Request *req, const Resource& res ) ;
+
 private :
 	// configuration parameters
 	fs::path	m_lib_path ;
 	fs::path	m_data_path ;
-	std::string	m_wb_root ;
 	
+	std::string	m_wb_root ;
 	std::string	m_main_page ;
+	
+	// query string parser
+	typedef boost::function<void (RootServer*, Request*, const Resource&)> Handler ;
+	Query<Handler>	m_query ;
 } ;
 
 } // end of namespace

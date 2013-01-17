@@ -17,23 +17,27 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <cppunit/ui/text/TestRunner.h>
+#include "QueryTest.hh"
+#include "parser/Query.hh"
 
-#include "parser/FormDataTest.hh"
-#include "parser/StreamParserTest.hh"
-#include "parser/QueryTest.hh"
+#include "Assert.hh"
 
-int main( int argc, char **argv )
+#include <boost/bind.hpp>
+
+namespace wbut {
+
+using namespace wb ;
+
+QueryTest::QueryTest( )
 {
-	using namespace wbut ;
-
-	CppUnit::TextUi::TestRunner runner;
-	runner.addTest( FormDataTest::suite() ) ;
-	runner.addTest( StreamParserTest::suite() ) ;
-	runner.addTest( QueryTest::suite() ) ;
-	
-	// run the test cases!
-	runner.run();
-
-	return 0 ;
 }
+
+void QueryTest::Test( )
+{
+	Query<int> subject ;
+	subject.Add( "name", 1 ) ;
+	subject.Add( "value", 2 ) ;
+	WBUT_ASSERT_EQUAL( subject.Parse( "name=value" ), 1 ) ;
+}
+
+} // end of namespace

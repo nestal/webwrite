@@ -27,6 +27,7 @@
 #include "util/File.hh"
 
 #include <boost/regex.hpp>
+#include <boost/bind.hpp>
 
 namespace wb {
 
@@ -36,6 +37,8 @@ RootServer::RootServer( ) :
 	m_wb_root	( cfg::Inst()["wb_root"].Str() ),
 	m_main_page	( cfg::Inst()["main_page"].Str() )
 {
+	static Resource a("") ;
+	m_query.Add( "mimecss", &RootServer::ServeMimeCss ) ;
 }
 	
 void RootServer::Work( Request *req, const Resource& res ) 
@@ -187,6 +190,12 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 		}
 	}
 	req->PrintF( "</ul>\r\n\r\n" ) ;
+}
+
+void RootServer::ServeMimeCss( Request *req, const Resource& res )
+{
+	req->PrintF( "Content-type: text/css\r\n\r\n" ) ;
+	req->PrintF( ".haha {\nwidth:100%;\n}\r\n\r\n" ) ;
 }
 
 } // end of namespace

@@ -20,24 +20,34 @@
 
 #pragma once
 
-#include <boost/function.hpp>
 #include <map>
 
 namespace wb {
 
+template <typename T>
 class Query
 {
 public :
-	Query() ;
+	Query()
+	{
+	}
 	
-	typedef boost::function<void(const std::string&)> Callback ;
+	void Add( const std::string& param, const T& cb )
+	{
+		m_cb[param] = cb ;
+	}
 	
-	void Add( const std::string& param, const Callback& cb ) ;
-	
-	bool Parse( const std::string& qstr ) const ;
+	T Parse( const std::string& qstr ) const
+	{
+		std::string name = qstr.substr( 0, qstr.find_first_of( "&#=" ) ) ;
+		
+		typename Map::const_iterator i = m_cb.find( name ) ;
+		return i != m_cb.end() ? i->second : T() ;
+	}
 
 private :
-	std::map<std::string, Callback>	m_cb ;
+	typedef std::map<std::string, T> Map ;
+	Map	m_cb ;
 } ;
 
 } // end of namespace
