@@ -1,4 +1,5 @@
 {
+	"name"		: "WebWrite",
 	"socket"	: ":9000",
 	"wb_root"	: "/webwrite",
 	"lib_path"	: "lib",
@@ -9,7 +10,9 @@
 		".js"	: "application/javascript",
 		".css"	: "text/css",
 		".jpg"	: "image/jpeg",
-		".jpeg"	: "image/jpeg"
+		".jpeg"	: "image/jpeg",
+		".svg"	: "image/svg+xml",
+		".png"	: "image/png",
 	},
 	"log"		:
 	{

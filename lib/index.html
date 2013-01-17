@@ -31,10 +31,6 @@
   
   <!-- load the jQuery and require.js libraries -->
   <script type="text/javascript" src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
-  <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"></link>
-  
-  <script type="text/javascript" src="?lib=wysihtml5/advanced.js"></script>
-  <script type="text/javascript" src="?lib=wysihtml5/wysihtml5-0.3.0.min.js"></script>
   <script src="/ckeditor/ckeditor.js"></script>
   
   <!-- our own script and stylesheet -->
@@ -55,17 +51,12 @@
         <div id="menu">There should be some quick shortcuts here</div>
       </div>
       <div class="torso">
-        <div id="content">
-	  <div class="wb-toolbar toolbar">
-	    <ul>
-	      <li id="edit_button">Edit</li>
-	      <li id="save_button">Save</li>
-	      <li id="upload_button">Upload</li>
-	    </ul>
-	  </div>
-	  <div class="rich" id="viewer" contenteditable="false">
-	  </div>
-	</div>
+        <div class="toolbar">
+          <img src="?lib=icons/save.svg" id="save_button" title="Save"></img>
+          <img src="?lib=icons/edit.svg" id="edit_button" title="Edit"></img>
+        </div>
+        <div class="rich" id="viewer" contenteditable="false">
+        </div>
       </div>
     </div>
   </div>

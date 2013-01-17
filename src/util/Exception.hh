@@ -41,8 +41,6 @@ struct Exception :
 	virtual public boost::exception
 {
 	Exception( ) ;
-	
-	const char* what() const throw();
 } ;
 
 struct FileError	: virtual Exception {} ;
