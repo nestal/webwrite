@@ -21,13 +21,23 @@
 #pragma once
 
 #include <boost/function.hpp>
+#include <map>
 
 namespace wb {
 
 class Query
 {
 public :
-	Query( ) ;
+	Query() ;
+	
+	typedef boost::function<void(const std::string&)> Callback ;
+	
+	void Add( const std::string& param, const Callback& cb ) ;
+	
+	void Parse( const std::string& qstr ) const ;
+
+private :
+	std::map<std::string, Callback>	m_cb ;
 } ;
 
 } // end of namespace

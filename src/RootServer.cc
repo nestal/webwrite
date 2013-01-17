@@ -28,11 +28,6 @@
 
 #include <boost/regex.hpp>
 
-#ifdef WIN32
-	#include <windows.h>
-	#include <Shellapi.h>
-#endif
-
 namespace wb {
 
 RootServer::RootServer( ) :

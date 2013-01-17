@@ -26,4 +26,13 @@ Query::Query( )
 {
 }
 
+void Query::Add( const std::string& param, const Callback& cb )
+{
+	m_cb[param] = cb ;
+}
+
+bool Query::Parse( const std::string& qstr ) const
+{
+}
+
 } // end of namespace
