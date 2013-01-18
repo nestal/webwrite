@@ -75,7 +75,8 @@ body div.torso
 .rich
 {
 	margin:			0;
-    padding:		0;
+    padding-left:	1em;
+    padding-right:  1em;
 	font-size:		100%;
 	font-family: 	Helvetica, Arial, Verdana;
 }

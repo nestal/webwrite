@@ -38,10 +38,14 @@ public :
 
 private :
 	void ServeContent( Request *req, const Resource& res ) ;
+	void ServeLib( Request *req, const Resource& res ) ;
 	void ServeLibFile( Request *req, const fs::path& path, const std::string& libfile ) ;
-	void ServeVar( Request *req ) ;
+	void ServeVar( Request *req, const Resource& ) ;
 	void ServeIndex( Request *req, const Resource& res ) ;
 	bool ServeDataFile( Request *req, const Resource& res ) ;
+	void Load( Request *req, const Resource& res ) ;
+	void Save( Request *req, const Resource& res ) ;
+	void Upload( Request *req, const Resource& res ) ;
 
 	void ServeMimeCss( Request *req, const Resource& res ) ;
 
@@ -55,7 +59,7 @@ private :
 	
 	// query string parser
 	typedef boost::function<void (RootServer*, Request*, const Resource&)> Handler ;
-	Query<Handler>	m_query ;
+	Query<Handler>	m_get, m_post ;
 } ;
 
 } // end of namespace

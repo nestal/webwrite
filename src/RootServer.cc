@@ -37,7 +37,11 @@ RootServer::RootServer( ) :
 	m_wb_root	( cfg::Inst()["wb_root"].Str() ),
 	m_main_page	( cfg::Inst()["main_page"].Str() )
 {
-	m_query.Add( "mimecss", &RootServer::ServeMimeCss ) ;
+	m_get.Add( "mimecss",	&RootServer::ServeMimeCss ) ;
+	m_get.Add( "var",		&RootServer::ServeVar ) ;
+	m_get.Add( "index",		&RootServer::ServeIndex ) ;
+	m_get.Add( "load",		&RootServer::Load ) ;
+	m_get.Add( "lib",		&RootServer::ServeLib ) ;
 }
 	
 void RootServer::Work( Request *req, const Resource& res ) 
@@ -62,46 +66,60 @@ void RootServer::Work( Request *req, const Resource& res )
 	}
 }
 
+void RootServer::Load( Request *req, const Resource& res )
+{
+	if ( !ServeDataFile( req, res ) )
+		ServeLibFile( req, res.Path(), "notfound.html" ) ;
+}
+
 void RootServer::ServeContent( Request *req, const Resource& res )
 {
 	std::string qstr	= req->Query() ;
 	
+	if ( req->Method() == "GET" )
+	{
+		Handler h = m_get.Parse( qstr ) ;
+		if ( !h.empty() )
+			h( this, req, res ) ;
+	}
+
+	else if ( req->Method() == "POST" && qstr == "save" )
+	{
+		Save( req, res ) ;
+	}
+	else if ( req->Method() == "POST" && qstr == "upload" )
+	{
+		Upload( req, res ) ;
+	}
+}
+
+void RootServer::Save( Request *req, const Resource& res )
+{
+	fs::path 	file	= res.ContentPath() ;
+	Log( "writing to file %1%", file, log::verbose ) ;
+		
+	fs::create_directories( file.parent_path() ) ;
+	File f( file, 0600 ) ;
+		
+	char buf[80] ;
+	std::size_t c ;
+	while ( (c = req->In()->Read(buf, sizeof(buf)) ) > 0 )
+		f.Write( buf, c ) ;
+}
+	
+void RootServer::Upload( Request *req, const Resource& res )
+{
+	FormData form( req->In(), req->ContentType() ) ;
+	form.Save( res.ContentPath().parent_path() ) ;
+}
+
+void RootServer::ServeLib( Request *req, const Resource& res )
+{
 	static const boost::regex re( "lib=(.+)" ) ;
 	boost::smatch m ;
-
-	if ( req->Method() == "POST" && qstr == "save" )
-	{
-		fs::path 	file	= res.ContentPath() ;
-		Log( "writing to file %1%", file, log::verbose ) ;
-		
-		fs::create_directories( file.parent_path() ) ;
-		File f( file, 0600 ) ;
-		
-		char buf[80] ;
-		std::size_t c ;
-		while ( (c = req->In()->Read(buf, sizeof(buf)) ) > 0 )
-			f.Write( buf, c ) ;
-	}
 	
-	if ( req->Method() == "POST" && qstr == "upload" )
-	{
-		FormData form( req->In(), req->ContentType() ) ;
-		form.Save( res.ContentPath().parent_path() ) ;
-	}
-	
-	else if ( req->Method() == "GET" && qstr == "load" )
-	{
-		if ( !ServeDataFile( req, res ) )
-			ServeLibFile( req, res.Path(), "notfound.html" ) ;
-	}
-
-	else if ( req->Method() == "GET" && qstr == "var" )
-		ServeVar( req ) ;
-	
-	else if ( req->Method() == "GET" && qstr == "index" )
-		ServeIndex( req, res ) ;
-	
-	else if ( req->Method() == "GET" && boost::regex_search( qstr, m, re ) )
+	std::string qstr = req->Query() ;
+	if ( boost::regex_search( qstr, m, re ) )
 		ServeLibFile( req, res.Path(), m[1].str() ) ;
 }
 
@@ -145,7 +163,7 @@ void RootServer::ServeLibFile( Request *req, const fs::path& res_path, const std
 	}
 }
 
-void RootServer::ServeVar( Request *req )
+void RootServer::ServeVar( Request *req, const Resource& )
 {
 	// path to URLs should be generic strings
 	Json var ;
