@@ -117,6 +117,7 @@ int main( int argc, char **argv )
 	catch ( Exception& e )
 	{
 		Log( "exception: %1%", boost::diagnostic_information(e), log::critical ) ;
+		throw;
 	}
 
 	return 0 ;

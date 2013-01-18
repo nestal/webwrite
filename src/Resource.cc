@@ -20,8 +20,6 @@
 #include "Resource.hh"
 #include "Config.hh"
 
-#include "util/Exception.hh"
-
 #include <algorithm>
 #include <cassert>
 #include <string>
@@ -33,7 +31,7 @@ Resource::Resource( const std::string& uri )
 	std::string wb_root = cfg::Inst()["wb_root"].Str() ;
 	
 	if ( uri.substr( 0, wb_root.size() ) != wb_root )
-		throw Exception() ;
+		BOOST_THROW_EXCEPTION( Error() << expt::ErrMsg( "invalid resource path" ) ) ;
 	
 	m_path = uri.substr(wb_root.size()) ;
 	

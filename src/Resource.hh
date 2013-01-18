@@ -20,12 +20,15 @@
 #pragma once
 
 #include "util/FileSystem.hh"
+#include "util/Exception.hh"
 
 namespace wb {
 
 class Resource
 {
 public :
+	struct Error : virtual public Exception {} ;
+
 	Resource( const std::string& uri ) ;
 	
 	/// a path to the resource relative to the "wb-root"

@@ -37,7 +37,6 @@ RootServer::RootServer( ) :
 	m_wb_root	( cfg::Inst()["wb_root"].Str() ),
 	m_main_page	( cfg::Inst()["main_page"].Str() )
 {
-	static Resource a("") ;
 	m_query.Add( "mimecss", &RootServer::ServeMimeCss ) ;
 }
 	
