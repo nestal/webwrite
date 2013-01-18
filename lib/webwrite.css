@@ -26,6 +26,11 @@ body div.sidebar
 {
 	width:	20%;
 	float:	left;
+    padding: 2px 2px 2px 2px;
+
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
 }
 
 body div.sidebar div.logo:hover
@@ -33,6 +38,11 @@ body div.sidebar div.logo:hover
 	background-color:	#003399;
 	color:				white;
 	text-shadow:		5px 5px 5px rgba(40, 50, 90, 0.9);
+}
+
+body div.sidebar ul
+{
+    padding: 0.5em;
 }
 
 body div.sidebar div.logo 
@@ -52,6 +62,14 @@ body div.torso
 	width:		80%;
 	float:		right;
 	overflow:	auto;
+    box-shadow:	0 1px 5px #333;
+    
+    /* this is the width of the right size toolbar */
+    padding-right:  48px;
+
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
 }
 
 .rich
@@ -60,7 +78,6 @@ body div.torso
     padding:		0;
 	font-size:		100%;
 	font-family: 	Helvetica, Arial, Verdana;
-	overflow:		auto;
 }
 
 div#menu
