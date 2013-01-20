@@ -193,7 +193,7 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 	
 	// show the [parent] entry
 	if ( res.Path().parent_path() != "/" )
-		req->PrintF( "<li class=\"idx_folder menu_idx\"><a href=\"%1%/%2%\">[parent]</a></li>",
+		req->PrintF( "<li class=\"inode-directory menu_idx\"><a href=\"%1%/%2%\">[parent]</a></li>",
 			res.UrlPath().parent_path().parent_path().generic_string(),
 			m_main_page) ;
 	
@@ -206,12 +206,11 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 				(res.UrlPath().parent_path() /
 				di->path().filename()).string() ) ;
 
-			static const std::string
-				file_class		= "idx_file",
-				folder_class	= "idx_folder" ;
+			std::string type = sibling.Type() ;
+			std::replace( type.begin(), type.end(), '/', '-' ) ;
 
 			req->PrintF( "<li class=\"%1% menu_idx\"><a href=\"%2%\">%3%</a></li>",
-				(fs::is_directory( di->path() ) ? folder_class : file_class),				
+				(fs::is_directory( di->path() ) ? "inode-directory" : type),
 				sibling.UrlPath().generic_string(),
 				(fs::is_directory( di->path() ) ? sibling.ParentName() : sibling.Name()) ) ;
 		}

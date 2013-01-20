@@ -12,7 +12,7 @@
 		".jpg"	: "image/jpeg",
 		".jpeg"	: "image/jpeg",
 		".svg"	: "image/svg+xml",
-		".png"	: "image/png",
+		".png"	: "image/png"
 	},
 	"log"		:
 	{

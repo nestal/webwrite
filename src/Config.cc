@@ -49,8 +49,10 @@ std::string MimeType( const fs::path& file )
 	const std::string ext = file.extension().string() ;
 
 	Json r;
-	return ext.empty() ? "text/html" :
-		(cfg::Inst()["mime"].Get(ext, r) ? r.Str() : "application/octet") ;
+	return 
+		fs::is_directory(file)	? "inode/directory" :
+		(ext.empty()			? "text/html" :
+		(cfg::Inst()["mime"].Get(ext, r) ? r.Str() : "application/octet-stream")) ;
 }
 
 }} // end of namespace

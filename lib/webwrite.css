@@ -117,36 +117,44 @@ span.edit_cmd:hover
 	cursor: pointer;
 }
 
-li.idx_file, li.idx_folder
+li.menu_idx
 {
 	cursor: pointer;
 	list-style: none;
+	
+	background-size:		30px 30px;
+	background-repeat:		no-repeat;
+	background-position:	left center;
 }
 
-li.idx_folder
+li.inode-directory
 {
-	background:		url("?lib=icons/folder.png") no-repeat left center;
-	padding-left:	30px; 
+	background-image:		url("?lib=icons/inode-directory.png") ;
 }
 
-li.idx_file
+li.text-html
 {
-	background:		url("?lib=icons/text-html.png") no-repeat left center;
-	padding-left:	30px; 
+	background-image:		url("?lib=icons/text-html.png") ;
 }
 
-li.idx_file > a, li.idx_folder > a
+li.application-octet-stream
 {
-	text-decoration: none;
-	color: rgb(30,30,128);
-	display: block;
+	background-image:		url("?lib=icons/application-octet-stream.svg");
 }
 
-li.idx_file:hover > a, li.idx_file:hover > a:hover, li.idx_folder:hover > a, li.idx_folder:hover > a:hover
+li.menu_idx > a
 {
-	color: 			rgb(30,30,192);
-	display: 		block;
-	text-shadow:	1px 1px 1px rgba(0, 0, 100, 0.5);
+	text-decoration: 	none;
+	color: 				rgb(30,30,128);
+	display: 			block;
+	padding-left:		30px;
+}
+
+li.menu_idx:hover > a, li.menu_idx:hover > a:hover
+{
+	color: 				rgb(30,30,192);
+	display: 			block;
+	text-shadow:		1px 1px 1px rgba(0, 0, 100, 0.5);
 	background-color:	lightgray;
 }
 
