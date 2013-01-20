@@ -54,8 +54,7 @@ private :
 
 	// other helpers
 	static std::string GenerateMimeCss( const fs::path& lib_path ) ;
-	bool ServeDataFile( Request *req, const Resource& res ) ;
-	void ServeLibFile( Request *req, const fs::path& path ) ;
+	bool ServeFile( Request *req, const fs::path& path ) ;
 
 private :
 	// configuration parameters

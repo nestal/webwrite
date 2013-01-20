@@ -41,7 +41,7 @@ RootServer::RootServer( ) :
 	m_main_page	( cfg::Inst()["main_page"].Str() ),
 	m_mime_css	( GenerateMimeCss(m_lib_path) )
 {
-	// GET requests
+	// handlers for GET requests
 	Query<Handler>& get = m_srv.insert( std::make_pair( 
 		"GET",
 		Query<Handler>(&RootServer::NotFound) ) ).first->second ;
@@ -53,7 +53,7 @@ RootServer::RootServer( ) :
 	get.Add( "load",	&RootServer::Load ) ;
 	get.Add( "lib",		&RootServer::ServeLib ) ;
 
-	// POST requests
+	// handlers for POST requests
 	Query<Handler>& post = m_srv.insert( std::make_pair( 
 		"POST",
 		Query<Handler>(&RootServer::NotFound) ) ).first->second ;
@@ -86,18 +86,16 @@ void RootServer::Work( Request *req, const Resource& res )
 void RootServer::DefaultPage( Request *req, const Resource& res )
 {
 	if ( res.Type() == "text/html" )
-	{
-		Log( "serving home page for %1%", res.Path(), log::verbose ) ;
-		req->XSendFile( (m_lib_path / "index.html").string() ) ;
-	}
+		ServeFile( req, m_lib_path / "index.html" ) ;
+
 	else
-		ServeDataFile( req, res ) ;
+		ServeFile( req, res.ContentPath() ) ;
 }
 
 void RootServer::Load( Request *req, const Resource& res )
 {
-	if ( !ServeDataFile( req, res ) )
-		ServeLibFile( req, "newpage.html" ) ;
+	if ( !ServeFile( req, res.ContentPath() ) )
+		ServeFile( req, m_lib_path / "newpage.html" ) ;
 }
 
 void RootServer::Save( Request *req, const Resource& res )
@@ -108,7 +106,7 @@ void RootServer::Save( Request *req, const Resource& res )
 	fs::create_directories( file.parent_path() ) ;
 	File f( file, 0600 ) ;
 		
-	char buf[80] ;
+	char buf[1024] ;
 	std::size_t c ;
 	while ( (c = req->In()->Read(buf, sizeof(buf)) ) > 0 )
 		f.Write( buf, c ) ;
@@ -137,7 +135,8 @@ void RootServer::ServeLib( Request *req, const Resource& res )
 		// only serve file if it is in the root path
 		else if ( res.Path().parent_path() == "/" )
 		{
-			ServeLibFile( req, p ) ;
+			if ( !ServeFile( req, m_lib_path/p) )
+				NotFound( req ) ;
 		}
 
 		// request for lib file using non-root paths will get a redirect
@@ -149,33 +148,17 @@ void RootServer::ServeLib( Request *req, const Resource& res )
 	}
 }
 
-bool RootServer::ServeDataFile( Request *req, const Resource& res )
+bool RootServer::ServeFile( Request *req, const fs::path& path )
 {
-	fs::path file	= res.ContentPath() ;
-	if ( fs::exists(file) )
-	{
-		Log( "reading from %1%, type %2%", file, res.Type(), log::verbose ) ;
-		req->Fmt()( "Content-type: %1%\r\n", res.Type() ) ;
-
-		req->XSendFile( file.string() ) ;
-		return true ;
-	}
-	else
-		return false ;
-}
-
-void RootServer::ServeLibFile( Request *req, const fs::path& libfile )
-{
-	fs::path path = m_lib_path / libfile ;
-	Log( "serving lib file: %1% %2%", path, cfg::MimeType(path), log::verbose ) ;
-	
+	Log( "serving file: %1% %2%", path, cfg::MimeType(path), log::verbose ) ;
 	if ( fs::exists(path) )
 	{
 		req->Fmt()( "Content-type: %1%\r\n", cfg::MimeType(path) ) ;
 		req->XSendFile( path.string() ) ;
+		return true ;
 	}
 	else
-		NotFound( req ) ;
+		return false ;
 }
 
 void RootServer::ServeVar( Request *req, const Resource& )
@@ -186,19 +169,19 @@ void RootServer::ServeVar( Request *req, const Resource& )
 	var.Add( "wb_root", Json( m_wb_root ) ) ;
 	var.Add( "main", Json( m_main_page ) ) ;
 		
-	std::string s = var.Str() ;
-	req->Fmt()( "Content-type: application/json\r\n\r\n%s\r\n\r\n", s.c_str() ) ;
+	req->Fmt()( "Content-type: application/json\r\n\r\n%s\r\n\r\n", var.Str() ) ;
 }
 
 void RootServer::ServeIndex( Request *req, const Resource& res )
 {
-	req->Fmt()( "Content-type: text/html\r\n\r\n" ) ;
-
-	req->Fmt()( "<ul>" ) ;
+	PrintF fmt = req->Fmt() ;
+	
+	fmt( "Content-type: text/html\r\n\r\n" ) ;
+	fmt( "<ul>" ) ;
 	
 	// show the [parent] entry
 	if ( res.Path().parent_path() != "/" )
-		req->Fmt()( "<li class=\"inode-directory menu_idx\"><a href=\"%1%/%2%\">[parent]</a></li>",
+		fmt( "<li class=\"inode-directory menu_idx\"><a href=\"%1%/%2%\">[parent]</a></li>",
 			res.UrlPath().parent_path().parent_path().generic_string(),
 			m_main_page) ;
 	
@@ -215,18 +198,18 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 			std::replace( type.begin(), type.end(), '/', '-' ) ;
 			std::replace( type.begin(), type.end(), '+', '-' ) ;
 
-			req->Fmt()( "<li class=\"%1% menu_idx\"><a href=\"%2%\">%3%</a></li>",
+			fmt( "<li class=\"%1% menu_idx\"><a href=\"%2%\">%3%</a></li>",
 				(fs::is_directory( di->path() ) ? "inode-directory" : type),
 				sibling.UrlPath().generic_string(),
 				(fs::is_directory( di->path() ) ? sibling.ParentName() : sibling.Name()) ) ;
 		}
 	}
-	req->Fmt()( "</ul>\r\n\r\n" ) ;
+	fmt( "</ul>\r\n\r\n" ) ;
 }
 
 void RootServer::ServeMimeCss( Request *req, const Resource& )
 {
-	req->Fmt()( "%1%", m_mime_css ) ;
+	req->Out()->Write( m_mime_css.c_str(), m_mime_css.size() ) ;
 }
 
 void RootServer::NotFound( Request *req, const Resource& )
