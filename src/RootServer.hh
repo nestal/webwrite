@@ -39,7 +39,7 @@ public :
 private :
 	void ServeContent( Request *req, const Resource& res ) ;
 	void ServeLib( Request *req, const Resource& res ) ;
-	void ServeLibFile( Request *req, const fs::path& path, const std::string& libfile ) ;
+	void ServeLibFile( Request *req, const fs::path& path ) ;
 	void ServeVar( Request *req, const Resource& ) ;
 	void ServeIndex( Request *req, const Resource& res ) ;
 	bool ServeDataFile( Request *req, const Resource& res ) ;

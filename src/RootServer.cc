@@ -69,7 +69,7 @@ void RootServer::Work( Request *req, const Resource& res )
 void RootServer::Load( Request *req, const Resource& res )
 {
 	if ( !ServeDataFile( req, res ) )
-		ServeLibFile( req, res.Path(), "notfound.html" ) ;
+		ServeLibFile( req, "notfound.html" ) ;
 }
 
 void RootServer::ServeContent( Request *req, const Resource& res )
@@ -118,9 +118,28 @@ void RootServer::ServeLib( Request *req, const Resource& res )
 	static const boost::regex re( "lib=(.+)" ) ;
 	boost::smatch m ;
 	
+	// must make a copy before calling regex_search
 	std::string qstr = req->Query() ;
 	if ( boost::regex_search( qstr, m, re ) )
-		ServeLibFile( req, res.Path(), m[1].str() ) ;
+	{
+		fs::path p( m[1].str() ) ;
+
+		if ( std::find( p.begin(), p.end(), ".." ) != p.end() )
+			req->NotFound() ;
+
+		// only serve file if it is in the root path
+		else if ( res.Path().parent_path() == "/" )
+		{
+			ServeLibFile( req, p ) ;
+		}
+
+		// request for lib file using non-root paths will get a redirect
+		else
+		{
+			std::string path = m_wb_root + "main?lib=" + p.string() ;
+			req->SeeOther( m_wb_root + "/" + m_main_page + "?lib=" + p.string() ) ;
+		}
+	}
 }
 
 bool RootServer::ServeDataFile( Request *req, const Resource& res )
@@ -138,29 +157,13 @@ bool RootServer::ServeDataFile( Request *req, const Resource& res )
 		return false ;
 }
 
-void RootServer::ServeLibFile( Request *req, const fs::path& res_path, const std::string& libfile )
+void RootServer::ServeLibFile( Request *req, const fs::path& libfile )
 {
-	fs::path p( libfile ) ;
-
-	if ( std::find( p.begin(), p.end(), ".." ) != p.end() )
-		req->NotFound() ;
-
-	// only serve file if it is in the root path
-	else if ( res_path.parent_path() == "/" )
-	{
-		fs::path path = m_lib_path / p ;
-		Log( "serving lib file: %1% %2%", path, cfg::MimeType(path), log::verbose ) ;
-		
-		req->PrintF( "Content-type: %1%\r\n", cfg::MimeType(path) ) ;
-		req->XSendFile( path ) ;
-	}
-
-	// request for lib file using non-root paths will get a redirect
-	else
-	{
-		std::string path = m_wb_root + "main?lib=" + libfile ;
-		req->SeeOther( m_wb_root + "/" + m_main_page + "?lib=" + libfile ) ;
-	}
+	fs::path path = m_lib_path / libfile ;
+	Log( "serving lib file: %1% %2%", path, cfg::MimeType(path), log::verbose ) ;
+	
+	req->PrintF( "Content-type: %1%\r\n", cfg::MimeType(path) ) ;
+	req->XSendFile( path ) ;
 }
 
 void RootServer::ServeVar( Request *req, const Resource& )

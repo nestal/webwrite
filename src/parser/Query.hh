@@ -28,7 +28,7 @@ template <typename T>
 class Query
 {
 public :
-	Query()
+	explicit Query( const T& def = T() ) : m_default( def )
 	{
 	}
 	
@@ -42,12 +42,13 @@ public :
 		std::string name = qstr.substr( 0, qstr.find_first_of( "&#=" ) ) ;
 		
 		typename Map::const_iterator i = m_cb.find( name ) ;
-		return i != m_cb.end() ? i->second : T() ;
+		return i != m_cb.end() ? i->second : m_default ;
 	}
 
 private :
 	typedef std::map<std::string, T> Map ;
 	Map	m_cb ;
+	T	m_default ;
 } ;
 
 } // end of namespace
