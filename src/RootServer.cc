@@ -28,13 +28,17 @@
 #include <boost/regex.hpp>
 #include <boost/bind.hpp>
 
+#include <set>
+#include <sstream>
+
 namespace wb {
 
 RootServer::RootServer( ) :
 	m_lib_path	( fs::canonical( cfg::Path("base") / cfg::Path("lib_path") ) ),
 	m_data_path	( fs::canonical( cfg::Path("base") / cfg::Path("data_path") ) ),
 	m_wb_root	( cfg::Inst()["wb_root"].Str() ),
-	m_main_page	( cfg::Inst()["main_page"].Str() )
+	m_main_page	( cfg::Inst()["main_page"].Str() ),
+	m_mime_css	( GenerateMimeCss(m_lib_path) )
 {
 	// GET requests
 	Query<Handler>& get = m_srv.insert( std::make_pair( 
@@ -208,6 +212,7 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 
 			std::string type = sibling.Type() ;
 			std::replace( type.begin(), type.end(), '/', '-' ) ;
+			std::replace( type.begin(), type.end(), '+', '-' ) ;
 
 			req->PrintF( "<li class=\"%1% menu_idx\"><a href=\"%2%\">%3%</a></li>",
 				(fs::is_directory( di->path() ) ? "inode-directory" : type),
@@ -220,13 +225,51 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 
 void RootServer::ServeMimeCss( Request *req, const Resource& )
 {
-	req->PrintF( "Content-type: text/css\r\n\r\n" ) ;
-	req->PrintF( ".haha {\nwidth:100%;\n}\r\n\r\n" ) ;
+	req->PrintF( "%1%", m_mime_css ) ;
 }
 
 void RootServer::NotFound( Request *req, const Resource& )
 {
 	req->NotFound("<h1>Not Found!!!</h1>") ;
+}
+
+std::string RootServer::GenerateMimeCss( const fs::path& lib_path )
+{
+	std::ostringstream ss ;
+	ss	<< "Content-type: text/css\r\n\r\n" ;
+
+	const fs::path icon_path = lib_path / "icons" ;
+	std::set<std::string> mime_set ;
+	mime_set.insert( "inode-directory" ) ;
+	mime_set.insert( "application-octet-stream" ) ;
+	
+	Json::Object mime = cfg::Inst()["mime"].AsObject() ;
+	for ( Json::Object::iterator i = mime.begin() ; i != mime.end() ; ++i )
+	{
+		std::string type = i->second.Str() ;
+		std::replace( type.begin(), type.end(), '/', '-' ) ;
+		std::replace( type.begin(), type.end(), '+', '-' ) ;
+		
+		mime_set.insert( type ) ;
+	}
+	
+	for ( std::set<std::string>::iterator i = mime_set.begin() ; i != mime_set.end() ; ++i )
+	{
+		ss	<< "." << *i << ":hover, ." << *i
+			<< "{background-image:url(\"?lib=icons/" ;
+		
+		if ( fs::exists(icon_path / (*i + ".png")) )
+			ss << *i << ".png" ;
+		else if ( fs::exists(icon_path / (*i + ".svg")) )
+			ss << *i << ".svg" ;
+		else
+			ss << "application-octet-stream.svg" ;
+		
+		ss << "\");}\n" ;
+	}
+	ss << "\r\n\r\n" ;
+	
+	return ss.str() ;
 }
 
 } // end of namespace

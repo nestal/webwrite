@@ -127,33 +127,19 @@ li.menu_idx
 	background-position:	left center;
 }
 
-li.inode-directory
-{
-	background-image:		url("?lib=icons/inode-directory.png") ;
-}
-
-li.text-html
-{
-	background-image:		url("?lib=icons/text-html.png") ;
-}
-
-li.application-octet-stream
-{
-	background-image:		url("?lib=icons/application-octet-stream.svg");
-}
-
 li.menu_idx > a
 {
 	text-decoration: 	none;
 	color: 				rgb(30,30,128);
 	display: 			block;
-	padding-left:		30px;
+	left:				30px;
+	padding-left:		0.25em;
+	position:			relative;
 }
 
-li.menu_idx:hover > a, li.menu_idx:hover > a:hover
+li.menu_idx:hover > a
 {
 	color: 				rgb(30,30,192);
-	display: 			block;
 	text-shadow:		1px 1px 1px rgba(0, 0, 100, 0.5);
 	background-color:	lightgray;
 }

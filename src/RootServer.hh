@@ -43,16 +43,19 @@ private :
 	// GET requests
 	void DefaultPage( Request *req, const Resource& res ) ;
 	void ServeLib( Request *req, const Resource& res ) ;
-	void ServeLibFile( Request *req, const fs::path& path ) ;
 	void ServeVar( Request *req, const Resource& ) ;
 	void ServeIndex( Request *req, const Resource& res ) ;
-	bool ServeDataFile( Request *req, const Resource& res ) ;
 	void Load( Request *req, const Resource& res ) ;
 	void ServeMimeCss( Request *req, const Resource& res ) ;
 	
 	// POST requests
 	void Save( Request *req, const Resource& res ) ;
 	void Upload( Request *req, const Resource& res ) ;
+
+	// other helpers
+	static std::string GenerateMimeCss( const fs::path& lib_path ) ;
+	bool ServeDataFile( Request *req, const Resource& res ) ;
+	void ServeLibFile( Request *req, const fs::path& path ) ;
 
 private :
 	// configuration parameters
@@ -61,7 +64,9 @@ private :
 	
 	std::string	m_wb_root ;
 	std::string	m_main_page ;
-	
+
+	std::string m_mime_css ;
+
 	// query string parser
 	typedef boost::function<void (RootServer*, Request*, const Resource&)> Handler ;
 	typedef std::map<std::string, Query<Handler> >	Map ;
