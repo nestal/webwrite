@@ -32,7 +32,7 @@ if ( WIN32 )
 	add_definitions( -D_SCL_SECURE_NO_WARNINGS )
 endif ( WIN32 )
 
-find_package(Boost COMPONENTS filesystem system regex REQUIRED)
+find_package(Boost COMPONENTS filesystem system regex date_time REQUIRED)
 find_package(JSONC REQUIRED)
 find_package(FCGI REQUIRED)
 find_package(CppUnit)

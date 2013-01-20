@@ -19,5 +19,12 @@
 	{
 		"level"	: "debug",
 		"file"	: "webwrite.log"
-	}
+	},
+	
+	"cache"		:
+	{
+		"lib"	: 3600,			// library files caches longer
+		"data"	: 300,			// data files caches shorter
+		"index"	: 600,			// people don't create pages often, do they?
+	},
 }

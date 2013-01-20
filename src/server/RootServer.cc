@@ -28,6 +28,7 @@
 
 #include <boost/regex.hpp>
 #include <boost/bind.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <set>
 #include <sstream>
@@ -86,16 +87,16 @@ void RootServer::Work( Request *req, const Resource& res )
 void RootServer::DefaultPage( Request *req, const Resource& res )
 {
 	if ( res.Type() == "text/html" )
-		ServeFile( req, m_lib_path / "index.html" ) ;
+		ServeFile( req, m_lib_path / "index.html", cfg::Inst()["cache"]["lib"].Int() ) ;
 
 	else
-		ServeFile( req, res.ContentPath() ) ;
+		ServeFile( req, res.ContentPath(), cfg::Inst()["cache"]["data"].Int() ) ;
 }
 
 void RootServer::Load( Request *req, const Resource& res )
 {
-	if ( !ServeFile( req, res.ContentPath() ) )
-		ServeFile( req, m_lib_path / "newpage.html" ) ;
+	if ( !ServeFile( req, res.ContentPath(), cfg::Inst()["cache"]["data"].Int() ) )
+		ServeFile( req, m_lib_path / "newpage.html", cfg::Inst()["cache"]["lib"].Int() ) ;
 }
 
 void RootServer::Save( Request *req, const Resource& res )
@@ -135,25 +136,27 @@ void RootServer::ServeLib( Request *req, const Resource& res )
 		// only serve file if it is in the root path
 		else if ( res.Path().parent_path() == "/" )
 		{
-			if ( !ServeFile( req, m_lib_path/p) )
+			if ( !ServeFile( req, m_lib_path/p, cfg::Inst()["cache"]["lib"].Int() ) )
 				NotFound( req ) ;
 		}
 
 		// request for lib file using non-root paths will get a redirect
 		else
 		{
-			std::string path = m_wb_root + "main?lib=" + p.string() ;
 			req->SeeOther( m_wb_root + "/" + m_main_page + "?lib=" + p.string() ) ;
 		}
 	}
 }
 
-bool RootServer::ServeFile( Request *req, const fs::path& path )
+bool RootServer::ServeFile( Request *req, const fs::path& path, int cache_age )
 {
-	Log( "serving file: %1% %2%", path, cfg::MimeType(path), log::verbose ) ;
+//	Log( "serving file: %1% %2%", path, cfg::MimeType(path), log::verbose ) ;
 	if ( fs::exists(path) )
 	{
-		req->Fmt()( "Content-type: %1%\r\n", cfg::MimeType(path) ) ;
+		PrintF fmt = req->Fmt() ;
+		if ( cache_age > 0 )
+			fmt( "Cache-Control: max-age=%1%\r\n", cache_age ) ;
+
 		req->XSendFile( path.string() ) ;
 		return true ;
 	}
@@ -168,14 +171,17 @@ void RootServer::ServeVar( Request *req, const Resource& )
 	var.Add( "name", Json( cfg::Inst()["name"] ) ) ;
 	var.Add( "wb_root", Json( m_wb_root ) ) ;
 	var.Add( "main", Json( m_main_page ) ) ;
-		
-	req->Fmt()( "Content-type: application/json\r\n\r\n%s\r\n\r\n", var.Str() ) ;
+	
+	PrintF fmt = req->Fmt() ;
+	fmt( "Cache-Control: max-age=%1%\r\n", cfg::Inst()["cache"]["lib"].Int() ) ;
+	fmt( "Content-type: application/json\r\n\r\n%s\r\n\r\n", var.Str() ) ;
 }
 
 void RootServer::ServeIndex( Request *req, const Resource& res )
 {
 	PrintF fmt = req->Fmt() ;
 	
+	fmt( "Cache-Control: max-age=%1%\r\n", cfg::Inst()["cache"]["index"].Int() ) ;
 	fmt( "Content-type: text/html\r\n\r\n" ) ;
 	fmt( "<ul>" ) ;
 	

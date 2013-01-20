@@ -53,6 +53,7 @@ http://example.com/webwrite/some/long/path/to/the/page?load
 #include <algorithm>
 #include <cstdlib>
 #include <cstdio>
+#include <ctime>
 
 using namespace wb ;
 
@@ -107,12 +108,15 @@ int main( int argc, char **argv )
 		int r ;
 		while ( (r = FCGX_Accept_r( &request )) == 0 )
 		{
+			std::clock_t start = std::clock() ;
+		
 			FCGIRequest req( &request ) ;
 			Log( "requesting: %1%", req.URI(), log::verbose ) ;
-			
 			srv.Work( &req, Resource( req.SansQueryURI() ) ) ;
-
 			FCGX_Finish_r( &request ) ;
+			
+			std::clock_t duration = std::clock() - start ;
+			Log( "request finished in %1% milliseconds", duration * 1000.0 / CLOCKS_PER_SEC ) ;
 		}
 	}
 	catch ( Exception& e )
