@@ -21,13 +21,13 @@
 
 #include "util/FileSystem.hh"
 #include "parser/Query.hh"
+#include "Resource.hh"
 
 #include <boost/function.hpp>
 
 namespace wb {
 
 class Request ;
-class Resource ;
 
 class RootServer
 {
@@ -37,17 +37,22 @@ public :
 	void Work( Request *req, const Resource& res ) ;
 
 private :
-	void ServeContent( Request *req, const Resource& res ) ;
+	// error handlers
+	void NotFound( Request *req, const Resource& = Resource() ) ;
+
+	// GET requests
+	void DefaultPage( Request *req, const Resource& res ) ;
 	void ServeLib( Request *req, const Resource& res ) ;
 	void ServeLibFile( Request *req, const fs::path& path ) ;
 	void ServeVar( Request *req, const Resource& ) ;
 	void ServeIndex( Request *req, const Resource& res ) ;
 	bool ServeDataFile( Request *req, const Resource& res ) ;
 	void Load( Request *req, const Resource& res ) ;
+	void ServeMimeCss( Request *req, const Resource& res ) ;
+	
+	// POST requests
 	void Save( Request *req, const Resource& res ) ;
 	void Upload( Request *req, const Resource& res ) ;
-
-	void ServeMimeCss( Request *req, const Resource& res ) ;
 
 private :
 	// configuration parameters
@@ -59,7 +64,8 @@ private :
 	
 	// query string parser
 	typedef boost::function<void (RootServer*, Request*, const Resource&)> Handler ;
-	Query<Handler>	m_get, m_post ;
+	typedef std::map<std::string, Query<Handler> >	Map ;
+	Map	m_srv ;
 } ;
 
 } // end of namespace

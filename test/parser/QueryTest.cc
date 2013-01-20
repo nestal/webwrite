@@ -38,6 +38,18 @@ void QueryTest::Test( )
 	subject.Add( "name", 1 ) ;
 	subject.Add( "value", 2 ) ;
 	WBUT_ASSERT_EQUAL( subject.Parse( "name=value" ), 1 ) ;
+	WBUT_ASSERT_EQUAL( subject.Parse( "value=name" ), 0 ) ;
+}
+
+void QueryTest::TestEmpty()
+{
+	Query<int> subject( 1000 ) ;
+	subject.Add( "",	0 ) ;
+	subject.Add( "two",	2 ) ;
+	WBUT_ASSERT_EQUAL( subject.Parse( "" ), 0 ) ;
+	WBUT_ASSERT_EQUAL( subject.Parse( "two#" ), 2 ) ;
+	WBUT_ASSERT_EQUAL( subject.Parse( "three" ), 1000 ) ;
+	
 }
 
 } // end of namespace

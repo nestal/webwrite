@@ -26,6 +26,11 @@
 
 namespace wb {
 
+Resource::Resource() :
+	m_path( cfg::Inst()["main_page"].Str() )
+{
+}
+
 Resource::Resource( const std::string& uri )
 {
 	std::string wb_root = cfg::Inst()["wb_root"].Str() ;

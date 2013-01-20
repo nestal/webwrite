@@ -32,10 +32,12 @@ public :
 	// declare suit function
 	CPPUNIT_TEST_SUITE( QueryTest ) ;
 		CPPUNIT_TEST( Test ) ;
+		CPPUNIT_TEST( TestEmpty ) ;
 	CPPUNIT_TEST_SUITE_END();
 
 private :
 	void Test( ) ;
+	void TestEmpty() ;
 } ;
 
 } // end of namespace

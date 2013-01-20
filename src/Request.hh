@@ -76,7 +76,7 @@ public :
 	
 	// HTTP status return
 	void SeeOther( const std::string& location, bool query = false ) ;
-	void NotFound() ;
+	void NotFound( const std::string& message ) ;
 	
 	// for debugging
 	void PrintEnv() const ;

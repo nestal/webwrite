@@ -29,7 +29,8 @@ class Resource
 public :
 	struct Error : virtual public Exception {} ;
 
-	Resource( const std::string& uri ) ;
+	Resource() ;
+	explicit Resource( const std::string& uri ) ;
 	
 	/// a path to the resource relative to the "wb-root"
 	const fs::path& Path() const ;

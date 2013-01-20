@@ -21,7 +21,6 @@
 
 #include "Config.hh"
 #include "Request.hh"
-#include "Resource.hh"
 #include "log/Log.hh"
 #include "parser/FormData.hh"
 #include "util/File.hh"
@@ -32,16 +31,29 @@
 namespace wb {
 
 RootServer::RootServer( ) :
-	m_lib_path	( cfg::Path("base") / cfg::Path("lib_path") ),
-	m_data_path	( cfg::Path("base") / cfg::Path("data_path") ),
+	m_lib_path	( fs::canonical( cfg::Path("base") / cfg::Path("lib_path") ) ),
+	m_data_path	( fs::canonical( cfg::Path("base") / cfg::Path("data_path") ) ),
 	m_wb_root	( cfg::Inst()["wb_root"].Str() ),
 	m_main_page	( cfg::Inst()["main_page"].Str() )
 {
-	m_get.Add( "mimecss",	&RootServer::ServeMimeCss ) ;
-	m_get.Add( "var",		&RootServer::ServeVar ) ;
-	m_get.Add( "index",		&RootServer::ServeIndex ) ;
-	m_get.Add( "load",		&RootServer::Load ) ;
-	m_get.Add( "lib",		&RootServer::ServeLib ) ;
+	// GET requests
+	Query<Handler>& get = m_srv.insert( std::make_pair( 
+		"GET",
+		Query<Handler>(&RootServer::NotFound) ) ).first->second ;
+	
+	get.Add( "",		&RootServer::DefaultPage ) ;
+	get.Add( "mime",	&RootServer::ServeMimeCss ) ;
+	get.Add( "var",		&RootServer::ServeVar ) ;
+	get.Add( "index",	&RootServer::ServeIndex ) ;
+	get.Add( "load",	&RootServer::Load ) ;
+	get.Add( "lib",		&RootServer::ServeLib ) ;
+
+	// POST requests
+	Query<Handler>& post = m_srv.insert( std::make_pair( 
+		"POST",
+		Query<Handler>(&RootServer::NotFound) ) ).first->second ;
+	post.Add( "save",	&RootServer::Save ) ;
+	post.Add( "upload",	&RootServer::Upload ) ;
 }
 	
 void RootServer::Work( Request *req, const Resource& res ) 
@@ -50,47 +62,37 @@ void RootServer::Work( Request *req, const Resource& res )
 	
 	if ( res.UrlPath() != req->SansQueryURI() )
 		req->SeeOther( res.UrlPath().string(), true ) ;
-	
-	else if ( !req->Query().empty() )
-		return ServeContent( req, res ) ;
-	
 	else
 	{
-		if ( res.Type() == "text/html" )
+		std::string qstr	= req->Query() ;
+
+		Map::const_iterator i = m_srv.find( req->Method() ) ;
+		if ( i != m_srv.end() )
 		{
-			Log( "serving home page for %1%", res.Path(), log::verbose ) ;
-			req->XSendFile( m_lib_path / "index.html" ) ;
+			Handler h = i->second.Parse( qstr ) ;
+			assert( !h.empty() ) ;
+			h( this, req, res ) ;
 		}
 		else
-			ServeDataFile( req, res ) ;
+			NotFound( req ) ;
 	}
+}
+
+void RootServer::DefaultPage( Request *req, const Resource& res )
+{
+	if ( res.Type() == "text/html" )
+	{
+		Log( "serving home page for %1%", res.Path(), log::verbose ) ;
+		req->XSendFile( m_lib_path / "index.html" ) ;
+	}
+	else
+		ServeDataFile( req, res ) ;
 }
 
 void RootServer::Load( Request *req, const Resource& res )
 {
 	if ( !ServeDataFile( req, res ) )
-		ServeLibFile( req, "notfound.html" ) ;
-}
-
-void RootServer::ServeContent( Request *req, const Resource& res )
-{
-	std::string qstr	= req->Query() ;
-	
-	if ( req->Method() == "GET" )
-	{
-		Handler h = m_get.Parse( qstr ) ;
-		if ( !h.empty() )
-			h( this, req, res ) ;
-	}
-
-	else if ( req->Method() == "POST" && qstr == "save" )
-	{
-		Save( req, res ) ;
-	}
-	else if ( req->Method() == "POST" && qstr == "upload" )
-	{
-		Upload( req, res ) ;
-	}
+		ServeLibFile( req, "newpage.html" ) ;
 }
 
 void RootServer::Save( Request *req, const Resource& res )
@@ -125,7 +127,7 @@ void RootServer::ServeLib( Request *req, const Resource& res )
 		fs::path p( m[1].str() ) ;
 
 		if ( std::find( p.begin(), p.end(), ".." ) != p.end() )
-			req->NotFound() ;
+			NotFound( req ) ;
 
 		// only serve file if it is in the root path
 		else if ( res.Path().parent_path() == "/" )
@@ -162,8 +164,13 @@ void RootServer::ServeLibFile( Request *req, const fs::path& libfile )
 	fs::path path = m_lib_path / libfile ;
 	Log( "serving lib file: %1% %2%", path, cfg::MimeType(path), log::verbose ) ;
 	
-	req->PrintF( "Content-type: %1%\r\n", cfg::MimeType(path) ) ;
-	req->XSendFile( path ) ;
+	if ( fs::exists(path) )
+	{
+		req->PrintF( "Content-type: %1%\r\n", cfg::MimeType(path) ) ;
+		req->XSendFile( path ) ;
+	}
+	else
+		NotFound( req ) ;
 }
 
 void RootServer::ServeVar( Request *req, const Resource& )
@@ -212,10 +219,15 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 	req->PrintF( "</ul>\r\n\r\n" ) ;
 }
 
-void RootServer::ServeMimeCss( Request *req, const Resource& res )
+void RootServer::ServeMimeCss( Request *req, const Resource& )
 {
 	req->PrintF( "Content-type: text/css\r\n\r\n" ) ;
 	req->PrintF( ".haha {\nwidth:100%;\n}\r\n\r\n" ) ;
+}
+
+void RootServer::NotFound( Request *req, const Resource& )
+{
+	req->NotFound("<h1>Not Found!!!</h1>") ;
 }
 
 } // end of namespace

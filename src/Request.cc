@@ -128,9 +128,12 @@ void Request::SeeOther( const std::string& location, bool query )
 			location.c_str() ) ;
 }
 
-void Request::NotFound()
+void Request::NotFound( const std::string& message )
 {
-	FCGX_FPrintF( m_req->out, "Status: 404 Not Found\r\n\r\n<html><h1>404 Not Found!!!!</h1></html>" ) ;
+	FCGX_FPrintF( m_req->out,
+		"Status: 404 Not Found\r\n\r\n"
+		"<html><body>%s</body></html>",
+		message.c_str() ) ;
 }
 
 std::string Request::SansQueryURI() const
