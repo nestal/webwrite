@@ -33,10 +33,11 @@ http://example.com/webwrite/some/long/path/to/the/page?load
 	The resource path in the URL locates the resource in the server.
 */
 
-#include "Config.hh"
-#include "Request.hh"
-#include "Resource.hh"
-#include "RootServer.hh"
+#include "FCGIRequest.hh"
+
+#include "server/Config.hh"
+#include "server/Resource.hh"
+#include "server/RootServer.hh"
 
 #include "log/CompositeLog.hh"
 #include "log/DefaultLog.hh"
@@ -47,7 +48,7 @@ http://example.com/webwrite/some/long/path/to/the/page?load
 
 #include <boost/exception/all.hpp>
 
-#include "fcgiapp.h"
+#include <fcgiapp.h>
 
 #include <algorithm>
 #include <cstdlib>
@@ -106,7 +107,7 @@ int main( int argc, char **argv )
 		int r ;
 		while ( (r = FCGX_Accept_r( &request )) == 0 )
 		{
-			Request req( &request ) ;
+			FCGIRequest req( &request ) ;
 			Log( "requesting: %1%", req.URI(), log::verbose ) ;
 			
 			srv.Work( &req, Resource( req.SansQueryURI() ) ) ;

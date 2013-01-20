@@ -38,7 +38,8 @@ void QueryTest::Test( )
 	subject.Add( "name", 1 ) ;
 	subject.Add( "value", 2 ) ;
 	WBUT_ASSERT_EQUAL( subject.Parse( "name=value" ), 1 ) ;
-	WBUT_ASSERT_EQUAL( subject.Parse( "value=name" ), 0 ) ;
+	WBUT_ASSERT_EQUAL( subject.Parse( "value=name" ), 2 ) ;
+	WBUT_ASSERT_EQUAL( subject.Parse( "2=1" ), 0 ) ;
 }
 
 void QueryTest::TestEmpty()

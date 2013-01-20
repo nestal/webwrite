@@ -24,6 +24,7 @@
 #include "log/Log.hh"
 #include "parser/FormData.hh"
 #include "util/File.hh"
+#include "util/PrintF.hh"
 
 #include <boost/regex.hpp>
 #include <boost/bind.hpp>
@@ -87,7 +88,7 @@ void RootServer::DefaultPage( Request *req, const Resource& res )
 	if ( res.Type() == "text/html" )
 	{
 		Log( "serving home page for %1%", res.Path(), log::verbose ) ;
-		req->XSendFile( m_lib_path / "index.html" ) ;
+		req->XSendFile( (m_lib_path / "index.html").string() ) ;
 	}
 	else
 		ServeDataFile( req, res ) ;
@@ -154,9 +155,9 @@ bool RootServer::ServeDataFile( Request *req, const Resource& res )
 	if ( fs::exists(file) )
 	{
 		Log( "reading from %1%, type %2%", file, res.Type(), log::verbose ) ;
-		req->PrintF( "Content-type: %1%\r\n", res.Type() ) ;
+		req->Fmt()( "Content-type: %1%\r\n", res.Type() ) ;
 
-		req->XSendFile( file ) ;
+		req->XSendFile( file.string() ) ;
 		return true ;
 	}
 	else
@@ -170,8 +171,8 @@ void RootServer::ServeLibFile( Request *req, const fs::path& libfile )
 	
 	if ( fs::exists(path) )
 	{
-		req->PrintF( "Content-type: %1%\r\n", cfg::MimeType(path) ) ;
-		req->XSendFile( path ) ;
+		req->Fmt()( "Content-type: %1%\r\n", cfg::MimeType(path) ) ;
+		req->XSendFile( path.string() ) ;
 	}
 	else
 		NotFound( req ) ;
@@ -186,18 +187,18 @@ void RootServer::ServeVar( Request *req, const Resource& )
 	var.Add( "main", Json( m_main_page ) ) ;
 		
 	std::string s = var.Str() ;
-	req->PrintF( "Content-type: application/json\r\n\r\n%s\r\n\r\n", s.c_str() ) ;
+	req->Fmt()( "Content-type: application/json\r\n\r\n%s\r\n\r\n", s.c_str() ) ;
 }
 
 void RootServer::ServeIndex( Request *req, const Resource& res )
 {
-	req->PrintF( "Content-type: text/html\r\n\r\n" ) ;
+	req->Fmt()( "Content-type: text/html\r\n\r\n" ) ;
 
-	req->PrintF( "<ul>" ) ;
+	req->Fmt()( "<ul>" ) ;
 	
 	// show the [parent] entry
 	if ( res.Path().parent_path() != "/" )
-		req->PrintF( "<li class=\"inode-directory menu_idx\"><a href=\"%1%/%2%\">[parent]</a></li>",
+		req->Fmt()( "<li class=\"inode-directory menu_idx\"><a href=\"%1%/%2%\">[parent]</a></li>",
 			res.UrlPath().parent_path().parent_path().generic_string(),
 			m_main_page) ;
 	
@@ -214,18 +215,18 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 			std::replace( type.begin(), type.end(), '/', '-' ) ;
 			std::replace( type.begin(), type.end(), '+', '-' ) ;
 
-			req->PrintF( "<li class=\"%1% menu_idx\"><a href=\"%2%\">%3%</a></li>",
+			req->Fmt()( "<li class=\"%1% menu_idx\"><a href=\"%2%\">%3%</a></li>",
 				(fs::is_directory( di->path() ) ? "inode-directory" : type),
 				sibling.UrlPath().generic_string(),
 				(fs::is_directory( di->path() ) ? sibling.ParentName() : sibling.Name()) ) ;
 		}
 	}
-	req->PrintF( "</ul>\r\n\r\n" ) ;
+	req->Fmt()( "</ul>\r\n\r\n" ) ;
 }
 
 void RootServer::ServeMimeCss( Request *req, const Resource& )
 {
-	req->PrintF( "%1%", m_mime_css ) ;
+	req->Fmt()( "%1%", m_mime_css ) ;
 }
 
 void RootServer::NotFound( Request *req, const Resource& )

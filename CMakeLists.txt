@@ -70,6 +70,8 @@ file (GLOB WEBWRITE_LIB_SRC
     ${webwrite_SOURCE_DIR}/src/parser/*.cc
     ${webwrite_SOURCE_DIR}/src/util/*.hh
     ${webwrite_SOURCE_DIR}/src/util/*.cc
+    ${webwrite_SOURCE_DIR}/src/server/*.hh
+    ${webwrite_SOURCE_DIR}/src/server/*.cc
 )
 
 add_library( wb_core

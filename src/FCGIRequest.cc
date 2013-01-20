@@ -17,11 +17,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Request.hh"
+#include "FCGIRequest.hh"
 
 #include "util/DataStream.hh"
 #include "util/Exception.hh"
 #include "util/File.hh"
+#include "util/PrintF.hh"
 
 #include "log/Log.hh"
 
@@ -31,7 +32,7 @@ namespace wb {
 
 const std::size_t buf_size = 8 * 1024 ;
 
-class Request::StreamWrapper : public DataStream
+class FCGIRequest::StreamWrapper : public DataStream
 {
 public :
 	explicit StreamWrapper( FCGX_Stream *str ) :
@@ -46,79 +47,79 @@ private :
 	FCGX_Stream	*m_str ;
 } ;
 
-Request::Request( FCGX_Request *req ) :
+FCGIRequest::FCGIRequest( FCGX_Request *req ) :
 	m_req( req ),
 	m_in( new StreamWrapper( m_req->in ) ),
 	m_out( new StreamWrapper( m_req->out ) )
 {
 }
 
-Request::~Request()
+FCGIRequest::~FCGIRequest()
 {
 }
 
-DataStream* Request::In()
+DataStream* FCGIRequest::In()
 {
 	return m_in.get() ;
 }
 
-DataStream* Request::Out()
+DataStream* FCGIRequest::Out()
 {
 	return m_out.get() ;
 }
 
-void Request::XSendFile( const fs::path& file )
+PrintF FCGIRequest::Fmt()
 {
-	FCGX_FPrintF( m_req->out, "X-Sendfile: %s\r\n\r\n", file.string().c_str() ) ;
+	return PrintF( m_out.get() ) ;
 }
 
-std::size_t Request::StreamWrapper::Read( char *data, std::size_t size )
+void FCGIRequest::XSendFile( const std::string& file )
+{
+	FCGX_FPrintF( m_req->out, "X-Sendfile: %s\r\n\r\n", file.c_str() ) ;
+}
+
+std::size_t FCGIRequest::StreamWrapper::Read( char *data, std::size_t size )
 {
 	return ::FCGX_GetStr( data, size, m_str ) ;
 }
 
-std::size_t Request::StreamWrapper::Write( const char *data, std::size_t size )
+std::size_t FCGIRequest::StreamWrapper::Write( const char *data, std::size_t size )
 {
 	return ::FCGX_PutStr( data, size, m_str ) ;
 }
 
-std::string Request::URI() const
+std::string FCGIRequest::URI() const
 {
 	return ::FCGX_GetParam( "REQUEST_URI", m_req->envp ) ;
 }
 
-void Request::PrintEnv() const
+void FCGIRequest::PrintEnv() const
 {
 	for ( int i = 0 ; m_req->envp[i] != 0 ; ++i )
 		Log( "env: %1%", m_req->envp[i], log::debug );
 }
 
-std::string Request::Method() const
+std::string FCGIRequest::Method() const
 {
 	return ::FCGX_GetParam( "REQUEST_METHOD", m_req->envp ) ;
 }
 
-std::string Request::Referer() const
+std::string FCGIRequest::Referer() const
 {
 	return ::FCGX_GetParam( "HTTP_REFERER", m_req->envp ) ;
 }
 
-std::string Request::Query() const
+std::string FCGIRequest::Query() const
 {
 	return ::FCGX_GetParam( "QUERY_STRING", m_req->envp ) ;
 }
 
-std::string Request::ContentType() const
+std::string FCGIRequest::ContentType() const
 {
 	return ::FCGX_GetParam( "CONTENT_TYPE", m_req->envp ) ;
 }
 
-int Request::PrintF( const std::string& fmt )
-{
-	return FCGX_PutS( fmt.c_str(), m_req->out ) ;
-}
-
-void Request::SeeOther( const std::string& location, bool query )
+void FCGIRequest::SeeOther( const std::string& location, bool query )
 {
 	FCGX_FPrintF(
 		m_req->out,
@@ -128,7 +129,7 @@ void Request::SeeOther( const std::string& location, bool query )
 			location.c_str() ) ;
 }
 
-void Request::NotFound( const std::string& message )
+void FCGIRequest::NotFound( const std::string& message )
 {
 	FCGX_FPrintF( m_req->out,
 		"Status: 404 Not Found\r\n\r\n"
@@ -136,7 +137,7 @@ void Request::NotFound( const std::string& message )
 		message.c_str() ) ;
 }
 
-std::string Request::SansQueryURI() const
+std::string FCGIRequest::SansQueryURI() const
 {
 	std::string uri		= URI() ;
 	std::string	query	= Query() ;
