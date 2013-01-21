@@ -20,14 +20,17 @@
 #include "Log.hh"
 
 #include <cassert>
+#include <iostream>
 
 namespace wb {
 
 class MockLog : public LogBase
 {
 public :
-	void Log( const log::Fmt&, log::Serverity )
+	void Log( const log::Fmt& e, log::Serverity )
 	{
+		// use std::cerr for fall back
+		std::cerr << e << std::endl ;
 	}
 	
 	bool Enable( log::Serverity, bool enable )

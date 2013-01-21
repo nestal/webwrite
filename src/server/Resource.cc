@@ -92,12 +92,12 @@ std::string Resource::DecodeName( const std::string& uri )
 
 fs::path Resource::DataPath() const
 {
-	return cfg::Path("data_path") / m_path ;
+	return cfg::Inst()["data"]["path"].Str() / m_path ;
 }
 
 fs::path Resource::ReDirPath() const
 {
-	return cfg::Path("data_redir") / m_path ;
+	return cfg::Inst()["data"]["redir"].Str() / m_path ;
 }
 
 fs::path Resource::UrlPath() const

@@ -36,8 +36,8 @@
 namespace wb {
 
 RootServer::RootServer( ) :
-	m_lib_redir	( cfg::Path("lib_redir") ),
-	m_data_path	( cfg::Path("data_path") ),
+	m_lib_redir	( cfg::Inst()["lib"]["redir"].Str() ),
+	m_data_path	( cfg::Inst()["data"]["path"].Str() ),
 	m_wb_root	( cfg::Inst()["wb_root"].Str() ),
 	m_main_page	( cfg::Inst()["main_page"].Str() ),
 	m_lib_cache	( ReadOptionalIntConfig( "cache", "lib" ) ),
@@ -230,7 +230,7 @@ std::string RootServer::GenerateMimeCss( )
 	std::ostringstream ss ;
 	ss	<< "Content-type: text/css\r\n\r\n" ;
 
-	const fs::path icon_path = cfg::Inst()["lib_path"].Str() + "/icons" ;
+	const fs::path icon_path = cfg::Inst()["lib"]["path"].Str() + "/icons" ;
 	std::set<std::string> mime_set ;
 	mime_set.insert( "inode-directory" ) ;
 	mime_set.insert( "application-octet-stream" ) ;
