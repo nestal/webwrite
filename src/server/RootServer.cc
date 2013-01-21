@@ -107,6 +107,9 @@ void RootServer::DefaultPage( Request *req, const Resource& res )
 
 void RootServer::Load( Request *req, const Resource& res )
 {
+	// don't cache for dynamic contents
+	req->Fmt()( "Cache-Control: max-age=%1%\r\n", m_index_cache ) ;
+	
 	if ( fs::exists( res.DataPath() ) )
 		ServeFile( req, res.ReDirPath(), m_data_cache ) ;
 	else
@@ -125,6 +128,8 @@ void RootServer::Save( Request *req, const Resource& res )
 	std::size_t c ;
 	while ( (c = req->In()->Read(buf, sizeof(buf)) ) > 0 )
 		f.Write( buf, c ) ;
+
+	req->Fmt()( "\r\n\r\n" ) ;
 }
 	
 void RootServer::Upload( Request *req, const Resource& res )
