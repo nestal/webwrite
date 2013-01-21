@@ -38,6 +38,11 @@ void FormDataTest::Test( )
 	FormData subject( &form_data, "multipart/form-data; boundary="
 		"---------------------------101378736882613805899358823" ) ;
 	subject.Save( "./" ) ;
+	
+	File form_data2( TEST_DATA "textures.form" ) ;
+	FormData subject2( &form_data2, "multipart/form-data; boundary="
+		"---------------------------11351845291583120309948566114" ) ;
+	subject2.Save( "./" ) ;
 }
 
 } // end of namespace

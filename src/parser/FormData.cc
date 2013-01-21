@@ -51,8 +51,8 @@ void FormData::Save( const fs::path& path )
 	StreamParser p( m_in ) ;
 
 	StringStream boundary ;
-	p.ReadUntil( "\r\n", &boundary ) ;
-	if ( boundary.Str() != ( "--" + m_boundary ) )
+	p.ReadUntil( "--" + m_boundary, &boundary ) ;
+	if ( boundary.Str() != "" )
 		BOOST_THROW_EXCEPTION(
 			Exception( )
 				<< expt::ErrMsg("invalid boundary")
@@ -60,17 +60,27 @@ void FormData::Save( const fs::path& path )
 				<< ActualBoundary( boundary.Str() )
 		) ;
 	
-	StringStream headers ;
-	p.ReadUntil( "\r\n\r\n", &headers ) ;
+	StringStream ending ;
+	p.Consume( 2, &ending ) ;
+	while ( ending.Str() == "\r\n" )
+	{
+		StringStream headers ;
+		p.ReadUntil( "\r\n\r\n", &headers ) ;
+	
+		// remember, don't use r-values for boost::regex_search
+		std::string fname = "outfile", hstr = headers.Str() ;
+		static const boost::regex e( ".*filename=\"(.+)\"" ) ;
+		boost::smatch m ;
+		if ( boost::regex_search( hstr, m, e ) )
+			fname = m[1] ;
 
-	std::string fname = "outfile", hstr = headers.Str() ;
-	static const boost::regex e( ".*filename=\"(.+)\"" ) ;
-	boost::smatch m ;
-	if ( boost::regex_search( hstr, m, e ) )
-		fname = m[1] ;
-
-	File f( path / fname, 0600 ) ;
-	p.ReadUntil( "\r\n" + boundary.Str(), &f ) ;
+		// read the whole file
+		File f( path / fname, 0600 ) ;
+		p.ReadUntil( "\r\n--" + m_boundary, &f ) ;
+		
+		ending.Str("") ;
+		p.Consume( 2, &ending ) ;
+	}
 }
 
 } // end of namespace

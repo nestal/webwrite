@@ -27,7 +27,7 @@ namespace wb {
 
 class DataStream ;
 
-/*!	\brief	HTTP multi-part form data. Defined in RFC2388.
+/*!	\brief	HTTP multi-part form data. Defined in RFC2388/1867.
 */
 class FormData
 {
