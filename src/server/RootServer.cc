@@ -40,9 +40,6 @@ RootServer::RootServer( ) :
 	m_data_path	( cfg::Inst()["data"]["path"].Str() ),
 	m_wb_root	( cfg::Inst()["wb_root"].Str() ),
 	m_main_page	( cfg::Inst()["main_page"].Str() ),
-	m_lib_cache	( ReadOptionalIntConfig( "cache", "lib" ) ),
-	m_data_cache( ReadOptionalIntConfig( "cache", "data" ) ),
-	m_index_cache( ReadOptionalIntConfig( "cache", "index" ) ),
 	m_mime_css	( GenerateMimeCss() )
 {
 	// handlers for GET requests
@@ -99,21 +96,21 @@ void RootServer::Work( Request *req, const Resource& res )
 void RootServer::DefaultPage( Request *req, const Resource& res )
 {
 	if ( res.Type() == "text/html" )
-		ServeFile( req, m_lib_redir / "index.html", m_lib_cache ) ;
+		ServeFile( req, m_lib_redir / "index.html" ) ;
 
 	else
-		ServeFile( req, res.ReDirPath(), m_data_cache ) ;
+		ServeFile( req, res.ReDirPath() ) ;
 }
 
 void RootServer::Load( Request *req, const Resource& res )
 {
 	// don't cache for dynamic contents
-	req->Fmt()( "Cache-Control: max-age=%1%\r\n", m_index_cache ) ;
+	req->Fmt()( "Cache-Control: max-age=%1%\r\n", 0 ) ;
 	
 	if ( fs::exists( res.DataPath() ) )
-		ServeFile( req, res.ReDirPath(), m_data_cache ) ;
+		ServeFile( req, res.ReDirPath() ) ;
 	else
-		ServeFile( req, m_lib_redir / "newpage.html", m_lib_cache ) ;
+		ServeFile( req, m_lib_redir / "newpage.html" ) ;
 }
 
 void RootServer::Save( Request *req, const Resource& res )
@@ -129,7 +126,8 @@ void RootServer::Save( Request *req, const Resource& res )
 	while ( (c = req->In()->Read(buf, sizeof(buf)) ) > 0 )
 		f.Write( buf, c ) ;
 
-	req->Fmt()( "\r\n\r\n" ) ;
+	// ask client to load the new content again
+	req->SeeOther( res.UrlPath().generic_string() + "?load" ) ;
 }
 	
 void RootServer::Upload( Request *req, const Resource& res )
@@ -154,7 +152,7 @@ void RootServer::ServeLib( Request *req, const Resource& res )
 
 		// only serve file if it is in the root path
 		else if ( res.Path().parent_path() == "/" )
-			ServeFile( req, m_lib_redir/p, m_lib_cache ) ;
+			ServeFile( req, m_lib_redir/p ) ;
 
 		// request for lib file using non-root paths will get a redirect
 		else
@@ -164,11 +162,10 @@ void RootServer::ServeLib( Request *req, const Resource& res )
 	}
 }
 
-bool RootServer::ServeFile( Request *req, const fs::path& path, int )
+void RootServer::ServeFile( Request *req, const fs::path& path )
 {
 	Log( "serving file: %1% %2%", path.generic_string(), cfg::MimeType(path), log::verbose ) ;
 	req->XSendFile( path.generic_string() ) ;
-	return true ;
 }
 
 void RootServer::ServeVar( Request *req, const Resource& )
@@ -180,7 +177,7 @@ void RootServer::ServeVar( Request *req, const Resource& )
 	var.Add( "main", Json( m_main_page ) ) ;
 	
 	PrintF fmt = req->Fmt() ;
-	fmt( "Cache-Control: max-age=%1%\r\n", m_lib_cache ) ;
+	fmt( "Cache-Control: max-age=%1%\r\n", 3600 ) ;
 	fmt( "Content-type: application/json\r\n\r\n%s\r\n\r\n", var.Str() ) ;
 }
 
@@ -188,7 +185,7 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 {
 	PrintF fmt = req->Fmt() ;
 	
-	fmt( "Cache-Control: max-age=%1%\r\n", m_index_cache ) ;
+	fmt( "Cache-Control: max-age=%1%\r\n", 0 ) ;
 	fmt( "Content-type: text/html\r\n\r\n" ) ;
 	fmt( "<ul>" ) ;
 	

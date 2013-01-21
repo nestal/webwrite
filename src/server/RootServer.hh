@@ -54,7 +54,7 @@ private :
 
 	// other helpers
 	static std::string GenerateMimeCss( ) ;
-	bool ServeFile( Request *req, const fs::path& path, int cache_age = 0 ) ;
+	void ServeFile( Request *req, const fs::path& path ) ;
 	static int ReadOptionalIntConfig( const std::string& base, const std::string& item, int def_value = 0 ) ;
 
 private :
@@ -63,7 +63,6 @@ private :
 	fs::path	m_data_path ;
 	std::string	m_wb_root ;
 	std::string	m_main_page ;
-	int			m_lib_cache, m_data_cache, m_index_cache ;
 
 	// pre-generated content
 	std::string m_mime_css ;
