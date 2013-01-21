@@ -40,7 +40,7 @@ Resource::Resource( const std::string& uri )
 	
 	m_path = uri.substr(wb_root.size()) ;
 	
-	if ( Filename().empty() || Filename() == "." || fs::is_directory(ContentPath()) )
+	if ( Filename().empty() || Filename() == "." || fs::is_directory(DataPath()) )
 		m_path /= cfg::Inst()["main_page"].Str() ; 
 }
 
@@ -90,9 +90,14 @@ std::string Resource::DecodeName( const std::string& uri )
 	return result ;
 }
 
-fs::path Resource::ContentPath() const
+fs::path Resource::DataPath() const
 {
-	return cfg::Path("base") / cfg::Path("data_path") / m_path ;
+	return cfg::Path("data_path") / m_path ;
+}
+
+fs::path Resource::ReDirPath() const
+{
+	return cfg::Path("data_redir") / m_path ;
 }
 
 fs::path Resource::UrlPath() const
@@ -102,7 +107,7 @@ fs::path Resource::UrlPath() const
 
 std::string Resource::Type() const
 {
-	return cfg::MimeType( ContentPath() ) ;
+	return cfg::MimeType( Path() ) ;
 }
 
 } // end of namespace

@@ -75,7 +75,7 @@ PrintF FCGIRequest::Fmt()
 
 void FCGIRequest::XSendFile( const std::string& file )
 {
-	FCGX_FPrintF( m_req->out, "X-Sendfile: %s\r\n\r\n", file.c_str() ) ;
+	FCGX_FPrintF( m_req->out, "X-Accel-Redirect: %s\r\n\r\n", file.c_str() ) ;
 }
 
 std::size_t FCGIRequest::StreamWrapper::Read( char *data, std::size_t size )

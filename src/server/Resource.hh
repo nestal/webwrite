@@ -35,7 +35,9 @@ public :
 	/// a path to the resource relative to the "wb-root"
 	const fs::path& Path() const ;
 
-	fs::path ContentPath() const ;
+	fs::path DataPath() const ;
+
+	fs::path ReDirPath() const ;
 	
 	fs::path UrlPath() const ;
 	

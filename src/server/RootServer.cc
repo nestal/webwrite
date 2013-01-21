@@ -36,11 +36,14 @@
 namespace wb {
 
 RootServer::RootServer( ) :
-	m_lib_path	( fs::canonical( cfg::Path("base") / cfg::Path("lib_path") ) ),
-	m_data_path	( fs::canonical( cfg::Path("base") / cfg::Path("data_path") ) ),
+	m_lib_redir	( cfg::Path("lib_redir") ),
+	m_data_path	( cfg::Path("data_path") ),
 	m_wb_root	( cfg::Inst()["wb_root"].Str() ),
 	m_main_page	( cfg::Inst()["main_page"].Str() ),
-	m_mime_css	( GenerateMimeCss(m_lib_path) )
+	m_lib_cache	( ReadOptionalIntConfig( "cache", "lib" ) ),
+	m_data_cache( ReadOptionalIntConfig( "cache", "data" ) ),
+	m_index_cache( ReadOptionalIntConfig( "cache", "index" ) ),
+	m_mime_css	( GenerateMimeCss() )
 {
 	// handlers for GET requests
 	Query<Handler>& get = m_srv.insert( std::make_pair( 
@@ -61,7 +64,16 @@ RootServer::RootServer( ) :
 	post.Add( "save",	&RootServer::Save ) ;
 	post.Add( "upload",	&RootServer::Upload ) ;
 }
-	
+
+int RootServer::ReadOptionalIntConfig( const std::string& base, const std::string& item, int def_value )
+{
+	Json base_json, item_json;
+
+	return ( cfg::Inst().Get( base, base_json ) && base_json.Get( item, item_json ) )
+		? item_json.Int()
+		: def_value ;
+}
+
 void RootServer::Work( Request *req, const Resource& res ) 
 {
 	fs::path	rel		= res.Path() ;
@@ -87,21 +99,23 @@ void RootServer::Work( Request *req, const Resource& res )
 void RootServer::DefaultPage( Request *req, const Resource& res )
 {
 	if ( res.Type() == "text/html" )
-		ServeFile( req, m_lib_path / "index.html", cfg::Inst()["cache"]["lib"].Int() ) ;
+		ServeFile( req, m_lib_redir / "index.html", m_lib_cache ) ;
 
 	else
-		ServeFile( req, res.ContentPath(), cfg::Inst()["cache"]["data"].Int() ) ;
+		ServeFile( req, res.ReDirPath(), m_data_cache ) ;
 }
 
 void RootServer::Load( Request *req, const Resource& res )
 {
-	if ( !ServeFile( req, res.ContentPath(), cfg::Inst()["cache"]["data"].Int() ) )
-		ServeFile( req, m_lib_path / "newpage.html", cfg::Inst()["cache"]["lib"].Int() ) ;
+	if ( fs::exists( res.DataPath() ) )
+		ServeFile( req, res.ReDirPath(), m_data_cache ) ;
+	else
+		ServeFile( req, m_lib_redir / "newpage.html", m_lib_cache ) ;
 }
 
 void RootServer::Save( Request *req, const Resource& res )
 {
-	fs::path 	file	= res.ContentPath() ;
+	fs::path 	file	= res.DataPath() ;
 	Log( "writing to file %1%", file, log::verbose ) ;
 		
 	fs::create_directories( file.parent_path() ) ;
@@ -116,7 +130,7 @@ void RootServer::Save( Request *req, const Resource& res )
 void RootServer::Upload( Request *req, const Resource& res )
 {
 	FormData form( req->In(), req->ContentType() ) ;
-	form.Save( res.ContentPath().parent_path() ) ;
+	form.Save( res.DataPath().parent_path() ) ;
 }
 
 void RootServer::ServeLib( Request *req, const Resource& res )
@@ -135,10 +149,7 @@ void RootServer::ServeLib( Request *req, const Resource& res )
 
 		// only serve file if it is in the root path
 		else if ( res.Path().parent_path() == "/" )
-		{
-			if ( !ServeFile( req, m_lib_path/p, cfg::Inst()["cache"]["lib"].Int() ) )
-				NotFound( req ) ;
-		}
+			ServeFile( req, m_lib_redir/p, m_lib_cache ) ;
 
 		// request for lib file using non-root paths will get a redirect
 		else
@@ -148,20 +159,11 @@ void RootServer::ServeLib( Request *req, const Resource& res )
 	}
 }
 
-bool RootServer::ServeFile( Request *req, const fs::path& path, int cache_age )
+bool RootServer::ServeFile( Request *req, const fs::path& path, int )
 {
-//	Log( "serving file: %1% %2%", path, cfg::MimeType(path), log::verbose ) ;
-	if ( fs::exists(path) )
-	{
-		PrintF fmt = req->Fmt() ;
-		if ( cache_age > 0 )
-			fmt( "Cache-Control: max-age=%1%\r\n", cache_age ) ;
-
-		req->XSendFile( path.string() ) ;
-		return true ;
-	}
-	else
-		return false ;
+	Log( "serving file: %1% %2%", path.generic_string(), cfg::MimeType(path), log::verbose ) ;
+	req->XSendFile( path.generic_string() ) ;
+	return true ;
 }
 
 void RootServer::ServeVar( Request *req, const Resource& )
@@ -173,7 +175,7 @@ void RootServer::ServeVar( Request *req, const Resource& )
 	var.Add( "main", Json( m_main_page ) ) ;
 	
 	PrintF fmt = req->Fmt() ;
-	fmt( "Cache-Control: max-age=%1%\r\n", cfg::Inst()["cache"]["lib"].Int() ) ;
+	fmt( "Cache-Control: max-age=%1%\r\n", m_lib_cache ) ;
 	fmt( "Content-type: application/json\r\n\r\n%s\r\n\r\n", var.Str() ) ;
 }
 
@@ -181,7 +183,7 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 {
 	PrintF fmt = req->Fmt() ;
 	
-	fmt( "Cache-Control: max-age=%1%\r\n", cfg::Inst()["cache"]["index"].Int() ) ;
+	fmt( "Cache-Control: max-age=%1%\r\n", m_index_cache ) ;
 	fmt( "Content-type: text/html\r\n\r\n" ) ;
 	fmt( "<ul>" ) ;
 	
@@ -191,9 +193,9 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 			res.UrlPath().parent_path().parent_path().generic_string(),
 			m_main_page) ;
 	
-	if ( fs::is_directory(res.ContentPath().parent_path()) )
+	if ( fs::is_directory(res.DataPath().parent_path()) )
 	{
-		fs::directory_iterator di( res.ContentPath().parent_path() ), end ;
+		fs::directory_iterator di( res.DataPath().parent_path() ), end ;
 		for ( ; di != end ; ++di )
 		{
 			Resource sibling(
@@ -223,12 +225,12 @@ void RootServer::NotFound( Request *req, const Resource& )
 	req->NotFound("<h1>Not Found!!!</h1>") ;
 }
 
-std::string RootServer::GenerateMimeCss( const fs::path& lib_path )
+std::string RootServer::GenerateMimeCss( )
 {
 	std::ostringstream ss ;
 	ss	<< "Content-type: text/css\r\n\r\n" ;
 
-	const fs::path icon_path = lib_path / "icons" ;
+	const fs::path icon_path = cfg::Inst()["lib_path"].Str() + "/icons" ;
 	std::set<std::string> mime_set ;
 	mime_set.insert( "inode-directory" ) ;
 	mime_set.insert( "application-octet-stream" ) ;

@@ -3,7 +3,9 @@
 	"socket"	: ":9000",
 	"wb_root"	: "/webwrite",
 	"lib_path"	: "lib",
+	"lib_redir"	: "/wb/lib",
 	"data_path"	: "data",
+	"data_redir"	: "/wb/data",
 	"mime"		:
 	{
 		".js"	: "application/javascript",

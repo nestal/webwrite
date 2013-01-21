@@ -53,17 +53,19 @@ private :
 	void Upload( Request *req, const Resource& res ) ;
 
 	// other helpers
-	static std::string GenerateMimeCss( const fs::path& lib_path ) ;
+	static std::string GenerateMimeCss( ) ;
 	bool ServeFile( Request *req, const fs::path& path, int cache_age = 0 ) ;
+	static int ReadOptionalIntConfig( const std::string& base, const std::string& item, int def_value = 0 ) ;
 
 private :
 	// configuration parameters
-	fs::path	m_lib_path ;
+	fs::path	m_lib_redir ;
 	fs::path	m_data_path ;
-	
 	std::string	m_wb_root ;
 	std::string	m_main_page ;
+	int			m_lib_cache, m_data_cache, m_index_cache ;
 
+	// pre-generated content
 	std::string m_mime_css ;
 
 	// query string parser
