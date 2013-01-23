@@ -237,6 +237,7 @@ std::string RootServer::GenerateMimeCss( )
 	mime_set.insert( "inode-directory" ) ;
 	mime_set.insert( "application-octet-stream" ) ;
 	
+	// generate a unique list of configured mime type 
 	Json::Object mime = cfg::Inst()["mime"].AsObject() ;
 	for ( Json::Object::iterator i = mime.begin() ; i != mime.end() ; ++i )
 	{
