@@ -21,6 +21,8 @@
 #include "ExpatParser.hh"
 #include "XmlHandler.hh"
 
+#include "log/Log.hh"
+
 #include <expat.h>
 
 #include <cassert>
@@ -31,6 +33,17 @@ struct ExpatParser::Expat
 {
 	XML_Parser	p;
 } ;
+
+int ExtEntityParser(
+	XML_Parser parser,
+	const XML_Char *context,
+	const XML_Char *base,
+	const XML_Char *systemId,
+	const XML_Char *publicId)
+{
+	Log( "entity %1% %2% %3% %4%", context, base, systemId, publicId ) ;
+	return 1 ;
+}
 
 ExpatParser::ExpatParser( XmlHandler *out ) :
 	m_xpt( new Expat ),
@@ -51,6 +64,9 @@ ExpatParser::ExpatParser( XmlHandler *out ) :
 		&ExpatParser::EndElement ) ;
 	
 	::XML_SetUserData( m_xpt->p, this ) ;
+	::XML_UseForeignDTD( m_xpt->p, XML_TRUE ) ;
+	::XML_SetParamEntityParsing( m_xpt->p, XML_PARAM_ENTITY_PARSING_NEVER ) ;
+	::XML_SetExternalEntityRefHandler( m_xpt->p, &ExtEntityParser ) ;
 }
 
 ExpatParser::~ExpatParser( )

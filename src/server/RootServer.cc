@@ -26,6 +26,11 @@
 #include "util/File.hh"
 #include "util/PrintF.hh"
 
+#ifdef HAVE_EXPAT
+	#include "parser/xml/ExpatParser.hh"
+	#include "parser/xml/XmlFilter.hh"
+#endif
+
 #include <boost/regex.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -120,11 +125,19 @@ void RootServer::Save( Request *req, const Resource& res )
 		
 	fs::create_directories( file.parent_path() ) ;
 	File f( file, 0600 ) ;
-		
+
+	DataStream *out = &f ;
+/*
+#ifdef HAVE_EXPAT
+	XmlFilter	filter( &f ) ;
+	ExpatParser	parser( &filter ) ;
+	out = &parser ;
+#endif
+*/
 	char buf[1024] ;
 	std::size_t c ;
 	while ( (c = req->In()->Read(buf, sizeof(buf)) ) > 0 )
-		f.Write( buf, c ) ;
+		out->Write( buf, c ) ;
 
 	// ask client to load the new content again
 	req->SeeOther( res.UrlPath().generic_string() + "?load" ) ;
