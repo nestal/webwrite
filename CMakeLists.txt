@@ -37,6 +37,7 @@ find_package(JSONC REQUIRED)
 find_package(FCGI REQUIRED)
 find_package(CppUnit)
 find_package(BFD)
+find_package(EXPAT)
 
 include_directories(
 	${JSONC_INCLUDE_DIR}
@@ -54,13 +55,24 @@ add_definitions(
 
 # build bfd classes if libbfd is found
 if ( BFD_FOUND )
-    set( OPT_LIBS   ${DL_LIBRARY} ${BFD_LIBRARY} )
-    file( GLOB OPT_SRC
-            ${webwrite_SOURCE_DIR}/src/bfd/*.cc
-    )
-    add_definitions( -DHAVE_BFD )
+	set( OPT_LIBS   ${DL_LIBRARY} ${BFD_LIBRARY} )
+	file( GLOB BFD_SRC
+		${webwrite_SOURCE_DIR}/src/bfd/*.cc
+	)
+	add_definitions( -DHAVE_BFD )
         
 endif ( BFD_FOUND )
+
+if ( EXPAT_FOUND )
+	set( OPT_LIBS	${EXPAT_LIBRARY} ${OPT_LIBS} )
+	include_directories( ${EXPAT_INCLUDE_DIR} )
+	file( GLOB EXPAT_SRC
+		${webwrite_SOURCE_DIR}/src/parser/xml/*.cc
+	)
+	add_definitions( -DHAVE_EXPAT )
+endif ( EXPAT_FOUND )
+
+set(OPT_SRC ${BFD_SRC} ${EXPAT_SRC} )
 
 file (GLOB WEBWRITE_LIB_SRC
 	${OPT_SRC}
