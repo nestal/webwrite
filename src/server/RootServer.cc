@@ -26,9 +26,8 @@
 #include "util/File.hh"
 #include "util/PrintF.hh"
 
-#ifdef HAVE_EXPAT
-	#include "parser/xml/ExpatParser.hh"
-	#include "parser/xml/XmlFilter.hh"
+#ifdef HAVE_LIBXML2
+	#include "parser/xml/HtmlValidator.hh"
 #endif
 
 #include <boost/regex.hpp>
@@ -127,13 +126,12 @@ void RootServer::Save( Request *req, const Resource& res )
 	File f( file, 0600 ) ;
 
 	DataStream *out = &f ;
-/*
+
 #ifdef HAVE_EXPAT
-	XmlFilter	filter( &f ) ;
-	ExpatParser	parser( &filter ) ;
-	out = &parser ;
+	HtmlValidator	html( out ) ;
+	out = &html ;
 #endif
-*/
+
 	char buf[1024] ;
 	std::size_t c ;
 	while ( (c = req->In()->Read(buf, sizeof(buf)) ) > 0 )

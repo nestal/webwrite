@@ -37,7 +37,8 @@ find_package(JSONC REQUIRED)
 find_package(FCGI REQUIRED)
 find_package(CppUnit)
 find_package(BFD)
-find_package(EXPAT)
+find_package(libxml2)
+find_package(iconv)
 
 include_directories(
 	${JSONC_INCLUDE_DIR}
@@ -60,19 +61,22 @@ if ( BFD_FOUND )
 		${webwrite_SOURCE_DIR}/src/bfd/*.cc
 	)
 	add_definitions( -DHAVE_BFD )
+	set(OPT_SRC ${BFD_SRC} )
         
 endif ( BFD_FOUND )
 
-if ( EXPAT_FOUND )
-	set( OPT_LIBS	${EXPAT_LIBRARY} ${OPT_LIBS} )
-	include_directories( ${EXPAT_INCLUDE_DIR} )
-	file( GLOB EXPAT_SRC
+if ( LIBXML2_FOUND )
+	set( OPT_LIBS	${LIBXML2_LIBRARIES} ${ICONV_LIBRARIES} ${OPT_LIBS} )
+	include_directories( ${LIBXML2_INCLUDE_DIR} ${ICONV_INCLUDE_DIRS} )
+	
+	file( GLOB XML_SRC
 		${webwrite_SOURCE_DIR}/src/parser/xml/*.cc
 	)
-	add_definitions( -DHAVE_EXPAT )
-endif ( EXPAT_FOUND )
+	set(OPT_SRC ${XML_SRC} ${OPT_SRC})
 
-set(OPT_SRC ${BFD_SRC} ${EXPAT_SRC} )
+	add_definitions( -DHAVE_LIBXML2 ${LIBXML2_DEFINITIONS} )
+endif ( LIBXML2_FOUND )
+
 
 file (GLOB WEBWRITE_LIB_SRC
 	${OPT_SRC}

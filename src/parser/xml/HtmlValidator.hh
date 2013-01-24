@@ -18,25 +18,31 @@
 	MA  02110-1301, USA.
 */
 
-#include "XmlFilter.hh"
+#pragma once
 
 #include "util/DataStream.hh"
-#include "log/Log.hh"
+#include "util/Exception.hh"
+#include <memory>
 
 namespace wb {
 
-XmlFilter::XmlFilter( DataStream *out ) :
-	m_out( out )
+class HtmlValidator : public DataStream
 {
-}
+public :
+	struct Error : public Exception {};
 
-void XmlFilter::StartElement( const char *element, const char **attr )
-{
-	Log( "find element %1%", element ) ;
-}
+	HtmlValidator( DataStream *out ) ;
+	~HtmlValidator() ;
+	
+	std::size_t Read( char *data, std::size_t size ) ;
+	std::size_t Write( const char *data, std::size_t size ) ;
 
-void XmlFilter::EndElement( const char *element )
-{
-}
+	void Finish() ;
+
+private :
+	struct Impl ;
+	std::auto_ptr<Impl>	m_;
+} ;
 
 } // end of namespace
+
