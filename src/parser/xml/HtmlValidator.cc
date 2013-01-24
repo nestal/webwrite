@@ -60,11 +60,15 @@ std::size_t HtmlValidator::Read( char *data, std::size_t size )
 
 std::size_t HtmlValidator::Write( const char *data, std::size_t size )
 {
+	Log( "read %1% bytes", size ) ;
 	if ( m_->ctx == 0 )
-		m_->ctx = ::htmlCreatePushParserCtxt( 0, 0, data, size, "haha" ) ;
+		m_->ctx = ::htmlCreatePushParserCtxt( 0, 0, data, size, "haha", XML_CHAR_ENCODING_NONE ) ;
 	else
-		::htmlParseChunk( m_->ctx, data, size, 0 ) ;
-
+	{
+		int r = ::htmlParseChunk( m_->ctx, data, size, 0 ) ;
+		if ( r == 0 )
+			Log( "error %1%", r ) ;
+	}
 	return m_->out->Write( data, size ) ;
 }
 
@@ -72,9 +76,19 @@ void HtmlValidator::Finish()
 {
 	if ( m_->ctx != 0 )
 	{
-		::htmlParseChunk( m_->ctx, 0, 0, 1 ) ;
+		int r = ::htmlParseChunk( m_->ctx, 0, 0, 1 ) ;
+		if ( r != 0 )
+			Log( "error %1%", r ) ;
+		else
+		{
+			htmlDocPtr doc = m_->ctx->myDoc ;
+			::htmlFreeParserCtxt( m_->ctx ) ;
+			m_->ctx = 0 ;
 
-		::htmlDocDump( stderr, m_->ctx->myDoc ) ;
+			htmlDocPtr c = xmlCopyDoc( doc, 1 ) ;
+			htmlDocDump( stdout, c ) ;
+
+		}
 	}
 }
 

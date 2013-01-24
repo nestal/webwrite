@@ -127,7 +127,7 @@ void RootServer::Save( Request *req, const Resource& res )
 
 	DataStream *out = &f ;
 
-#ifdef HAVE_EXPAT
+#ifdef HAVE_LIBXML2
 	HtmlValidator	html( out ) ;
 	out = &html ;
 #endif
@@ -136,6 +136,10 @@ void RootServer::Save( Request *req, const Resource& res )
 	std::size_t c ;
 	while ( (c = req->In()->Read(buf, sizeof(buf)) ) > 0 )
 		out->Write( buf, c ) ;
+
+#ifdef HAVE_LIBXML2
+	html.Finish() ;
+#endif
 
 	// ask client to load the new content again
 	req->SeeOther( res.UrlPath().generic_string() + "?load" ) ;
