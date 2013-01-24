@@ -87,7 +87,6 @@ void HtmlValidator::Finish()
 
 			htmlDocPtr c = xmlCopyDoc( doc, 1 ) ;
 			htmlDocDump( stdout, c ) ;
-
 		}
 	}
 }

@@ -37,8 +37,11 @@ find_package(JSONC REQUIRED)
 find_package(FCGI REQUIRED)
 find_package(CppUnit)
 find_package(BFD)
-find_package(libxml2)
-find_package(iconv)
+find_package(LibXml2)
+
+if ( WIN32 )
+	find_package(iconv)
+endif ( WIN32 )
 
 include_directories(
 	${JSONC_INCLUDE_DIR}
