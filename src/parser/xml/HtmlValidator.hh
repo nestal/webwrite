@@ -31,7 +31,7 @@ class HtmlValidator : public DataStream
 public :
 	struct Error : public Exception {};
 
-	HtmlValidator( DataStream *out ) ;
+	HtmlValidator( DataStream *out, const std::string& filename = "" ) ;
 	~HtmlValidator() ;
 	
 	std::size_t Read( char *data, std::size_t size ) ;

@@ -128,7 +128,7 @@ void RootServer::Save( Request *req, const Resource& res )
 	DataStream *out = &f ;
 
 #ifdef HAVE_LIBXML2
-	HtmlValidator	html( out ) ;
+	HtmlValidator	html( out, file.filename().string() ) ;
 	out = &html ;
 #endif
 

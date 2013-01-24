@@ -21,11 +21,13 @@
 #include "HtmlValidator.hh"
 
 #include "log/Log.hh"
+#include "util/CArray.hh"
 
 #include <libxml/HTMLparser.h>
 #include <libxml/HTMLtree.h>
 
 #include <cassert>
+#include <set>
 
 namespace wb {
 
@@ -33,10 +35,50 @@ struct HtmlValidator::Impl
 {
 	htmlParserCtxtPtr	ctx ;
 	DataStream			*out ;
-	xmlSAXHandler		sax ;
 } ;
 
 namespace {
+
+// hard code the HTML element white list for now
+const std::string white_list_array[] =
+{
+	"html",
+	"body",
+	"div",
+	"span",
+	"p",
+	
+	"a",
+	"img",
+	"br",
+	"b",
+	"u",
+	"strong",
+	"em",
+	"pre",
+	
+	"h1",
+	"h2",
+	"h3",
+	"h4",
+	"h5",
+	
+	"ul",
+	"ol",
+	"li",
+	"dl",
+	"dt",
+	"dd",
+	
+	"table",
+	"tbody",
+	"tr",
+	"td",
+} ;
+
+const std::set<std::string> white_list(
+	Begin(white_list_array),
+	End(white_list_array) ) ;
 
 void OnStartElementNs(
     void *ctx,
@@ -44,7 +86,8 @@ void OnStartElementNs(
     const xmlChar **attr
 )
 {
-	Log( "read element %1%", name ) ;
+	if ( white_list.find( std::string(reinterpret_cast<const char*>(name)) ) == white_list.end() )
+		Log( "unknown element %1%", name ) ;
 }
  
 void OnEndElementNs(
@@ -56,16 +99,22 @@ void OnEndElementNs(
 
 } // end of local namespace
 
-HtmlValidator::HtmlValidator( DataStream *out ) :
+HtmlValidator::HtmlValidator( DataStream *out, const std::string& filename ) :
 	m_( new Impl )
 {
 	assert( out != 0 ) ;
 	m_->out = out ;
 
-	m_->ctx = 0 ;
-	memset( &m_->sax, 0, sizeof(m_->sax) ) ;
-	m_->sax.startElement	= &OnStartElementNs ;
-	m_->sax.endElement		= &OnEndElementNs ; 
+	xmlSAXHandler sax = {} ;
+	sax.startElement	= &OnStartElementNs ;
+	sax.endElement		= &OnEndElementNs ;
+	
+	Log( "this = %1%", this ) ;
+		
+	m_->ctx = ::htmlCreatePushParserCtxt(
+		&sax, this, 0, 0,
+		filename.c_str(),
+		XML_CHAR_ENCODING_NONE ) ;
 }
 
 HtmlValidator::~HtmlValidator( )
@@ -85,34 +134,22 @@ std::size_t HtmlValidator::Read( char *data, std::size_t size )
 std::size_t HtmlValidator::Write( const char *data, std::size_t size )
 {
 	Log( "read %1% bytes", size ) ;
-	if ( m_->ctx == 0 )
-		m_->ctx = ::htmlCreatePushParserCtxt( &m_->sax, 0, data, size, "haha", XML_CHAR_ENCODING_NONE ) ;
-	else
-	{
-		int r = ::htmlParseChunk( m_->ctx, data, size, 0 ) ;
-		if ( r != 0 )
-			Log( "error %1%", r ) ;
-	}
+	assert( m_->ctx != 0 ) ;
+	
+	int r = ::htmlParseChunk( m_->ctx, data, size, 0 ) ;
+	if ( r != 0 )
+		Log( "error %1%", r ) ;
+	
 	return m_->out->Write( data, size ) ;
 }
 
 void HtmlValidator::Finish()
 {
-	if ( m_->ctx != 0 )
-	{
-		int r = ::htmlParseChunk( m_->ctx, 0, 0, 1 ) ;
-		if ( r != 0 )
-			Log( "error %1%", r ) ;
-		else
-		{
-			htmlDocPtr doc = m_->ctx->myDoc ;
-			::htmlFreeParserCtxt( m_->ctx ) ;
-			m_->ctx = 0 ;
-
-			htmlDocPtr c = xmlCopyDoc( doc, 1 ) ;
-			htmlDocDump( stdout, c ) ;
-		}
-	}
+	assert( m_->ctx != 0 ) ;
+	
+	int r = ::htmlParseChunk( m_->ctx, 0, 0, 1 ) ;
+	if ( r != 0 )
+		Log( "error %1%", r ) ;
 }
 
 } // end of namespace
