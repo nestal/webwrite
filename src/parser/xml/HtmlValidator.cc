@@ -33,7 +33,28 @@ struct HtmlValidator::Impl
 {
 	htmlParserCtxtPtr	ctx ;
 	DataStream			*out ;
+	xmlSAXHandler		sax ;
 } ;
+
+namespace {
+
+void OnStartElementNs(
+    void *ctx,
+    const xmlChar *name,
+    const xmlChar **attr
+)
+{
+	Log( "read element %1%", name ) ;
+}
+ 
+void OnEndElementNs(
+    void* ctx,
+    const xmlChar* name
+)
+{
+}
+
+} // end of local namespace
 
 HtmlValidator::HtmlValidator( DataStream *out ) :
 	m_( new Impl )
@@ -42,6 +63,9 @@ HtmlValidator::HtmlValidator( DataStream *out ) :
 	m_->out = out ;
 
 	m_->ctx = 0 ;
+	memset( &m_->sax, 0, sizeof(m_->sax) ) ;
+	m_->sax.startElement	= &OnStartElementNs ;
+	m_->sax.endElement		= &OnEndElementNs ; 
 }
 
 HtmlValidator::~HtmlValidator( )
@@ -62,11 +86,11 @@ std::size_t HtmlValidator::Write( const char *data, std::size_t size )
 {
 	Log( "read %1% bytes", size ) ;
 	if ( m_->ctx == 0 )
-		m_->ctx = ::htmlCreatePushParserCtxt( 0, 0, data, size, "haha", XML_CHAR_ENCODING_NONE ) ;
+		m_->ctx = ::htmlCreatePushParserCtxt( &m_->sax, 0, data, size, "haha", XML_CHAR_ENCODING_NONE ) ;
 	else
 	{
 		int r = ::htmlParseChunk( m_->ctx, data, size, 0 ) ;
-		if ( r == 0 )
+		if ( r != 0 )
 			Log( "error %1%", r ) ;
 	}
 	return m_->out->Write( data, size ) ;

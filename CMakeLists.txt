@@ -32,7 +32,7 @@ if ( WIN32 )
 	add_definitions( -D_SCL_SECURE_NO_WARNINGS )
 endif ( WIN32 )
 
-find_package(Boost COMPONENTS filesystem system regex date_time REQUIRED)
+find_package(Boost COMPONENTS filesystem system regex unit_test_framework REQUIRED)
 find_package(JSONC REQUIRED)
 find_package(FCGI REQUIRED)
 find_package(CppUnit)
@@ -139,5 +139,13 @@ if ( CPPUNIT_FOUND )
 		${Boost_LIBRARIES}
 		${OPT_LIBS}
 	)
-        
+
 endif ( CPPUNIT_FOUND )
+
+add_executable( btest test/parser/HtmlValidatorTest.cc )
+target_link_libraries( btest wb_core
+	${JSONC_LIBRARY}
+	${Boost_LIBRARIES}
+	${OPT_LIBS}
+)
+set_target_properties( btest PROPERTIES COMPILE_FLAGS -DBOOST_TEST_DYN_LINK ) 
