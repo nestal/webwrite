@@ -31,8 +31,10 @@ BOOST_AUTO_TEST_CASE( HtmlValidatorTest )
 	StringStream ss ;
     HtmlValidator subject( &ss ) ;
 
-    const char html[] = "<html><body>hi</body></html>" ;
+    const char html[] = "<html><body><div class=\"wow\">hi&gt;</body><div/></html>" ;
     subject.Write( html, sizeof(html)-1 ) ;
+
+    std::cout << ss.Str() << std::endl ;
 
     BOOST_CHECK( true );
 }

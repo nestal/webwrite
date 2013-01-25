@@ -116,6 +116,29 @@ void HtmlValidator::OnCharacters(
 	int					len
 )
 {
+	Impl *im = GetImpl(pv) ;
+	
+	unsigned char out[1024] ;
+	int out_len	= sizeof(out) ;
+	
+	const unsigned char *in = chars ;
+	int in_len = len ;
+	
+	while ( true )
+	{
+		int iolen = in_len ;
+		if ( ::htmlEncodeEntities( out, &out_len, in, &iolen, '\0' ) != 0 )
+			break ;
+
+		im->out->Write( reinterpret_cast<const char*>(out), out_len ) ;
+		
+		// finish!
+		if ( iolen == in_len )
+			break ;
+		
+		in		+= iolen ;
+		in_len	-= iolen ;		
+	}
 }
 
 void HtmlValidator::OnEndElement(
