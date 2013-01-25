@@ -32,12 +32,6 @@ class PrintF
 public :
 	explicit PrintF( DataStream *out ) ;
 	
-	template <std::size_t size>
-	std::size_t operator()( const char (&str)[size] )
-	{
-		return PutS( &str[0], size ) ;
-	}
-	
 	std::size_t operator()( const std::string& fmt ) ;
 	
 	// template version of printf

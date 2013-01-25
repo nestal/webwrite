@@ -120,11 +120,11 @@ void HtmlValidator::OnStartElement(
 	im->element.push_back( Impl::normal ) ;
 	
 	PrintF fmt(im->out) ;
-	fmt( "<%1%", name ) ;
+	fmt( "<%1%", (char*)name ) ;
 	
 	while ( attr != 0 && attr[0] != 0 && attr[1] != 0 )
 	{
-		fmt( " %1%=\"%2%\"", attr[0], attr[1] ) ;
+		fmt( " %1%=\"%2%\"", (char*)attr[0], (char*)attr[1] ) ;
 		attr += 2 ;
 	}
 	
@@ -163,6 +163,7 @@ void HtmlValidator::OnCharacters(
 		in_len	-= iolen ;		
 	}
 }
+
 
 void HtmlValidator::OnEndElement(
 	void				*pv,
