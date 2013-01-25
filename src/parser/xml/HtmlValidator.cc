@@ -29,6 +29,7 @@
 
 #include <cassert>
 #include <set>
+#include <iostream>
 
 #define THROW()				\
 	BOOST_THROW_EXCEPTION(	\
@@ -65,6 +66,13 @@ struct HtmlValidator::Impl
 {
 	htmlParserCtxtPtr	ctx ;
 	DataStream			*out ;
+	
+	enum State
+	{
+		normal,
+		unknown,
+	} ;
+	std::vector<State>	element ;
 } ;
 
 HtmlValidator::HtmlValidator( DataStream *out, const std::string& filename ) :
@@ -102,12 +110,25 @@ void HtmlValidator::OnStartElement(
 	const unsigned char	**attr
 )
 {
-	if ( white_list.find( std::string(reinterpret_cast<const char*>(name)) ) == white_list.end() )
-		Log( "unknown element %1%", name ) ;
-
 	Impl *im = GetImpl(pv) ;
+	if ( white_list.find( std::string(reinterpret_cast<const char*>(name)) ) == white_list.end() )
+	{
+		Log( "unknown element %1%", name ) ;
+		im->element.push_back( Impl::unknown ) ;
+		return ;
+	}
+	im->element.push_back( Impl::normal ) ;
+	
 	PrintF fmt(im->out) ;
-	fmt( "<%1%>", name ) ;
+	fmt( "<%1%", name ) ;
+	
+	while ( attr != 0 && attr[0] != 0 && attr[1] != 0 )
+	{
+		fmt( " %1%=\"%2%\"", attr[0], attr[1] ) ;
+		attr += 2 ;
+	}
+	
+	fmt( ">" ) ;
 }
 
 void HtmlValidator::OnCharacters(
@@ -117,7 +138,9 @@ void HtmlValidator::OnCharacters(
 )
 {
 	Impl *im = GetImpl(pv) ;
-	
+	if ( im->element.empty() || im->element.back() == Impl::unknown )
+		return ;
+		
 	unsigned char out[1024] ;
 	int out_len	= sizeof(out) ;
 	
@@ -129,7 +152,7 @@ void HtmlValidator::OnCharacters(
 		int iolen = in_len ;
 		if ( ::htmlEncodeEntities( out, &out_len, in, &iolen, '\0' ) != 0 )
 			break ;
-
+//std::cout << "last char = " << int(out[out_len-1]) << std::endl ;
 		im->out->Write( reinterpret_cast<const char*>(out), out_len ) ;
 		
 		// finish!
@@ -147,8 +170,14 @@ void HtmlValidator::OnEndElement(
 )
 {
 	Impl *im = GetImpl(pv) ;
-	PrintF fmt(im->out) ;
-	fmt( "</%1%>", name ) ;
+	if ( !im->element.empty() && im->element.back() == Impl::normal )
+	{
+		PrintF fmt(im->out) ;
+		fmt( "</%1%>", name ) ;
+	}
+	
+	if ( !im->element.empty() )
+		im->element.pop_back() ;
 }
 
 std::size_t HtmlValidator::Read( char *data, std::size_t size )

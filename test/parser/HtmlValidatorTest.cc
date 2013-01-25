@@ -31,11 +31,12 @@ BOOST_AUTO_TEST_CASE( HtmlValidatorTest )
 	StringStream ss ;
     HtmlValidator subject( &ss ) ;
 
-    const char html[] = "<html><body><div class=\"wow\">hi&gt;</body><div/></html>" ;
+    const char html[] = "<html><body><script class=\"wow\">hi&gt;</script></body></html>" ;
     subject.Write( html, sizeof(html)-1 ) ;
 
-    std::cout << ss.Str() << std::endl ;
+    std::string exp = "<html><body></body></html>" ;
+    std::cout << "\"" << ss.Str() << "\"" << std::endl ;
+    std::cout << "\"" << exp << "\"" << std::endl ;
 
-    BOOST_CHECK( true );
+    BOOST_CHECK_EQUAL( ss.Str().size(), exp.size() );
 }
-
