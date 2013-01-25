@@ -22,6 +22,7 @@
 
 #include "log/Log.hh"
 #include "util/CArray.hh"
+#include "util/PrintF.hh"
 
 #include <libxml/HTMLparser.h>
 #include <libxml/HTMLtree.h>
@@ -29,7 +30,36 @@
 #include <cassert>
 #include <set>
 
+#define THROW()				\
+	BOOST_THROW_EXCEPTION(	\
+			Error() << expt::ErrMsg( ::xmlCtxtGetLastError(m_->ctx)->message )	\
+		) ;	
+
 namespace wb {
+
+namespace
+{
+	// hard code the HTML element white list for now
+	const std::string white_list_array[] =
+	{
+		"html",	"a",	"img",
+		"body",	"br",	"pre",
+		"div",	"b",	"strong",
+		"span",	"u",	"em",
+		"p",
+		
+		"h1",	"ul",	"dd",	"table",
+		"h2",	"ol",			"tbody",
+		"h3",	"li",			"tr",
+		"h4",	"dl",			"td",
+		"h5",	"dt",
+	} ;
+
+	const std::set<std::string> white_list(
+		Begin(white_list_array),
+		End(white_list_array) ) ;
+
+} // end of local namespace
 
 struct HtmlValidator::Impl
 {
@@ -37,82 +67,19 @@ struct HtmlValidator::Impl
 	DataStream			*out ;
 } ;
 
-namespace {
-
-// hard code the HTML element white list for now
-const std::string white_list_array[] =
-{
-	"html",
-	"body",
-	"div",
-	"span",
-	"p",
-	
-	"a",
-	"img",
-	"br",
-	"b",
-	"u",
-	"strong",
-	"em",
-	"pre",
-	
-	"h1",
-	"h2",
-	"h3",
-	"h4",
-	"h5",
-	
-	"ul",
-	"ol",
-	"li",
-	"dl",
-	"dt",
-	"dd",
-	
-	"table",
-	"tbody",
-	"tr",
-	"td",
-} ;
-
-const std::set<std::string> white_list(
-	Begin(white_list_array),
-	End(white_list_array) ) ;
-
-void OnStartElementNs(
-    void *ctx,
-    const xmlChar *name,
-    const xmlChar **attr
-)
-{
-	if ( white_list.find( std::string(reinterpret_cast<const char*>(name)) ) == white_list.end() )
-		Log( "unknown element %1%", name ) ;
-}
- 
-void OnEndElementNs(
-    void* ctx,
-    const xmlChar* name
-)
-{
-}
-
-} // end of local namespace
-
 HtmlValidator::HtmlValidator( DataStream *out, const std::string& filename ) :
 	m_( new Impl )
 {
 	assert( out != 0 ) ;
 	m_->out = out ;
 
-	xmlSAXHandler sax = {} ;
-	sax.startElement	= &OnStartElementNs ;
-	sax.endElement		= &OnEndElementNs ;
+	::xmlSAXHandler sax = {} ;
+	sax.startElement	= &HtmlValidator::OnStartElement ;
+	sax.endElement		= &HtmlValidator::OnEndElement ;
+	sax.characters		= &HtmlValidator::OnCharacters ;
 	
-	Log( "this = %1%", this ) ;
-		
 	m_->ctx = ::htmlCreatePushParserCtxt(
-		&sax, this, 0, 0,
+		&sax, m_.get(), 0, 0,
 		filename.c_str(),
 		XML_CHAR_ENCODING_NONE ) ;
 }
@@ -121,11 +88,50 @@ HtmlValidator::~HtmlValidator( )
 {
 }
 
+HtmlValidator::Impl* HtmlValidator::GetImpl( void *pv )
+{
+	Impl *im = reinterpret_cast<Impl*>( pv ) ;
+	assert( im != 0 ) ;
+	assert( im->out != 0 ) ;
+	return im ;
+}
+
+void HtmlValidator::OnStartElement(
+	void				*pv,
+	const unsigned char	*name,
+	const unsigned char	**attr
+)
+{
+	if ( white_list.find( std::string(reinterpret_cast<const char*>(name)) ) == white_list.end() )
+		Log( "unknown element %1%", name ) ;
+
+	Impl *im = GetImpl(pv) ;
+	PrintF fmt(im->out) ;
+	fmt( "<%1%>", name ) ;
+}
+
+void HtmlValidator::OnCharacters(
+	void				*pv,
+	const unsigned char	*chars,
+	int					len
+)
+{
+}
+
+void HtmlValidator::OnEndElement(
+	void				*pv,
+	const unsigned char	*name
+)
+{
+	Impl *im = GetImpl(pv) ;
+	PrintF fmt(im->out) ;
+	fmt( "</%1%>", name ) ;
+}
+
 std::size_t HtmlValidator::Read( char *data, std::size_t size )
 {
-	BOOST_THROW_EXCEPTION(
-		Error() << expt::ErrMsg( "XmlFilter is not for reading!" )
-	) ;
+	// not supported
+	assert( false ) ;
 	
 	// to shut off some warnings
 	return 0 ;
@@ -133,14 +139,13 @@ std::size_t HtmlValidator::Read( char *data, std::size_t size )
 
 std::size_t HtmlValidator::Write( const char *data, std::size_t size )
 {
-	Log( "read %1% bytes", size ) ;
 	assert( m_->ctx != 0 ) ;
 	
 	int r = ::htmlParseChunk( m_->ctx, data, size, 0 ) ;
 	if ( r != 0 )
-		Log( "error %1%", r ) ;
+		THROW() ;
 	
-	return m_->out->Write( data, size ) ;
+	return size ;
 }
 
 void HtmlValidator::Finish()
@@ -149,7 +154,7 @@ void HtmlValidator::Finish()
 	
 	int r = ::htmlParseChunk( m_->ctx, 0, 0, 1 ) ;
 	if ( r != 0 )
-		Log( "error %1%", r ) ;
+		THROW() ;
 }
 
 } // end of namespace

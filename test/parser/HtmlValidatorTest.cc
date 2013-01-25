@@ -31,6 +31,9 @@ BOOST_AUTO_TEST_CASE( HtmlValidatorTest )
 	StringStream ss ;
     HtmlValidator subject( &ss ) ;
 
+    const char html[] = "<html><body>hi</body></html>" ;
+    subject.Write( html, sizeof(html)-1 ) ;
+
     BOOST_CHECK( true );
 }
 

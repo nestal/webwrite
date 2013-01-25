@@ -41,6 +41,24 @@ public :
 
 private :
 	struct Impl ;
+	
+	static void OnStartElement(
+		void				*pv,
+		const unsigned char	*name,
+		const unsigned char	**attr
+	) ;
+	static void OnEndElement(
+		void				*pv,
+		const unsigned char	*name
+	) ;
+	static void OnCharacters(
+		void				*pv,
+		const unsigned char	*chars,
+		int					len
+	) ;
+	static Impl* GetImpl( void *pv ) ;
+
+private :
 	std::auto_ptr<Impl>	m_;
 } ;
 
