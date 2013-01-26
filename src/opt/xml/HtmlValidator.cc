@@ -60,6 +60,14 @@ namespace
 		Begin(white_list_array),
 		End(white_list_array) ) ;
 
+	const std::string ignore_list_array[] =
+	{
+		"html", "body",
+	} ;
+	
+	const std::set<std::string> ignore_list(
+		Begin(ignore_list_array),
+		End(ignore_list_array) ) ;
 } // end of local namespace
 
 struct HtmlValidator::Impl
@@ -89,7 +97,7 @@ HtmlValidator::HtmlValidator( DataStream *out, const std::string& filename ) :
 	m_->ctx = ::htmlCreatePushParserCtxt(
 		&sax, m_.get(), 0, 0,
 		filename.c_str(),
-		XML_CHAR_ENCODING_NONE ) ;
+		XML_CHAR_ENCODING_UTF8 ) ;
 }
 
 HtmlValidator::~HtmlValidator( )
@@ -106,29 +114,44 @@ HtmlValidator::Impl* HtmlValidator::GetImpl( void *pv )
 
 void HtmlValidator::OnStartElement(
 	void				*pv,
-	const unsigned char	*name,
+	const unsigned char	*uname,
 	const unsigned char	**attr
 )
 {
+	const std::string name( reinterpret_cast<const char*>(uname) ) ;
+	
 	Impl *im = GetImpl(pv) ;
-	if ( white_list.find( std::string(reinterpret_cast<const char*>(name)) ) == white_list.end() )
+	if ( !im->element.empty() && im->element.back() == Impl::unknown )
+	{
+		Log( "element %1% inside unknown element, ignored", name ) ;
+		im->element.push_back( Impl::unknown ) ;
+		return ;
+	}
+	
+	if ( white_list.find(name) == white_list.end() )
 	{
 		Log( "unknown element %1%", name ) ;
 		im->element.push_back( Impl::unknown ) ;
 		return ;
 	}
-	im->element.push_back( Impl::normal ) ;
 	
-	PrintF fmt(im->out) ;
-	fmt( "<%1%", (char*)name ) ;
-	
-	while ( attr != 0 && attr[0] != 0 && attr[1] != 0 )
+	// don't write the root element tags because we only save the "inner-html"
+	// the javascript will put it inside a <div>
+	if ( ignore_list.find(name) == ignore_list.end() && !im->element.empty() )
 	{
-		fmt( " %1%=\"%2%\"", (char*)attr[0], (char*)attr[1] ) ;
-		attr += 2 ;
+		PrintF fmt(im->out) ;
+		fmt( "<%1%", name ) ;
+		
+		while ( attr != 0 && attr[0] != 0 && attr[1] != 0 )
+		{
+			fmt( " %1%=\"%2%\"", (char*)attr[0], (char*)attr[1] ) ;
+			attr += 2 ;
+		}
+		
+		fmt( ">" ) ;
 	}
 	
-	fmt( ">" ) ;
+	im->element.push_back( Impl::normal ) ;
 }
 
 void HtmlValidator::OnCharacters(
@@ -152,7 +175,7 @@ void HtmlValidator::OnCharacters(
 		int iolen = in_len ;
 		if ( ::htmlEncodeEntities( out, &out_len, in, &iolen, '\0' ) != 0 )
 			break ;
-//std::cout << "last char = " << int(out[out_len-1]) << std::endl ;
+
 		im->out->Write( reinterpret_cast<const char*>(out), out_len ) ;
 		
 		// finish!
@@ -167,16 +190,20 @@ void HtmlValidator::OnCharacters(
 
 void HtmlValidator::OnEndElement(
 	void				*pv,
-	const unsigned char	*name
+	const unsigned char	*uname
 )
 {
+	const std::string name( reinterpret_cast<const char*>(uname) ) ;
+
 	Impl *im = GetImpl(pv) ;
-	if ( !im->element.empty() && im->element.back() == Impl::normal )
+	if ( ignore_list.find(name) == ignore_list.end() )
 	{
-		PrintF fmt(im->out) ;
-		fmt( "</%1%>", name ) ;
+		if ( !im->element.empty() && im->element.back() == Impl::normal )
+		{
+			PrintF fmt(im->out) ;
+			fmt( "</%1%>", name ) ;
+		}
 	}
-	
 	if ( !im->element.empty() )
 		im->element.pop_back() ;
 }

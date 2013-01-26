@@ -44,10 +44,24 @@ BOOST_FIXTURE_TEST_SUITE( HtmlValidatorTest, F )
 
 BOOST_AUTO_TEST_CASE( TestFilterScript )
 {
-    const char html[] = "<html><body><script class=\"wow\">hi&gt;</script></body></html>" ;
+    const char html[] = "<html><body><div>hello</div><script class=\"wow\">hi&gt;</script></body></html>" ;
     subject.Write( html, sizeof(html)-1 ) ;
 
-    std::string exp = "<html><body></body></html>" ;
+    std::string exp = "<div>hello</div>" ;
+
+    BOOST_CHECK_EQUAL( ss.Str().size(), exp.size() );
+}
+
+BOOST_AUTO_TEST_CASE( TestFilterChildren )
+{
+    const char html[] =
+    	"<html><body>"
+    	"<object class=\"wow\"><p>should be ignored</p><span>oops</span></object>"
+    	"<div>I am not ignored!</div>"
+    	"</body></html>" ;
+    subject.Write( html, sizeof(html)-1 ) ;
+
+    std::string exp = "<div>I am not ignored!</div>" ;
 
     BOOST_CHECK_EQUAL( ss.Str().size(), exp.size() );
 }
