@@ -629,7 +629,7 @@ WARN_LOGFILE =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT = src 
+INPUT = ../src 
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
@@ -876,7 +876,7 @@ HTML_TIMESTAMP = YES
 # the style sheet file to the HTML output directory, so don't put your own
 # stylesheet in the HTML output directory as well, or it will be erased!
 
-HTML_STYLESHEET = 
+HTML_STYLESHEET = wb_doc.css
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1189,7 +1189,7 @@ SERVER_BASED_SEARCH = NO
 # If the GENERATE_LATEX tag is set to YES (the default) Doxygen will
 # generate Latex output.
 
-GENERATE_LATEX = YES
+GENERATE_LATEX = NO
 
 # The LATEX_OUTPUT tag is used to specify where the LaTeX docs will be put.
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
