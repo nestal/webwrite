@@ -17,22 +17,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "FormDataTest.hh"
-
 #include "parser/FormData.hh"
 #include "util/File.hh"
 
+#include <boost/test/unit_test.hpp>
 #include <boost/exception/diagnostic_information.hpp>
-
-namespace wbut {
 
 using namespace wb ;
 
-FormDataTest::FormDataTest( )
-{
-}
+BOOST_AUTO_TEST_SUITE( FormDataTest )
 
-void FormDataTest::Test( )
+BOOST_AUTO_TEST_CASE( Test )
 {
 	File form_data( TEST_DATA "test.pdf.form" ) ;
 	FormData subject( &form_data, "multipart/form-data; boundary="
@@ -45,4 +40,4 @@ void FormDataTest::Test( )
 	subject2.Save( "./" ) ;
 }
 
-} // end of namespace
+BOOST_AUTO_TEST_SUITE_END()

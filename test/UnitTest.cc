@@ -17,23 +17,5 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <cppunit/ui/text/TestRunner.h>
-
-#include "parser/FormDataTest.hh"
-#include "parser/StreamParserTest.hh"
-#include "parser/QueryTest.hh"
-
-int main( int argc, char **argv )
-{
-	using namespace wbut ;
-
-	CppUnit::TextUi::TestRunner runner;
-	runner.addTest( FormDataTest::suite() ) ;
-	runner.addTest( StreamParserTest::suite() ) ;
-	runner.addTest( QueryTest::suite() ) ;
-	
-	// run the test cases!
-	runner.run();
-
-	return 0 ;
-}
+#define BOOST_TEST_MAIN
+#include <boost/test/unit_test.hpp>

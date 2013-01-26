@@ -17,40 +17,40 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "QueryTest.hh"
 #include "parser/Query.hh"
 
-#include "Assert.hh"
-
-#include <boost/bind.hpp>
-
-namespace wbut {
+#include <boost/test/unit_test.hpp>
 
 using namespace wb ;
 
-QueryTest::QueryTest( )
+namespace
 {
+	struct F
+	{
+	} ;
 }
 
-void QueryTest::Test( )
+BOOST_FIXTURE_TEST_SUITE( QueryTest, F )
+
+BOOST_AUTO_TEST_CASE( TestNormalParse )
 {
 	Query<int> subject ;
 	subject.Add( "name", 1 ) ;
 	subject.Add( "value", 2 ) ;
-	WBUT_ASSERT_EQUAL( subject.Parse( "name=value" ), 1 ) ;
-	WBUT_ASSERT_EQUAL( subject.Parse( "value=name" ), 2 ) ;
-	WBUT_ASSERT_EQUAL( subject.Parse( "2=1" ), 0 ) ;
+	BOOST_CHECK_EQUAL( subject.Parse( "name=value" ), 1 ) ;
+	BOOST_CHECK_EQUAL( subject.Parse( "value=name" ), 2 ) ;
+	BOOST_CHECK_EQUAL( subject.Parse( "2=1" ), 0 ) ;
 }
 
-void QueryTest::TestEmpty()
+BOOST_AUTO_TEST_CASE( TestEmpty )
 {
 	Query<int> subject( 1000 ) ;
 	subject.Add( "",	0 ) ;
 	subject.Add( "two",	2 ) ;
-	WBUT_ASSERT_EQUAL( subject.Parse( "" ), 0 ) ;
-	WBUT_ASSERT_EQUAL( subject.Parse( "two#" ), 2 ) ;
-	WBUT_ASSERT_EQUAL( subject.Parse( "three" ), 1000 ) ;
+	BOOST_CHECK_EQUAL( subject.Parse( "" ), 0 ) ;
+	BOOST_CHECK_EQUAL( subject.Parse( "two#" ), 2 ) ;
+	BOOST_CHECK_EQUAL( subject.Parse( "three" ), 1000 ) ;
 	
 }
 
-} // end of namespace
+BOOST_AUTO_TEST_SUITE_END()

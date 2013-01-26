@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <string>
 #include <map>
 
 namespace wb {

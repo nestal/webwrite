@@ -18,25 +18,38 @@
 	MA  02110-1301, USA.
 */
 
-#include "parser/xml/HtmlValidator.hh"
+#include "xml/HtmlValidator.hh"
 #include "util/StringStream.hh"
 
-#define BOOST_TEST_MODULE HtmlValidatorTest
 #include <boost/test/unit_test.hpp>
 
 using namespace wb ;
 
-BOOST_AUTO_TEST_CASE( HtmlValidatorTest )
+namespace
 {
-	StringStream ss ;
-    HtmlValidator subject( &ss ) ;
+	// fixture
+	struct F
+	{
+		StringStream ss ;
+	    HtmlValidator subject ;
+		
+		F() :
+			subject( &ss )
+		{
+		}
+	} ;
+}
 
+BOOST_FIXTURE_TEST_SUITE( HtmlValidatorTest, F )
+
+BOOST_AUTO_TEST_CASE( TestFilterScript )
+{
     const char html[] = "<html><body><script class=\"wow\">hi&gt;</script></body></html>" ;
     subject.Write( html, sizeof(html)-1 ) ;
 
     std::string exp = "<html><body></body></html>" ;
-    std::cout << "\"" << ss.Str() << "\"" << std::endl ;
-    std::cout << "\"" << exp << "\"" << std::endl ;
 
     BOOST_CHECK_EQUAL( ss.Str().size(), exp.size() );
 }
+
+BOOST_AUTO_TEST_SUITE_END()
