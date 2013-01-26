@@ -44,26 +44,38 @@ BOOST_FIXTURE_TEST_SUITE( HtmlValidatorTest, F )
 
 BOOST_AUTO_TEST_CASE( TestFilterScript )
 {
-    const char html[] = "<html><body><div>hello</div><script class=\"wow\">hi&gt;</script></body></html>" ;
+    const char html[] = "<html><body><div>hello&amp;</div><script class=\"wow\">hi&gt;</script></body></html>" ;
     subject.Write( html, sizeof(html)-1 ) ;
 
-    std::string exp = "<div>hello</div>" ;
+    std::string exp = "<div>hello&amp;</div>" ;
 
-    BOOST_CHECK_EQUAL( ss.Str().size(), exp.size() );
+    BOOST_CHECK_EQUAL( ss.Str(), exp );
 }
 
 BOOST_AUTO_TEST_CASE( TestFilterChildren )
 {
     const char html[] =
     	"<html><body>"
-    	"<object class=\"wow\"><p>should be ignored</p><span>oops</span></object>"
-    	"<div>I am not ignored!</div>"
+    	"<object class=\"wow\"><p>should be ignored</p><span>oops&gt;</span></object>"
+    	"<div>I am not ignored!&gt;more chars</div>"
     	"</body></html>" ;
     subject.Write( html, sizeof(html)-1 ) ;
 
-    std::string exp = "<div>I am not ignored!</div>" ;
+    std::string exp = "<div>I am not ignored!&gt;more chars</div>" ;
 
-    BOOST_CHECK_EQUAL( ss.Str().size(), exp.size() );
+    BOOST_CHECK_EQUAL( ss.Str(), exp );
+}
+
+BOOST_AUTO_TEST_CASE( TestEntities )
+{
+    const char html[] =
+    	"<html><body>"
+    	"<div>many entities like: &something; should be the same</div>"
+    	"</body></html>" ;
+    subject.Write( html, sizeof(html)-1 ) ;
+
+    std::string exp = "<div>many entities like: &amp;something; should be the same</div>" ;
+    BOOST_CHECK_EQUAL( ss.Str(), exp );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -83,6 +83,23 @@ struct HtmlValidator::Impl
 	std::vector<State>	element ;
 } ;
 
+namespace
+{
+	int	DataStreamOutCallback(
+		void		*user, 
+		const char	*buffer, 
+		int len )
+	{
+		DataStream *out = reinterpret_cast<DataStream*>(user) ;
+		return static_cast<int>(out->Write( buffer, len )) ;
+	}
+	
+	int WhateverCloseCallback( void * )
+	{
+		return 0 ;
+	}
+}
+
 HtmlValidator::HtmlValidator( DataStream *out, const std::string& filename ) :
 	m_( new Impl )
 {
@@ -163,30 +180,19 @@ void HtmlValidator::OnCharacters(
 	Impl *im = GetImpl(pv) ;
 	if ( im->element.empty() || im->element.back() == Impl::unknown )
 		return ;
-		
-	unsigned char out[1024] ;
-	int out_len	= sizeof(out) ;
-	
-	const unsigned char *in = chars ;
-	int in_len = len ;
-	
-	while ( true )
-	{
-		int iolen = in_len ;
-		if ( ::htmlEncodeEntities( out, &out_len, in, &iolen, '\0' ) != 0 )
-			break ;
 
-		im->out->Write( reinterpret_cast<const char*>(out), out_len ) ;
-		
-		// finish!
-		if ( iolen == in_len )
-			break ;
-		
-		in		+= iolen ;
-		in_len	-= iolen ;		
-	}
+	xmlOutputBufferPtr xobp = xmlOutputBufferCreateIO(
+		&DataStreamOutCallback,
+		&WhateverCloseCallback,
+		im->out,
+		0 ) ;
+
+	std::vector<unsigned char> copy( chars, chars+len ) ;
+	copy.push_back( '\0' ) ;
+	xmlOutputBufferWriteEscape( xobp, &copy[0], 0 ) ;
+
+	xmlOutputBufferClose( xobp ) ;
 }
-
 
 void HtmlValidator::OnEndElement(
 	void				*pv,
