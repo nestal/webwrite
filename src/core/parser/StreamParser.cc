@@ -22,11 +22,11 @@
 #include "util/DataStream.hh"
 #include "util/NullDataStream.hh"
 
+#include <boost/bind.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <cstring>
-
-#include <iostream>
 
 namespace wb {
 
@@ -66,7 +66,8 @@ std::size_t StreamParser::Consume( std::size_t count, DataStream *out )
 	return total ;
 }
 
-std::size_t StreamParser::ReadUntil( char target, DataStream *out )
+template <typename Find>
+std::size_t StreamParser::GenericReadUntil( Find find, DataStream *out )
 {
 	assert( out != 0 ) ;
 	
@@ -81,7 +82,7 @@ std::size_t StreamParser::ReadUntil( char target, DataStream *out )
 		// if Refill() returns true there must be some bytes here
 		assert( Size() > 0 ) ;
 		
-		const char *r = std::find( m_cache, m_end, target ) ;
+		const char *r = find( m_cache, m_end ) ;
 		bool found = ( r != m_end ) ;
 		
 		// no matter we found the target or not, we should write the skipped bytes
@@ -94,6 +95,20 @@ std::size_t StreamParser::ReadUntil( char target, DataStream *out )
 	}
 	
 	return total ;
+}
+
+namespace
+{
+	const char* FindChar( const char *begin, const char *end, char target )
+	{
+		return std::find( begin, end, target ) ;
+	}
+}
+
+std::size_t StreamParser::ReadUntil( char target, DataStream *out )
+{
+	assert( out != 0 ) ;
+	return GenericReadUntil( boost::bind( &FindChar, _1, _2, target ), out ) ;
 }
 
 std::size_t StreamParser::ReadUntil( const std::string& target, DataStream *out )

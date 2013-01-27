@@ -32,11 +32,16 @@ public :
 
 	std::size_t ReadUntil( const std::string& target, DataStream *out ) ;
 	std::size_t ReadUntil( char target, DataStream *out ) ;
+	std::size_t ReadUntilFirstOf( const std::string& first_of, DataStream *out ) ;
 	std::size_t Consume( std::size_t count, DataStream *out ) ;
 	
 	bool Refill() ;
 	std::size_t Size() const ;
 	std::size_t Capacity() const ;
+
+private :
+	template <typename Find>
+	std::size_t GenericReadUntil( Find find, DataStream *out ) ;
 
 private :
 	DataStream	*m_in ;
