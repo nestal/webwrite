@@ -30,6 +30,7 @@
 #include <string>
 
 #include <iostream>
+#include "log/Log.hh"
 
 namespace wb {
 

@@ -42,7 +42,7 @@ public :
 	void Parse( DataStream *in, DataStream *out ) ;
 
 private :
-	void OnStartElement( const std::string& element, const std::string& attr ) ;
+	bool CheckElement( const std::string& element, const std::string& attr ) ;
 
 private :
 	struct Impl ;

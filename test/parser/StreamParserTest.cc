@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE( TestChar )
 	StringStream input( "line 1$#line 2--something--???###" ), output ;
 	StreamParser subject( &input ) ;
 	
-	BOOST_CHECK_EQUAL( subject.ReadUntil( "1", &output ), 6 ) ;
+	BOOST_CHECK_EQUAL( subject.ReadUntil( "1", &output ).consumed, 6 ) ;
 	BOOST_CHECK_EQUAL( output.Str(), "line " ) ;
 }
 
@@ -71,13 +71,13 @@ BOOST_AUTO_TEST_CASE( TestString )
 	StringStream input( "line 1$#line 2--something--???###" ), output ;
 	StreamParser subject( &input ) ;
 	
-	BOOST_CHECK_EQUAL( subject.ReadUntil( "$#", &output ), sizeof("line 1$#")-1 ) ;
+	BOOST_CHECK_EQUAL( subject.ReadUntil( "$#", &output ).consumed, sizeof("line 1$#")-1 ) ;
 	BOOST_CHECK_EQUAL( output.Str(), "line 1" ) ;
 
 	output.Str("") ;
 	
 	BOOST_CHECK_EQUAL(
-		subject.ReadUntil( "--something--", &output ),
+		subject.ReadUntil( "--something--", &output ).consumed,
 		sizeof("line 2--something--")-1 ) ;
 		
 	BOOST_CHECK_EQUAL( output.Str(), "line 2" ) ;
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE( TestFindAny )
 	BOOST_CHECK_EQUAL( result.consumed,	0 ) ;
 	BOOST_CHECK_EQUAL( result.found,	true ) ;
 	BOOST_CHECK_EQUAL( result.target,	'<' ) ;
-	subject.Consume(1) ;
+	subject.Consume(1, DevNull() ) ;
 	
 	BOOST_CHECK_EQUAL( output.Str(), "" ) ;
 	
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE( TestFile )
 	StreamParser subject( &input ) ;
 	
 	std::string boundary( "-----------------------------11351845291583120309948566114" ) ;
-	BOOST_CHECK_EQUAL( subject.ReadUntil( "\r\n", &output ), boundary.size() + 2 ) ;
+	BOOST_CHECK_EQUAL( subject.ReadUntil( "\r\n", &output ).consumed, boundary.size() + 2 ) ;
 	BOOST_CHECK_EQUAL( output.Str(), boundary ) ;
 	
 	// skip content-disposition. too long to check

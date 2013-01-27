@@ -128,13 +128,13 @@ StreamParser::Result StreamParser::ReadUntilAny(
 	    boost::bind( &StreamParser::FindAnyChar, _1, _2, target ), out ) ;
 }
 
-std::size_t StreamParser::ReadUntil(
+StreamParser::Result StreamParser::ReadUntil(
     const std::string& target, DataStream *out )
 {
 	assert( !target.empty() ) ;
 	assert( Capacity() >= target.size() ) ;
 
-	std::size_t total = 0 ;
+	Result result = {} ;
 
 	while ( true )
 	{
@@ -145,23 +145,23 @@ std::size_t StreamParser::ReadUntil(
 		// if Refill() returns true there must be some bytes here
 		assert( Size() > 0 ) ;
 
-		total += ReadUntil( target[0], out ).consumed ;
+		result.consumed += ReadUntil( target[0], out ).consumed ;
 		Refill( ) ;
 
 		const char *r = std::search(
 		    m_cache, m_end, target.begin( ), target.end( ) ) ;
-		bool found = ( r != m_end ) ;
+		result.found = ( r != m_end ) ;
 
-		total += Consume( r - m_cache, out ) ;
+		result.consumed += Consume( r - m_cache, out ) ;
 
-		if ( found )
+		if ( result.found )
 		{
-			total += Consume( target.size( ), DevNull() ) ;
+			result.consumed += Consume( target.size( ), DevNull() ) ;
 			break ;
 		}
 	}
 
-	return total ;
+	return result ;
 }
 
 ///	tries to read more data from input and fill the cache.

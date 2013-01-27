@@ -83,6 +83,7 @@ BOOST_AUTO_TEST_CASE( TestParseTag )
     const char html[] =
     	"<html><body>"
     	"<div>many entities like: &something; should be the same</div>"
+    	"<script>??<<>><<?&&& this should be skipped ####</script>"
     	"</body></html>" ;
 
     StringStream in( html ), out ;

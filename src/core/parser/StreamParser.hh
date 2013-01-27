@@ -40,9 +40,9 @@ public :
 		char		target ;	///< the actual character found.
 	} ;
 
-	std::size_t ReadUntil( const std::string& target, DataStream *out = DevNull() ) ;
+	Result ReadUntil( const std::string& target, DataStream *out ) ;
 	Result ReadUntil( char target, DataStream *out ) ;
-	Result ReadUntilAny( const std::string& first_of, DataStream *out = DevNull() ) ;
+	Result ReadUntilAny( const std::string& first_of, DataStream *out ) ;
 	std::size_t Consume( std::size_t count, DataStream *out = DevNull() ) ;
 		
 	bool Refill() ;

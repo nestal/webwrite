@@ -266,24 +266,43 @@ void HtmlValidator::Parse( DataStream *in, DataStream *out )
 	while ( r.found )
 	{
 		// throw away the '<'
-		inp.Consume(1) ;
+		inp.Consume(1, DevNull() ) ;
 	
 		StringStream tag, attr ;
 		r = inp.ReadUntilAny( " >", &tag ) ;
 		
-		// tag not closed yet
+		// tag not closed yet. read its attributes
 		if ( r.target == ' ' )
 			inp.ReadUntil( '>', &attr ) ;
 		
-		OnStartElement( tag.Str(), attr.Str() ) ;
-				
+		bool good = CheckElement( tag.Str(), attr.Str() ) ;
+		
+		// if the element is in the white list, we consider it filtered in
+		// and scan for next element
+		if ( good )
+		{
+			PrintF fmt(out);
+			fmt( "<%1% %2%", tag.Str(), attr.Str() ) ;
+		}
+		
+		// element not in the white list. we will skip everything inside it
+		// until its end tag
+		else
+		{
+			inp.ReadUntil( "</" + tag.Str(), DevNull() ) ;
+			inp.ReadUntil( '>', DevNull() ) ;
+		}
+		
 		r = inp.ReadUntil( '<', out ) ;
 	}
 }
 
-void HtmlValidator::OnStartElement( const std::string& element, const std::string& attr )
+/// List of HTML5 tags can be omitted:
+/// http://www.w3.org/TR/html5/syntax.html#syntax-tag-omission
+bool HtmlValidator::CheckElement( const std::string& element, const std::string& attr )
 {
 	Log( "read tag %1% %2%", element, attr ) ;
+	return white_list.find(element) != white_list.end() ;
 }
 
 } // end of namespace
