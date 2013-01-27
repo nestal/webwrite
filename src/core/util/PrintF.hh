@@ -32,53 +32,53 @@ class PrintF
 public :
 	explicit PrintF( DataStream *out ) ;
 	
-	std::size_t operator()( const std::string& fmt ) ;
+	PrintF& operator()( const std::string& fmt ) ;
 	
 	// template version of printf
 	template <typename P1>
-	std::size_t operator()( const std::string& fmt, const P1& p1 ) ;
+	PrintF& operator()( const std::string& fmt, const P1& p1 ) ;
 
 	template <typename P1, typename P2>
-	std::size_t operator()( const std::string& fmt, const P1& p1, const P2& p2 ) ;
+	PrintF& operator()( const std::string& fmt, const P1& p1, const P2& p2 ) ;
 
 	template <typename P1, typename P2, typename P3>
-	std::size_t operator()(
+	PrintF& operator()(
 		const std::string& fmt,
 		const P1& p1, const P2& p2, const P3& p3 ) ;
 
 	template <typename P1, typename P2, typename P3, typename P4>
-	std::size_t operator()(
+	PrintF& operator()(
 		const std::string& fmt,
 		const P1& p1, const P2& p2,
 		const P3& p3, const P4& p4 ) ;
 
 private :
-	std::size_t PutS( const char *str, std::size_t size ) ;
+	PrintF& PutS( const char *str, std::size_t size ) ;
 
 private :
 	DataStream	*m_out ;
 } ;
 
 template <typename P1>
-std::size_t PrintF::operator()( const std::string& fmt, const P1& p1 )
+PrintF& PrintF::operator()( const std::string& fmt, const P1& p1 )
 {
 	return operator()((boost::format(fmt) % p1).str());
 }
 
 template <typename P1, typename P2>
-std::size_t PrintF::operator()( const std::string& fmt, const P1& p1, const P2& p2 )
+PrintF& PrintF::operator()( const std::string& fmt, const P1& p1, const P2& p2 )
 {
 	return operator()((boost::format(fmt) % p1 % p2).str()) ;
 }
 
 template <typename P1, typename P2, typename P3>
-std::size_t PrintF::operator()( const std::string& fmt, const P1& p1, const P2& p2, const P3& p3 )
+PrintF& PrintF::operator()( const std::string& fmt, const P1& p1, const P2& p2, const P3& p3 )
 {
 	return operator()((boost::format(fmt) % p1 % p2 % p3).str()) ;
 }
 
 template <typename P1, typename P2, typename P3, typename P4>
-std::size_t PrintF::operator()(
+PrintF& PrintF::operator()(
 	const std::string& fmt,
 	const P1& p1,
 	const P2& p2,

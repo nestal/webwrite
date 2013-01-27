@@ -32,14 +32,15 @@ PrintF::PrintF( DataStream *out ) :
 	assert( m_out != 0 ) ;
 }
 
-std::size_t PrintF::PutS( const char *str, std::size_t size )
+PrintF& PrintF::PutS( const char *str, std::size_t size )
 {
-	return m_out->Write( str, size ) ;
+	m_out->Write( str, size ) ;
+	return *this ;
 }
 
 /// Note that the terminating null is not written. In general, there is no
 /// need to specially handle null-terminating strings in this project. 
-std::size_t PrintF::operator()( const std::string& fmt )
+PrintF& PrintF::operator()( const std::string& fmt )
 {
 	return PutS( fmt.c_str(), fmt.size() ) ;
 }

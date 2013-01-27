@@ -87,8 +87,14 @@ BOOST_AUTO_TEST_CASE( TestParseTag )
     	"</body></html>" ;
 
     StringStream in( html ), out ;
-
     subject.Parse( &in, &out ) ;
+    
+    const char exp[] =
+    	"<html><body>"
+    	"<div>many entities like: &something; should be the same</div>"
+    	"</body></html>" ;
+    
+    BOOST_CHECK_EQUAL( out.Str(), exp ) ;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

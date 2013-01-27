@@ -282,7 +282,10 @@ void HtmlValidator::Parse( DataStream *in, DataStream *out )
 		if ( good )
 		{
 			PrintF fmt(out);
-			fmt( "<%1% %2%", tag.Str(), attr.Str() ) ;
+			fmt("<")(tag.Str()) ;
+			
+			if ( !attr.Str().empty() )
+				fmt(" ")(attr.Str()) ;
 		}
 		
 		// element not in the white list. we will skip everything inside it
@@ -290,7 +293,8 @@ void HtmlValidator::Parse( DataStream *in, DataStream *out )
 		else
 		{
 			inp.ReadUntil( "</" + tag.Str(), DevNull() ) ;
-			inp.ReadUntil( '>', DevNull() ) ;
+			if ( inp.ReadUntil( '>', DevNull() ).found )
+				inp.Consume(1) ;
 		}
 		
 		r = inp.ReadUntil( '<', out ) ;
@@ -302,7 +306,10 @@ void HtmlValidator::Parse( DataStream *in, DataStream *out )
 bool HtmlValidator::CheckElement( const std::string& element, const std::string& attr )
 {
 	Log( "read tag %1% %2%", element, attr ) ;
-	return white_list.find(element) != white_list.end() ;
+	
+	std::string tag = (!element.empty() && element[0] == '/' ? element.substr(1) : element) ;
+	
+	return white_list.find(tag) != white_list.end() ;
 }
 
 } // end of namespace
