@@ -38,4 +38,9 @@ std::size_t NullDataStream::Write( const char *, std::size_t size )
 	return size ;
 }
 
+DataStream* DevNull()
+{
+	return &NullDataStream::instance ;
+}
+
 } // end of namespace

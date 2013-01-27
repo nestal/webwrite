@@ -21,8 +21,10 @@
 #include "HtmlValidator.hh"
 
 #include "log/Log.hh"
+#include "parser/StreamParser.hh"
 #include "util/CArray.hh"
 #include "util/PrintF.hh"
+#include "util/StringStream.hh"
 
 #include <libxml/HTMLparser.h>
 #include <libxml/HTMLtree.h>
@@ -241,6 +243,23 @@ void HtmlValidator::Finish()
 	int r = ::htmlParseChunk( m_->ctx, 0, 0, 1 ) ;
 	if ( r != 0 )
 		THROW() ;
+}
+
+void HtmlValidator::Parse( DataStream *in, DataStream *out )
+{
+	StreamParser inp( in ) ;
+	
+	// throw away stuff until first open tag
+	inp.ReadUntil( '<', DevNull() ) ;
+	
+	while ( true )
+	{
+		StringStream tag ;
+		inp.ReadUntil( " >", &tag ) ;
+		
+		Log( "read tag %1%", tag.Str() ) ;
+		break ;
+	}
 }
 
 } // end of namespace

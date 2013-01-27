@@ -89,13 +89,19 @@ BOOST_AUTO_TEST_CASE( TestFindAny )
 	StringStream input( "<html>" ), output ;
 	StreamParser subject( &input ) ;
 	
-	BOOST_CHECK_EQUAL( subject.ReadUntilAny( "<> ", &output ), 0 ) ;
+	StreamParser::Result result = subject.ReadUntilAny( "<> ", &output ) ;
+	BOOST_CHECK_EQUAL( result.consumed,	0 ) ;
+	BOOST_CHECK_EQUAL( result.found,	true ) ;
+	BOOST_CHECK_EQUAL( result.target,	'<' ) ;
 	subject.Consume(1) ;
 	
 	BOOST_CHECK_EQUAL( output.Str(), "" ) ;
 	
-	BOOST_CHECK_EQUAL( subject.ReadUntilAny( "<> ", &output ), 4 ) ;
-	BOOST_CHECK_EQUAL( output.Str(), "html" ) ;
+	result = subject.ReadUntilAny( "<> ", &output ) ;
+	BOOST_CHECK_EQUAL( result.consumed,	4 ) ;
+	BOOST_CHECK_EQUAL( result.found,	true ) ;
+	BOOST_CHECK_EQUAL( result.target,	'>' ) ;
+	BOOST_CHECK_EQUAL( output.Str(),	"html" ) ;
 }
 
 BOOST_AUTO_TEST_CASE( TestFile )

@@ -30,18 +30,26 @@ class StreamParser
 public :
 	explicit StreamParser( DataStream *in ) ;
 
+	/// Result of parsing.
+	struct Result
+	{
+		bool		found ;		///< true if the target is found.
+		std::size_t	consumed ;	///< # of bytes consumed.
+		char		target ;	///< the actual character found.
+	} ;
+
 	std::size_t ReadUntil( const std::string& target, DataStream *out ) ;
-	std::size_t ReadUntil( char target, DataStream *out ) ;
-	std::size_t ReadUntilAny( const std::string& first_of, DataStream *out ) ;
+	Result ReadUntil( char target, DataStream *out ) ;
+	Result ReadUntilAny( const std::string& first_of, DataStream *out ) ;
 	std::size_t Consume( std::size_t count, DataStream *out = 0 ) ;
-	
+		
 	bool Refill() ;
 	std::size_t Size() const ;
 	std::size_t Capacity() const ;
 
 private :
 	template <typename Find>
-	std::size_t FindUntil( Find find, DataStream *out ) ;
+	Result FindUntil( Find find, DataStream *out ) ;
 	
 	static const char* FindChar( const char *begin, const char *end, char target ) ;
 	static const char* FindAnyChar( const char *begin, const char *end,

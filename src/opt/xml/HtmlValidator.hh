@@ -38,6 +38,8 @@ public :
 	std::size_t Write( const char *data, std::size_t size ) ;
 
 	void Finish() ;
+	
+	void Parse( DataStream *in, DataStream *out ) ;
 
 private :
 	struct Impl ;

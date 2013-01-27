@@ -35,4 +35,7 @@ public :
 	virtual std::size_t Write( const char *data, std::size_t size ) = 0 ;
 } ;
 
+/// Stream for /dev/null, i.e. read and writing nothing
+DataStream* DevNull() ;
+
 } // end of namespace

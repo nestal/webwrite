@@ -20,13 +20,13 @@
 #include "StreamParser.hh"
 
 #include "util/DataStream.hh"
-#include "util/NullDataStream.hh"
 
 #include <boost/bind.hpp>
 
 #include <algorithm>
 #include <cassert>
 #include <cstring>
+#include "log/Log.hh"
 
 namespace wb {
 
@@ -43,7 +43,7 @@ std::size_t StreamParser::Consume( std::size_t count, DataStream *out )
 {
 	// lazy shortcut
 	if ( out == 0 )
-		out = &NullDataStream::instance ;
+		out = DevNull() ;
 
 	std::size_t total = 0 ;
 
@@ -69,11 +69,11 @@ std::size_t StreamParser::Consume( std::size_t count, DataStream *out )
 
 // no need to put the definition in header for private functions
 template<typename Find>
-std::size_t StreamParser::FindUntil( Find find, DataStream *out )
+StreamParser::Result StreamParser::FindUntil( Find find, DataStream *out )
 {
 	assert( out != 0 ) ;
 
-	std::size_t total = 0 ;
+	StreamParser::Result result = {} ;
 
 	while ( true )
 	{
@@ -84,19 +84,24 @@ std::size_t StreamParser::FindUntil( Find find, DataStream *out )
 		// if Refill() returns true there must be some bytes here
 		assert( Size() > 0 ) ;
 
+		// we must remember the target (i.e. *r) right here and not after
+		// calling Consume(), becuase it may overwrite the buffer by calling
+		// Refill().
 		const char *r = find( m_cache, m_end ) ;
-		bool found = ( r != m_end ) ;
+		result.found = ( r != m_end ) ;
+		if ( result.found )
+			result.target = *r ;
 
 		// no matter we found the target or not, we should write the skipped bytes
 		// to output
-		total += Consume( r - m_cache, out ) ;
+		result.consumed += Consume( r - m_cache, out ) ;
 
 		// found! now see if "r" really points to the target char
-		if ( found )
+		if ( result.found )
 			break ;
 	}
 
-	return total ;
+	return result ;
 }
 
 const char* StreamParser::FindChar(
@@ -105,7 +110,7 @@ const char* StreamParser::FindChar(
 	return std::find( begin, end, target ) ;
 }
 
-std::size_t StreamParser::ReadUntil( char target, DataStream *out )
+StreamParser::Result StreamParser::ReadUntil( char target, DataStream *out )
 {
 	assert( out != 0 ) ;
 	return FindUntil(
@@ -118,7 +123,8 @@ const char* StreamParser::FindAnyChar(
 	return std::find_first_of( begin, end, target.begin(), target.end() ) ;
 }
 
-std::size_t StreamParser::ReadUntilAny( const std::string& target, DataStream *out )
+StreamParser::Result StreamParser::ReadUntilAny(
+	const std::string& target, DataStream *out )
 {
 	assert( out != 0 ) ;
 	return FindUntil(
@@ -142,7 +148,7 @@ std::size_t StreamParser::ReadUntil(
 		// if Refill() returns true there must be some bytes here
 		assert( Size() > 0 ) ;
 
-		total += ReadUntil( target[0], out ) ;
+		total += ReadUntil( target[0], out ).consumed ;
 		Refill( ) ;
 
 		const char *r = std::search(
@@ -153,7 +159,7 @@ std::size_t StreamParser::ReadUntil(
 
 		if ( found )
 		{
-			total += Consume( target.size( ), &NullDataStream::instance ) ;
+			total += Consume( target.size( ), DevNull() ) ;
 			break ;
 		}
 	}
