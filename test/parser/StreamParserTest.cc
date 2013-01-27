@@ -84,6 +84,20 @@ BOOST_AUTO_TEST_CASE( TestString )
 
 }
 
+BOOST_AUTO_TEST_CASE( TestFindAny )
+{
+	StringStream input( "<html>" ), output ;
+	StreamParser subject( &input ) ;
+	
+	BOOST_CHECK_EQUAL( subject.ReadUntilAny( "<> ", &output ), 0 ) ;
+	subject.Consume(1) ;
+	
+	BOOST_CHECK_EQUAL( output.Str(), "" ) ;
+	
+	BOOST_CHECK_EQUAL( subject.ReadUntilAny( "<> ", &output ), 4 ) ;
+	BOOST_CHECK_EQUAL( output.Str(), "html" ) ;
+}
+
 BOOST_AUTO_TEST_CASE( TestFile )
 {
 	File input( TEST_DATA "textures.form" ) ;
