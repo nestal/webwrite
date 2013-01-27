@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "util//DataStream.hh"
+
 #include <string>
 
 namespace wb {
@@ -38,10 +40,10 @@ public :
 		char		target ;	///< the actual character found.
 	} ;
 
-	std::size_t ReadUntil( const std::string& target, DataStream *out ) ;
+	std::size_t ReadUntil( const std::string& target, DataStream *out = DevNull() ) ;
 	Result ReadUntil( char target, DataStream *out ) ;
-	Result ReadUntilAny( const std::string& first_of, DataStream *out ) ;
-	std::size_t Consume( std::size_t count, DataStream *out = 0 ) ;
+	Result ReadUntilAny( const std::string& first_of, DataStream *out = DevNull() ) ;
+	std::size_t Consume( std::size_t count, DataStream *out = DevNull() ) ;
 		
 	bool Refill() ;
 	std::size_t Size() const ;

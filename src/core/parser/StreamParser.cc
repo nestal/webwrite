@@ -41,10 +41,7 @@ StreamParser::StreamParser( DataStream *in ) :
 
 std::size_t StreamParser::Consume( std::size_t count, DataStream *out )
 {
-	// lazy shortcut
-	if ( out == 0 )
-		out = DevNull() ;
-
+	assert( out != 0 ) ;
 	std::size_t total = 0 ;
 
 	while ( count > 0 )

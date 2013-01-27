@@ -70,6 +70,16 @@ namespace
 	const std::set<std::string> ignore_list(
 		Begin(ignore_list_array),
 		End(ignore_list_array) ) ;
+	
+	const std::string self_close_array[] =
+	{
+		"br",	"hr",	"img"
+	} ;
+	
+	const std::set<std::string> self_close(
+		Begin(self_close_array),
+		End(self_close_array) ) ;
+	
 } // end of local namespace
 
 struct HtmlValidator::Impl
@@ -245,21 +255,35 @@ void HtmlValidator::Finish()
 		THROW() ;
 }
 
+/// Parsed according to W3C specification: http://www.w3.org/TR/html5/syntax.html
 void HtmlValidator::Parse( DataStream *in, DataStream *out )
 {
 	StreamParser inp( in ) ;
 	
 	// throw away stuff until first open tag
-	inp.ReadUntil( '<', DevNull() ) ;
+	StreamParser::Result r = inp.ReadUntil( '<', DevNull() ) ;
 	
-	while ( true )
+	while ( r.found )
 	{
-		StringStream tag ;
-		inp.ReadUntil( " >", &tag ) ;
+		// throw away the '<'
+		inp.Consume(1) ;
+	
+		StringStream tag, attr ;
+		r = inp.ReadUntilAny( " >", &tag ) ;
 		
-		Log( "read tag %1%", tag.Str() ) ;
-		break ;
+		// tag not closed yet
+		if ( r.target == ' ' )
+			inp.ReadUntil( '>', &attr ) ;
+		
+		OnStartElement( tag.Str(), attr.Str() ) ;
+				
+		r = inp.ReadUntil( '<', out ) ;
 	}
+}
+
+void HtmlValidator::OnStartElement( const std::string& element, const std::string& attr )
+{
+	Log( "read tag %1% %2%", element, attr ) ;
 }
 
 } // end of namespace
