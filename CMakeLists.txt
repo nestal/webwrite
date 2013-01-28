@@ -21,26 +21,37 @@ project( webwrite )
 cmake_minimum_required(VERSION 2.8)
 set( WEBWRITE_VERSION "0.1" )
 
+if ( WIN32 )
+	# don't use shared library in win32
+	# we need this before find_package
+	set(Boost_USE_STATIC_LIBS 	ON)
+
+	# disable msvc stupid warnings
+	add_definitions( -D_SCL_SECURE_NO_WARNINGS )
+endif ( WIN32 )
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
-find_package(Boost COMPONENTS filesystem system regex unit_test_framework REQUIRED)
+# need these before find package
+set(Boost_USE_MULTITHREADED ON )
+set(Boost_DETAILED_FAILURE_MSG ON )
+
+find_package(Boost COMPONENTS unit_test_framework )
+find_package(Boost COMPONENTS filesystem system regex date_time REQUIRED )
 find_package(JSONC REQUIRED)
 find_package(FCGI REQUIRED)
 find_package(BFD)
 find_package(LibXml2)
 
+# debug messages
+if ( BOOST_UNIT_TEST_FRAMEWORK_FOUND )
+	message( "found boost UTF at ${BOOST_UNIT_TEST_FRAMEWORK_LIBRARY}" )
+else ( BOOST_UNIT_TEST_FRAMEWORK_FOUND )
+	message( "boost UTF not found, unit test is not compiled" )
+endif ( BOOST_UNIT_TEST_FRAMEWORK_FOUND )
+
 if ( WIN32 )
 	find_package(iconv)
-endif ( WIN32 )
-
-set(Boost_USE_MULTITHREADED ON )
-
-if ( WIN32 )
-	# don't use shared library in win32
-	set(Boost_USE_STATIC_LIBS 	1)
-
-	# disable msvc stupid warnings
-	add_definitions( -D_SCL_SECURE_NO_WARNINGS )
 endif ( WIN32 )
 
 include_directories(
@@ -110,17 +121,19 @@ target_link_libraries( webwrite
 
 install(TARGETS webwrite RUNTIME DESTINATION bin)
 
-file (GLOB_RECURSE WEBWRITE_UT_SRC
-#    ${webwrite_SOURCE_DIR}/test/*.hh
-    ${webwrite_SOURCE_DIR}/test/*.cc
-)
+if ( BOOST_UNIT_TEST_FRAMEWORK_FOUND )
+	file (GLOB_RECURSE WEBWRITE_UT_SRC
+	#    ${webwrite_SOURCE_DIR}/test/*.hh
+		${webwrite_SOURCE_DIR}/test/*.cc
+	)
 
-add_executable( btest
-	${WEBWRITE_UT_SRC} )
+	add_executable( btest
+		${WEBWRITE_UT_SRC} )
 	
-target_link_libraries( btest wb_core
-	${JSONC_LIBRARY}
-	${Boost_LIBRARIES}
-	${OPT_LIBS}
-)
-set_target_properties( btest PROPERTIES COMPILE_FLAGS -DBOOST_TEST_DYN_LINK ) 
+	target_link_libraries( btest wb_core
+		${JSONC_LIBRARY}
+		${Boost_LIBRARIES}
+		${OPT_LIBS}
+	)
+	set_target_properties( btest PROPERTIES COMPILE_FLAGS -DBOOST_TEST_DYN_LINK ) 
+endif ( BOOST_UNIT_TEST_FRAMEWORK_FOUND )
