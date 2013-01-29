@@ -41,7 +41,6 @@ find_package(Boost COMPONENTS filesystem system regex date_time REQUIRED )
 find_package(JSONC REQUIRED)
 find_package(FCGI REQUIRED)
 find_package(BFD)
-find_package(LibXml2)
 
 # debug messages
 if ( BOOST_UNIT_TEST_FRAMEWORK_FOUND )
@@ -78,20 +77,6 @@ if ( BFD_FOUND )
 	)
 	add_definitions( -DHAVE_BFD )
 endif ( BFD_FOUND )
-
-if ( LIBXML2_FOUND )
-	set( OPT_LIBS	${LIBXML2_LIBRARIES} ${ICONV_LIBRARIES} ${OPT_LIBS} )
-	include_directories( ${LIBXML2_INCLUDE_DIR} ${ICONV_INCLUDE_DIRS} )
-	
-	file( GLOB_RECURSE XML_SRC
-		${webwrite_SOURCE_DIR}/src/opt/xml/*.cc
-		${webwrite_SOURCE_DIR}/src/opt/xml/*.hh
-	)
-	set(OPT_SRC ${XML_SRC} ${OPT_SRC})
-
-	add_definitions( -DHAVE_LIBXML2 ${LIBXML2_DEFINITIONS} )
-endif ( LIBXML2_FOUND )
-
 
 file (GLOB_RECURSE WEBWRITE_CORE_SRC
     ${webwrite_SOURCE_DIR}/src/core/*.hh

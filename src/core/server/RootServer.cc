@@ -23,12 +23,9 @@
 #include "Request.hh"
 #include "log/Log.hh"
 #include "parser/FormData.hh"
+#include "parser/HTMLStreamFilter.hh"
 #include "util/File.hh"
 #include "util/PrintF.hh"
-
-#ifdef HAVE_LIBXML2
-	#include "xml/HTMLStreamFilter.hh"
-#endif
 
 #include <boost/regex.hpp>
 #include <boost/bind.hpp>
@@ -127,23 +124,10 @@ void RootServer::Save( Request *req, const Resource& res )
 
 	DataStream *out = &f ;
 
-#if 0
-#ifdef HAVE_LIBXML2
-	HtmlValidator	html( out, file.filename().string() ) ;
-	out = &html ;
-#endif
-#endif
-
 	char buf[1024] ;
 	std::size_t c ;
 	while ( (c = req->In()->Read(buf, sizeof(buf)) ) > 0 )
 		out->Write( buf, c ) ;
-
-#if 0
-#ifdef HAVE_LIBXML2
-	html.Finish() ;
-#endif
-#endif
 
 	// ask client to load the new content again
 	req->SeeOther( res.UrlPath().generic_string() + "?load" ) ;

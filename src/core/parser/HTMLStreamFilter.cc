@@ -19,10 +19,11 @@
 */
 
 #include "HTMLStreamFilter.hh"
+#include "StreamParser.hh"
 
 #include "log/Log.hh"
-#include "parser/StreamParser.hh"
 #include "util/CArray.hh"
+#include "util/DataStream.hh"
 #include "util/PrintF.hh"
 #include "util/StringStream.hh"
 

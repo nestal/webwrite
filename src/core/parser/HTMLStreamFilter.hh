@@ -20,11 +20,12 @@
 
 #pragma once
 
-#include "util/DataStream.hh"
 #include "util/Exception.hh"
 #include <memory>
 
 namespace wb {
+
+class DataStream ;
 
 class HTMLStreamFilter
 {
