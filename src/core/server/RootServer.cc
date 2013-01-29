@@ -27,7 +27,7 @@
 #include "util/PrintF.hh"
 
 #ifdef HAVE_LIBXML2
-	#include "xml/HtmlValidator.hh"
+	#include "xml/HTMLStreamFilter.hh"
 #endif
 
 #include <boost/regex.hpp>

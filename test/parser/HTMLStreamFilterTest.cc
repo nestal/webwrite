@@ -18,7 +18,7 @@
 	MA  02110-1301, USA.
 */
 
-#include "xml/HtmlValidator.hh"
+#include "xml/HTMLStreamFilter.hh"
 #include "util/StringStream.hh"
 
 #include <boost/test/unit_test.hpp>
@@ -31,7 +31,7 @@ namespace
 	struct F
 	{
 		StringStream ss ;
-	    HtmlValidator subject ;
+	    HTMLStreamFilter subject ;
 		
 		F() :
 			subject( &ss )
@@ -40,7 +40,7 @@ namespace
 	} ;
 }
 
-BOOST_FIXTURE_TEST_SUITE( HtmlValidatorTest, F )
+BOOST_FIXTURE_TEST_SUITE( HTMLStreamFilterTest, F )
 
 BOOST_AUTO_TEST_CASE( TestFilterScript )
 {

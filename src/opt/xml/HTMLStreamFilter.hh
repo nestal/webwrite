@@ -26,45 +26,19 @@
 
 namespace wb {
 
-class HtmlValidator : public DataStream
+class HTMLStreamFilter
 {
 public :
 	struct Error : public Exception {};
 
-	HtmlValidator( DataStream *out, const std::string& filename = "" ) ;
-	~HtmlValidator() ;
-	
-	std::size_t Read( char *data, std::size_t size ) ;
-	std::size_t Write( const char *data, std::size_t size ) ;
-
-	void Finish() ;
+	HTMLStreamFilter() ;
 	
 	void Parse( DataStream *in, DataStream *out ) ;
 
 private :
-	bool CheckElement( const std::string& element, const std::string& attr ) ;
+	bool CheckElement( const std::string& element ) ;
 
 private :
-	struct Impl ;
-	
-	static void OnStartElement(
-		void				*pv,
-		const unsigned char	*name,
-		const unsigned char	**attr
-	) ;
-	static void OnEndElement(
-		void				*pv,
-		const unsigned char	*name
-	) ;
-	static void OnCharacters(
-		void				*pv,
-		const unsigned char	*chars,
-		int					len
-	) ;
-	static Impl* GetImpl( void *pv ) ;
-
-private :
-	std::auto_ptr<Impl>	m_;
 } ;
 
 } // end of namespace

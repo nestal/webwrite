@@ -127,7 +127,7 @@ if ( BOOST_UNIT_TEST_FRAMEWORK_FOUND )
 		${webwrite_SOURCE_DIR}/test/*.cc
 	)
 
-	add_executable( btest
+	add_executable( unittest
 		${WEBWRITE_UT_SRC} )
 	
 	target_link_libraries( btest wb_core
