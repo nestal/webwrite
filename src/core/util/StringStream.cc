@@ -35,8 +35,8 @@ StringStream::StringStream( const std::string& init ) :
 {
 }
 
-/// Read \a size bytes from the stream. Those bytes will be removed from
-/// the underlying string by calling std::string::erase(). Therefore, it is
+/// Read `size` bytes from the stream. Those bytes will be removed from
+/// the underlying string by calling `std::string::erase()`. Therefore, it is
 /// not a good idea to call Read() to read byte-by-byte.
 std::size_t StringStream::Read( char *data, std::size_t size )
 {

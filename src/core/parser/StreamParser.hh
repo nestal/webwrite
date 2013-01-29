@@ -27,16 +27,24 @@ namespace wb {
 
 class DataStream ;
 
+/**	\brief	A parser base on DataStream
+
+	The purpose of the StreamParser is to copy data from a DataStream to
+	another _until_ a certain data pattern is found. It contains a buffer
+	to store data read from its input DataStream. Normally the target data
+	pattern must not be larger than the size of the StreamParser internal
+	buffer.
+*/
 class StreamParser
 {
 public :
 	explicit StreamParser( DataStream *in ) ;
 
-	/// Result of parsing.
+	/// Result of parsing. Used by StreamParser::ReadUntil()
 	struct Result
 	{
-		bool		found ;		///< true if the target is found.
-		std::size_t	consumed ;	///< # of bytes consumed.
+		bool		found ;		///< `true` if the target is found.
+		std::size_t	consumed ;	///< number of bytes consumed.
 		char		target ;	///< the actual character found.
 	} ;
 

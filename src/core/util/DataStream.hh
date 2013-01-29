@@ -23,7 +23,8 @@
 
 namespace wb {
 
-/*!	\brief	encapsulations of data streams. Useful for unit tests.
+/**	\brief	Encapsulation of data streams. Useful for unit tests.
+	This class provides two functions: Read() and Write().
 */
 class DataStream
 {
@@ -31,6 +32,17 @@ protected :
 	virtual ~DataStream() {}
 	
 public :
+	/**	Reading from the stream. The caller indicates that it wants
+		to read `size` bytes and must provide enough space pointed
+		by `data`.
+		\param	data	Buffer to hold the data read from the stream
+						Must have at least `size` bytes.
+		\param	size	Number of bytes the caller wants to read.
+		\throw	wb::Exception	In case of any error.
+		\return			The number of byte actually read from the stream.
+						0 indicates the end of stream, i.e. you will
+						still get 0 if you call again.
+	*/
 	virtual std::size_t Read( char *data, std::size_t size ) = 0 ;
 	virtual std::size_t Write( const char *data, std::size_t size ) = 0 ;
 } ;

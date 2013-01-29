@@ -1,0 +1,32 @@
+/**
+	\dir	/lib
+	
+	This directory contains the files that are not modified when WebWrite
+	is running. It typically contains web site files (HTML, javascript,
+	style sheets) that are served to the client via the `?lib=index.html`
+	command.
+	
+	\dir	/src
+	
+	This is the root directory of the source code.
+	
+	\dir	/src/core
+	
+	The core source file of WebWrite. All source codes in this directory
+	will be included in the `wb_core` library, which is shared between
+	the webwrite executable and the unit test binary.
+	
+	\dir	/src/core/log
+	
+	Source files related to logging. Files in this directory should be
+	able to be re-used in other projects.
+	
+	\dir	/src/core/server
+	
+	Classes used in WebWrite server. These classes is specific to WebWrite.
+	
+	\dir	/src/core/util
+	
+	Utilities classes. Not WebWrite specific and can be reusable in other
+	projects. Examples include wb::File and wb::Exception.
+*/

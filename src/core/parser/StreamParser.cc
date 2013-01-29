@@ -39,6 +39,13 @@ StreamParser::StreamParser( DataStream *in ) :
 	Refill( ) ;
 }
 
+/**	Copy `count` number of bytes from input to `out`. This function is
+	also internally called by ReadUntil() to copy the bytes.
+	\param	count	Number of bytes to copy.
+	\param	out		Destination DataStream.
+	\return			Actually number of bytes copied. This is always
+					less than or equal to `count`.
+*/
 std::size_t StreamParser::Consume( std::size_t count, DataStream *out )
 {
 	assert( out != 0 ) ;
@@ -128,6 +135,13 @@ StreamParser::Result StreamParser::ReadUntilAny(
 	    boost::bind( &StreamParser::FindAnyChar, _1, _2, target ), out ) ;
 }
 
+/**	Copy data from input to `out` until the `target` string is found.
+	Unlike the single-byte version of ReadUntil(), this one _does_
+	copy the `target` string if it is found.
+	\param	target	Copy bytes until this string is found in input.
+	\param	out		Data will be copied to until `target` is found.
+	\return			Parser result. Result::target is not updated.
+*/
 StreamParser::Result StreamParser::ReadUntil(
     const std::string& target, DataStream *out )
 {

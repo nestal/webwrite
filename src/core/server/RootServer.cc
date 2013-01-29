@@ -122,12 +122,10 @@ void RootServer::Save( Request *req, const Resource& res )
 	fs::create_directories( file.parent_path() ) ;
 	File f( file, 0600 ) ;
 
-	DataStream *out = &f ;
-
 	char buf[1024] ;
 	std::size_t c ;
 	while ( (c = req->In()->Read(buf, sizeof(buf)) ) > 0 )
-		out->Write( buf, c ) ;
+		f.Write( buf, c ) ;
 
 	// ask client to load the new content again
 	req->SeeOther( res.UrlPath().generic_string() + "?load" ) ;

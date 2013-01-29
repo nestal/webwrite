@@ -32,13 +32,17 @@
 
 namespace wb {
 
-/*!	\brief	a wrapper class for file read/write.
+/**	\brief	A wrapper class for file read/write.
 
-	It will throw exceptions when encountered errors.
+	It is a simple wrapper around the UNIX file descriptor. It will
+	throw exceptions (i.e. Error) when it encounters errors.
 */
 class File : public DataStream
 {
 public :
+	/// File specific errors. It often includes
+	/// boost::errinfo_api_function and boost::errinfo_errno for the
+	/// detail information.
 	struct Error : virtual Exception {} ;
 
 public :

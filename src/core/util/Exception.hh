@@ -32,9 +32,10 @@ class Backtrace ;
 /**	\defgroup	exception	Exception Classes
 */
 
-///	base class for exception in libpdfdoc
-/**	\ingroup exception
-	This class is the base class for all exception class in libpdfdoc.
+/**	\brief	base class for exception in WebWrite
+	\ingroup exception
+	This class is the base class for all exception class in WebWrite.
+	It allows us to catch all WebWrite exception with one catch clause.
 */
 struct Exception :
 	virtual public std::exception,
@@ -42,25 +43,6 @@ struct Exception :
 {
 	Exception( ) ;
 } ;
-
-struct FileError	: virtual Exception {} ;
-
-///	Parse error exception.
-/**	\ingroup exception
-	This exception will be thrown when there is a parse error when reading
-	a PDF file.
-*/
-struct ParseError	: virtual Exception {} ;
-
-///	Invalid type exception.
-/**	\ingroup exception
-	This exception will be thrown when the Object cannot convert its
-	underlying data to a specific type. The what() member function will
-	describe the expected and actual type of the data.
-*/
-struct BadType 		: virtual Exception {} ;
-
-struct Unsupported	: virtual Exception {} ;
 
 /// Exception informations
 namespace expt

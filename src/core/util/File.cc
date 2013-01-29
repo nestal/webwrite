@@ -83,20 +83,28 @@ File::File( ) : m_fd( -1 )
 {
 }
 
-/*!	opens the file for reading.
+/**	Opens the file for reading.
+	\param	path	Path to the file to be opened.
+	\throw	Error	When the file cannot be openned.
 */
 File::File( const fs::path& path ) : m_fd( -1 )
 {
 	OpenForRead( path ) ;
 }
 
-/*!	opens the file for writing
+/**	Opens the file for writing.
+	\param	path	Path to the file to be opened.
+	\param	mode	Mode of the file to be created, e.g. 0600 for user
+					readable/writable.
+	\throw	Error	When the file cannot be opened.
 */
 File::File( const fs::path& path, int mode ) : m_fd( -1 )
 {
 	OpenForWrite( path, mode ) ;
 }
 
+/**	The destructor will close the file. 
+*/
 File::~File( )
 {
 	Close() ;
@@ -152,6 +160,9 @@ bool File::IsOpened() const
 	return m_fd != -1 ;
 }
 
+/**	Read bytes from file. See DataStream::Read() for details.
+	\throw	Error	In case of any error.
+*/
 std::size_t File::Read( char *ptr, std::size_t size )
 {
 	assert( IsOpened() ) ;
@@ -175,7 +186,7 @@ std::size_t File::Write( const char *ptr, std::size_t size )
 	{
 		BOOST_THROW_EXCEPTION(
 			Error()
-				<< boost::errinfo_api_function("read")
+				<< boost::errinfo_api_function("write")
 				<< boost::errinfo_errno(errno)
 		) ;
 	}
@@ -219,12 +230,13 @@ void File::Chmod( int mode )
 #endif
 }
 
-/// This function is not supported in win32 yet.
+/// This function is not implemented in win32 yet.
 void* File::Map( off_t offset, std::size_t length )
 {
 	assert( IsOpened() ) ;
 	
 #ifdef WIN32
+	assert( false ) ;
 	return 0 ;
 #else
 	void *addr = ::mmap( 0, length, PROT_READ, MAP_PRIVATE, m_fd, offset ) ;
