@@ -26,7 +26,21 @@
 
 namespace wb {
 
-/// webwrite config is base on JSON.
+/** 
+	\page	Configuration
+	
+	The configuration file used by WebWrite is based on [JSON](http://www.json.org/).
+	This page documents the configuration items.
+	
+	\include config.json
+	
+	- name (string)\n
+	This is the name of the site. This string will be shown in the upper left corner
+	of the page.
+	- socket (string)\n
+	The socket that WebWrite listens to. This must match with your FastCGI configuration
+	of your web server.
+*/
 namespace cfg
 {
 	const Json& Inst( const Json& json = Json() ) ;

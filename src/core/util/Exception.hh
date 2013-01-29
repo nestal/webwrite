@@ -62,16 +62,16 @@ struct BadType 		: virtual Exception {} ;
 
 struct Unsupported	: virtual Exception {} ;
 
-// Exception informations
+/// Exception informations
 namespace expt
 {
 	// back-trace information. should be present for all exceptions
 	typedef boost::error_info<struct BacktraceTag, Backtrace>	BacktraceInfo ;
 
-	// generic error message
+	/// generic error message
 	typedef boost::error_info<struct MsgTag, std::string>		ErrMsg ;
 	
-	// nested exception
+	/// nested exception
 	typedef boost::error_info<struct ExceptionTag, Exception>	Nested ;
 }
 

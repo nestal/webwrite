@@ -317,6 +317,9 @@ bool Json::Is<Json::Array>() const
 	return ::json_object_is_type( m_json, json_type_array ) == TRUE ;
 }
 
+///	Finds an element in the array.
+///	\pre	"this" is an array
+///	\return	*this[i] if *this[i][key] == value
 Json Json::FindInArray( const std::string& key, const std::string& value ) const
 {
 	std::size_t count = ::json_object_array_length( m_json ) ;
@@ -327,8 +330,12 @@ Json Json::FindInArray( const std::string& key, const std::string& value ) const
 		if ( item.Has(key) && item[key].Str() == value )
 			return item ;
 	}
+	
 	BOOST_THROW_EXCEPTION(
 		Error() << expt::ErrMsg( "cannot find " + key + " = " + value + " in array" ) ) ;
+	
+	// shut off compiler warnings
+	return Json() ;
 }
 
 bool Json::FindInArray( const std::string& key, const std::string& value, Json& result ) const
@@ -340,8 +347,8 @@ bool Json::FindInArray( const std::string& key, const std::string& value, Json& 
 	}
 	catch ( Error& )
 	{
-		return false ;
 	}
+	return false ;
 }
 
 Json Json::Parse( const std::string& str )
@@ -353,6 +360,9 @@ Json Json::Parse( const std::string& str )
 	return Json( json, NotOwned() ) ;
 }
 
+/// Parse a file. The file is loaded from file system.
+/// \throw	Error	expt::ErrMsg contains a human-readable message describing the
+///					error.
 Json Json::ParseFile( const std::string& filename )
 {
 	File file( filename ) ;

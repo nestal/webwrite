@@ -1,6 +1,6 @@
 {
-	"name"		: "WebWrite",
-	"socket"	: ":9000",
+	"name"		: "WebWrite",		// name of the site
+	"socket"	: ":9000",			// socket to be listened to
 	"wb_root"	: "/webwrite",
 	"lib"		: { "path": "lib",  "redir": "/wb/lib" },
 	"data"		: { "path": "data", "redir": "/wb/data" },

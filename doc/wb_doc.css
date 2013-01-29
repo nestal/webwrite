@@ -161,7 +161,6 @@ pre.fragment {
         margin: 4px 8px 4px 2px;
         overflow: auto;
         word-wrap: break-word;
-        font-size:  9pt;
         line-height: 125%;
         font-family: monospace, fixed;
         font-size: 105%;
@@ -176,7 +175,6 @@ div.fragment {
 
 div.line {
 	font-family: monospace, fixed;
-        font-size: 13px;
 	min-height: 13px;
 	line-height: 1.0;
 	text-wrap: unrestricted;
@@ -656,7 +654,7 @@ span.mlabel {
 	margin-right: 4px;
 	padding: 2px 3px;
 	border-radius: 3px;
-	font-size: 7pt;
+	font-size: 70%;
 	white-space: nowrap;
 	vertical-align: middle;
 }
@@ -718,7 +716,6 @@ div.directory {
         white-space: nowrap;
         width: 100%;
         text-align: right;
-        font-size: 9pt;
 }
 
 .directory .levels span {
@@ -833,12 +830,12 @@ table.fieldtable {
 	background-image: url('tab_b.png');
 	z-index: 101;
 	overflow: hidden;
-	font-size: 13px;
+	font-size: 130%;
 }
 
 .navpath ul
 {
-	font-size: 11px;
+	font-size: 95%;
 	background-image:url('tab_b.png');
 	background-repeat:repeat-x;
 	background-position: 0 -5px;
@@ -890,14 +887,12 @@ table.fieldtable {
         background-repeat:no-repeat;
         background-position:right;
         color:#364D7C;
-        font-size: 8pt;
 }
 
 
 div.summary
 {
 	float: right;
-	font-size: 8pt;
 	padding-right: 5px;
 	width: 50%;
 	text-align: right;
@@ -910,7 +905,6 @@ div.summary a
 
 div.ingroups
 {
-	font-size: 8pt;
 	width: 50%;
 	text-align: left;
 }

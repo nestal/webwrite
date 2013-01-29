@@ -127,9 +127,11 @@ void RootServer::Save( Request *req, const Resource& res )
 
 	DataStream *out = &f ;
 
+#if 0
 #ifdef HAVE_LIBXML2
 	HtmlValidator	html( out, file.filename().string() ) ;
 	out = &html ;
+#endif
 #endif
 
 	char buf[1024] ;
@@ -137,8 +139,10 @@ void RootServer::Save( Request *req, const Resource& res )
 	while ( (c = req->In()->Read(buf, sizeof(buf)) ) > 0 )
 		out->Write( buf, c ) ;
 
+#if 0
 #ifdef HAVE_LIBXML2
 	html.Finish() ;
+#endif
 #endif
 
 	// ask client to load the new content again

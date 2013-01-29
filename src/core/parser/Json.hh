@@ -31,6 +31,11 @@ namespace wb {
 
 class File ;
 
+/*!	\brief	Simple wrapper around JSON-C objects.
+
+	This class represents JSON-C objects, which can be integers, booleans, strings
+	double, arrays and object.
+*/
 class Json
 {
 public :
