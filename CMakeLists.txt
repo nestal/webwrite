@@ -43,11 +43,11 @@ find_package(FCGI REQUIRED)
 find_package(BFD)
 
 # debug messages
-if ( BOOST_UNIT_TEST_FRAMEWORK_FOUND )
+if ( Boost_UNIT_TEST_FRAMEWORK_FOUND )
 	message( "found boost UTF at ${BOOST_UNIT_TEST_FRAMEWORK_LIBRARY}" )
-else ( BOOST_UNIT_TEST_FRAMEWORK_FOUND )
+else ( Boost_UNIT_TEST_FRAMEWORK_FOUND )
 	message( "boost UTF not found, unit test is not compiled" )
-endif ( BOOST_UNIT_TEST_FRAMEWORK_FOUND )
+endif ( Boost_UNIT_TEST_FRAMEWORK_FOUND )
 
 if ( WIN32 )
 	find_package(iconv)
@@ -106,7 +106,7 @@ target_link_libraries( webwrite
 
 install(TARGETS webwrite RUNTIME DESTINATION bin)
 
-if ( BOOST_UNIT_TEST_FRAMEWORK_FOUND )
+if ( Boost_UNIT_TEST_FRAMEWORK_FOUND )
 	file (GLOB_RECURSE WEBWRITE_UT_SRC
 	#    ${webwrite_SOURCE_DIR}/test/*.hh
 		${webwrite_SOURCE_DIR}/test/*.cc
@@ -115,10 +115,10 @@ if ( BOOST_UNIT_TEST_FRAMEWORK_FOUND )
 	add_executable( unittest
 		${WEBWRITE_UT_SRC} )
 	
-	target_link_libraries( btest wb_core
+	target_link_libraries( unittest wb_core
 		${JSONC_LIBRARY}
 		${Boost_LIBRARIES}
 		${OPT_LIBS}
 	)
-	set_target_properties( btest PROPERTIES COMPILE_FLAGS -DBOOST_TEST_DYN_LINK ) 
-endif ( BOOST_UNIT_TEST_FRAMEWORK_FOUND )
+	set_target_properties( unittest PROPERTIES COMPILE_FLAGS -DBOOST_TEST_DYN_LINK ) 
+endif ( Boost_UNIT_TEST_FRAMEWORK_FOUND )

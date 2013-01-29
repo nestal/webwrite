@@ -18,7 +18,7 @@
 	MA  02110-1301, USA.
 */
 
-#include "xml/HTMLStreamFilter.hh"
+#include "parser/HTMLStreamFilter.hh"
 #include "util/StringStream.hh"
 
 #include <boost/test/unit_test.hpp>
@@ -30,13 +30,7 @@ namespace
 	// fixture
 	struct F
 	{
-		StringStream ss ;
 	    HTMLStreamFilter subject ;
-		
-		F() :
-			subject( &ss )
-		{
-		}
 	} ;
 }
 
@@ -45,11 +39,14 @@ BOOST_FIXTURE_TEST_SUITE( HTMLStreamFilterTest, F )
 BOOST_AUTO_TEST_CASE( TestFilterScript )
 {
     const char html[] = "<html><body><div>hello&amp;</div><script class=\"wow\">hi&gt;</script></body></html>" ;
-    subject.Write( html, sizeof(html)-1 ) ;
 
-    std::string exp = "<div>hello&amp;</div>" ;
-
-    BOOST_CHECK_EQUAL( ss.Str(), exp );
+	StringStream in( html ), out ;
+	subject.Parse( &in, &out ) ;
+    
+    const char exp[] =
+    	"<html><body><div>hello&amp;</div></body></html>" ;
+    	
+    BOOST_CHECK_EQUAL( out.Str(), exp ) ;
 }
 
 BOOST_AUTO_TEST_CASE( TestFilterChildren )
@@ -59,11 +56,12 @@ BOOST_AUTO_TEST_CASE( TestFilterChildren )
     	"<object class=\"wow\"><p>should be ignored</p><span>oops&gt;</span></object>"
     	"<div>I am not ignored!&gt;more chars</div>"
     	"</body></html>" ;
-    subject.Write( html, sizeof(html)-1 ) ;
+	StringStream in( html ), out ;
+	subject.Parse( &in, &out ) ;
 
-    std::string exp = "<div>I am not ignored!&gt;more chars</div>" ;
-
-    BOOST_CHECK_EQUAL( ss.Str(), exp );
+	std::string exp = "<html><body><div>I am not ignored!&gt;more chars</div></body></html>" ;
+	
+	BOOST_CHECK_EQUAL( out.Str(), exp );
 }
 
 BOOST_AUTO_TEST_CASE( TestEntities )
@@ -72,10 +70,11 @@ BOOST_AUTO_TEST_CASE( TestEntities )
     	"<html><body>"
     	"<div>many entities like: &something; should be the same</div>"
     	"</body></html>" ;
-    subject.Write( html, sizeof(html)-1 ) ;
+	StringStream in( html ), out ;
+	subject.Parse( &in, &out ) ;
 
-    std::string exp = "<div>many entities like: &amp;something; should be the same</div>" ;
-    BOOST_CHECK_EQUAL( ss.Str(), exp );
+	std::string exp = "<html><body><div>many entities like: &something; should be the same</div></body></html>" ;
+	BOOST_CHECK_EQUAL( out.Str(), exp );
 }
 
 BOOST_AUTO_TEST_CASE( TestParseTag )
@@ -83,7 +82,7 @@ BOOST_AUTO_TEST_CASE( TestParseTag )
     const char html[] =
     	"<html><body>"
     	"<div>many entities like: &something; should be the same</div>"
-    	"<script>??<<>><<?&&& this should be skipped ####</script>"
+    	"<script>?? <<>><<?&&& this should be skipped ####</script>"
     	"</body></html>" ;
 
     StringStream in( html ), out ;

@@ -17,7 +17,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "xml/HtmlValidator.hh"
 #include "parser/StreamParser.hh"
 #include "util/StringStream.hh"
 #include "util/File.hh"

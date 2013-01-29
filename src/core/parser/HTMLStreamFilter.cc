@@ -93,7 +93,10 @@ void HTMLStreamFilter::Parse( DataStream *in, DataStream *out )
 	
 	while ( r.found )
 	{
-		// don't throw away the '<'
+		// throw away the '<'
+		assert( r.target == '<' ) ;
+		inp.Consume(1) ;
+		
 		StringStream tag ;
 		r = inp.ReadUntilAny( " >", &tag ) ;
 
@@ -103,7 +106,8 @@ void HTMLStreamFilter::Parse( DataStream *in, DataStream *out )
 		// and scan for next element
 		if ( good )
 		{
-			out->Write( tag.Str().c_str(), tag.Str().size() ) ;
+			std::string element = '<' + tag.Str() ;
+			out->Write( element.c_str(), element.size() ) ;
 		
 			// tag not closed yet. read its attributes
 			StringStream attr ;
@@ -131,9 +135,6 @@ bool HTMLStreamFilter::CheckElement( const std::string& element )
 	std::string tag = element ;
 	if ( tag.empty() )
 		return false ;
-	
-	if ( tag[0] == '<' )
-		tag.erase( tag.begin() ) ;
 	
 	if ( tag[0] == '/' )
 		tag.erase( tag.begin() ) ;
