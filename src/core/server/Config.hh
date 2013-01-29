@@ -27,19 +27,23 @@
 namespace wb {
 
 /** 
-	\page	Configuration
+	\page	config	Configuration
 	
 	The configuration file used by WebWrite is based on [JSON](http://www.json.org/).
 	This page documents the configuration items.
 	
+	Configuration File {#config_file}
+	==================
+	
+	Here is a sample of the configuration file:
+	
 	\include config.json
 	
-	- name (string)\n
-	This is the name of the site. This string will be shown in the upper left corner
-	of the page.
-	- socket (string)\n
-	The socket that WebWrite listens to. This must match with your FastCGI configuration
-	of your web server.
+	Web Server Configuration
+	========================
+	
+	WebWrite is a FastCGI back-end. It communicates with the web server using
+	FastCGI protocol. 
 */
 namespace cfg
 {

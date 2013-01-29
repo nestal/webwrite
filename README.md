@@ -1,4 +1,5 @@
-\mainpage
+WebWrite {#mainpage}
+========
 
 WebWrite is a wiki-like content management system written in HTML5/Javascript/C++.
 WebWrite uses [ckeditor](http://ckeditor.com/) for in-place HTML editing. Unlike
@@ -36,6 +37,11 @@ Required:
 - [libxml2](http://www.xmlsoft.org/index.html) (optional, but recommended for security)
 - [ckeditor](http://ckeditor.com/)
 
+
+Configuration
+=============
+
+See [this](@ref config) for details.
 
 REST API
 ========

@@ -1,0 +1,8 @@
+body, table, div, p, dl {
+	font-size: 100%;
+	line-height: normal;
+}
+
+div.line {
+	font-size: 100%;
+}
