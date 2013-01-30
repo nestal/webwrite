@@ -96,4 +96,25 @@ BOOST_AUTO_TEST_CASE( TestParseTag )
     BOOST_CHECK_EQUAL( out.Str(), exp ) ;
 }
 
+BOOST_AUTO_TEST_CASE( TestSkipBadEndTag )
+{
+    const char html[] =
+    	"<html><body>"
+    	"<div>many entities like: &something; should be the same</div>"
+    	"</badtag>this should not be skipped"
+    	"<href> skippied </href>"
+    	"</body></html>" ;
+
+    StringStream in( html ), out ;
+    subject.Parse( &in, &out ) ;
+    
+    const char exp[] =
+    	"<html><body>"
+    	"<div>many entities like: &something; should be the same</div>"
+    	"this should not be skipped"
+    	"</body></html>" ;
+    
+    BOOST_CHECK_EQUAL( out.Str(), exp ) ;
+}
+
 BOOST_AUTO_TEST_SUITE_END()

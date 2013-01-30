@@ -121,11 +121,11 @@ void HTMLStreamFilter::Parse( DataStream *in, DataStream *out )
 			// if the bad tag is a start tag, skip everything until we see
 			// the end tag
 			if ( !end_tag )
-			{
 				inp.ReadUntil( "</" + tag.Str(), DevNull() ) ;
-				if ( inp.ReadUntil( '>', DevNull() ).found )
-					inp.Consume(1) ;
-			}
+			
+			// skip close tag
+			if ( inp.ReadUntil( '>', DevNull() ).found )
+				inp.Consume(1) ;
 		}
 		
 		r = inp.ReadUntil( '<', out ) ;
