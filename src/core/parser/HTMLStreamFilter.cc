@@ -100,7 +100,8 @@ void HTMLStreamFilter::Parse( DataStream *in, DataStream *out )
 		StringStream tag ;
 		r = inp.ReadUntilAny( " >", &tag ) ;
 
-		bool good = CheckElement( tag.Str() ) ;
+		bool end_tag	= !tag.Str().empty() && tag.Str()[0] == '/' ;
+		bool good		= CheckElement( end_tag ? tag.Str().substr(1) : tag.Str() ) ;
 		
 		// if the element is in the white list, we consider it filtered in
 		// and scan for next element
@@ -110,17 +111,26 @@ void HTMLStreamFilter::Parse( DataStream *in, DataStream *out )
 			out->Write( element.c_str(), element.size() ) ;
 		
 			// tag not closed yet. read its attributes
-			StringStream attr ;
 			if ( r.target == ' ' )
 				inp.ReadUntil( '>', out ) ;
 		}
+		
 		// element not in the white list. we will skip everything inside it
 		// until its end tag
 		else
 		{
-			inp.ReadUntil( "</" + tag.Str(), DevNull() ) ;
-			if ( inp.ReadUntil( '>', DevNull() ).found )
-				inp.Consume(1) ;
+			// tag not closed yet. skip its attributes
+			if ( r.target == ' ' )
+				inp.ReadUntil( '>', DevNull() ) ;
+
+			// if the bad tag is a start tag, skip everything until we see
+			// the end tag
+			if ( !end_tag )
+			{
+				inp.ReadUntil( "</" + tag.Str(), DevNull() ) ;
+				if ( inp.ReadUntil( '>', DevNull() ).found )
+					inp.Consume(1) ;
+			}
 		}
 		
 		r = inp.ReadUntil( '<', out ) ;
@@ -132,14 +142,7 @@ void HTMLStreamFilter::Parse( DataStream *in, DataStream *out )
 bool HTMLStreamFilter::CheckElement( const std::string& element )
 {
 	Log( "read tag %1%", element ) ;
-	std::string tag = element ;
-	if ( tag.empty() )
-		return false ;
-	
-	if ( tag[0] == '/' )
-		tag.erase( tag.begin() ) ;
-	
-	return white_list.find(tag) != white_list.end() ;
+	return white_list.find(element) != white_list.end() ;
 }
 
 } // end of namespace

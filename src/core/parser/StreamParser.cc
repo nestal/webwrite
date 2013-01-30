@@ -137,7 +137,9 @@ StreamParser::Result StreamParser::ReadUntilAny(
 
 /**	Copy data from input to `out` until the `target` string is found.
 	Unlike the single-byte version of ReadUntil(), this one _does_
-	copy the `target` string if it is found.
+	not copy the `target` string if it is found. Instead, the `target`
+	string will be skipped.
+
 	\param	target	Copy bytes until this string is found in input.
 	\param	out		Data will be copied to until `target` is found.
 	\return			Parser result. Result::target is not updated.
