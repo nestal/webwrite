@@ -36,22 +36,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(Boost_USE_MULTITHREADED ON )
 set(Boost_DETAILED_FAILURE_MSG ON )
 
-find_package(Boost COMPONENTS unit_test_framework )
-find_package(Boost COMPONENTS filesystem system regex date_time REQUIRED )
+find_package(Boost COMPONENTS filesystem system regex date_time unit_test_framework REQUIRED )
 find_package(JSONC REQUIRED)
 find_package(FCGI REQUIRED)
 find_package(BFD)
-
-# debug messages
-if ( Boost_UNIT_TEST_FRAMEWORK_FOUND )
-	message( "found boost UTF at ${BOOST_UNIT_TEST_FRAMEWORK_LIBRARY}" )
-else ( Boost_UNIT_TEST_FRAMEWORK_FOUND )
-	message( "boost UTF not found, unit test is not compiled" )
-endif ( Boost_UNIT_TEST_FRAMEWORK_FOUND )
-
-if ( WIN32 )
-	find_package(iconv)
-endif ( WIN32 )
 
 include_directories(
 	${JSONC_INCLUDE_DIR}
@@ -106,19 +94,17 @@ target_link_libraries( webwrite
 
 install(TARGETS webwrite RUNTIME DESTINATION bin)
 
-if ( Boost_UNIT_TEST_FRAMEWORK_FOUND )
-	file (GLOB_RECURSE WEBWRITE_UT_SRC
-	#    ${webwrite_SOURCE_DIR}/test/*.hh
-		${webwrite_SOURCE_DIR}/test/*.cc
-	)
+# unit tests
+file (GLOB_RECURSE WEBWRITE_UT_SRC
+	${webwrite_SOURCE_DIR}/test/*.cc
+)
 
-	add_executable( unittest
-		${WEBWRITE_UT_SRC} )
-	
-	target_link_libraries( unittest wb_core
-		${JSONC_LIBRARY}
-		${Boost_LIBRARIES}
-		${OPT_LIBS}
-	)
-	set_target_properties( unittest PROPERTIES COMPILE_FLAGS -DBOOST_TEST_DYN_LINK ) 
-endif ( Boost_UNIT_TEST_FRAMEWORK_FOUND )
+add_executable( unittest
+	${WEBWRITE_UT_SRC} )
+
+target_link_libraries( unittest wb_core
+	${JSONC_LIBRARY}
+	${Boost_LIBRARIES}
+	${OPT_LIBS}
+)
+set_target_properties( unittest PROPERTIES COMPILE_FLAGS -DBOOST_TEST_DYN_LINK ) 

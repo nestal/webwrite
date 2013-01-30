@@ -26,10 +26,6 @@
 
 #include <string>
 
-#ifdef WIN32
-	#include <memory>
-#endif
-
 namespace wb {
 
 /**	\brief	A wrapper class for file read/write.

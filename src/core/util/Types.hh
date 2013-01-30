@@ -21,7 +21,7 @@
 
 #include <sys/types.h>
 
-// import types into the Grive namespace
+// import types into the wb namespace
 namespace wb
 {
 	using ::off_t ;

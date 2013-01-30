@@ -30,11 +30,6 @@
 #include <cassert>
 #include <set>
 
-#define THROW()				\
-	BOOST_THROW_EXCEPTION(	\
-			Error() << expt::ErrMsg( ::xmlCtxtGetLastError(m_->ctx)->message )	\
-		) ;	
-
 namespace wb {
 
 namespace
