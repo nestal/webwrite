@@ -26,11 +26,12 @@
 #include "parser/HTMLStreamFilter.hh"
 #include "util/File.hh"
 #include "util/PrintF.hh"
+#include "util/TeeStream.hh"
 
 #include <boost/regex.hpp>
 #include <boost/bind.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 
+#include <ctime>
 #include <set>
 #include <sstream>
 
@@ -118,14 +119,21 @@ void RootServer::Save( Request *req, const Resource& res )
 {
 	fs::path 	file	= res.DataPath() ;
 	Log( "writing to file %1%", file, log::verbose ) ;
-		
+
+	boost::format backup_fn( "~%1%-%2%" ) ;
+
 	fs::create_directories( file.parent_path() ) ;
 	File f( file, 0600 ) ;
+	
+	// create backup file
+	File backup(
+		file.parent_path() /
+		(backup_fn % file.filename().string() % std::time(0)).str(), 0600 ) ;
 
-	char buf[1024] ;
-	std::size_t c ;
-	while ( (c = req->In()->Read(buf, sizeof(buf)) ) > 0 )
-		f.Write( buf, c ) ;
+	TeeStream t( req->In(), &backup );
+	
+	HTMLStreamFilter filter;
+	filter.Parse( &t, &f ) ;
 
 	// ask client to load the new content again
 	req->SeeOther( res.UrlPath().generic_string() + "?load" ) ;

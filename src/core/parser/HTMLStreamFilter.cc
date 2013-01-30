@@ -136,8 +136,13 @@ void HTMLStreamFilter::Parse( DataStream *in, DataStream *out )
 /// http://www.w3.org/TR/html5/syntax.html#syntax-tag-omission
 bool HTMLStreamFilter::CheckElement( const std::string& element )
 {
-	Log( "read tag %1%", element ) ;
-	return white_list.find(element) != white_list.end() ;
+	if ( white_list.find(element) == white_list.end() )
+	{
+		Log( "read invalid tag %1%", element ) ;
+		return false ;
+	}
+	else
+		return true ;
 }
 
 } // end of namespace
