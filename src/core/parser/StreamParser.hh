@@ -44,8 +44,8 @@ public :
 	struct Result
 	{
 		bool		found ;		///< `true` if the target is found.
-		std::size_t	consumed ;	///< number of bytes consumed.
 		char		target ;	///< the actual character found.
+		std::size_t	consumed ;	///< number of bytes consumed.
 	} ;
 
 	Result ReadUntil( const std::string& target, DataStream *out ) ;

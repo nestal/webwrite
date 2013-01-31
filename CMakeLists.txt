@@ -108,4 +108,3 @@ target_link_libraries( unittest wb_core
 	${Boost_LIBRARIES}
 	${OPT_LIBS}
 )
-set_target_properties( unittest PROPERTIES COMPILE_FLAGS -DBOOST_TEST_DYN_LINK ) 
