@@ -93,7 +93,7 @@ void HTMLStreamFilter::Parse( DataStream *in, DataStream *out )
 		inp.Consume(1) ;
 		
 		StringStream tag ;
-		r = inp.ReadUntilAny( " >", &tag ) ;
+		r = inp.ReadUntilAny( " >\n", &tag ) ;
 
 		bool end_tag	= !tag.Str().empty() && tag.Str()[0] == '/' ;
 		bool good		= CheckElement( end_tag ? tag.Str().substr(1) : tag.Str() ) ;
@@ -108,6 +108,12 @@ void HTMLStreamFilter::Parse( DataStream *in, DataStream *out )
 			// tag not closed yet. read its attributes
 			if ( r.target == ' ' )
 				inp.ReadUntil( '>', out ) ;
+		}
+		
+		else if ( tag.Str() == "!--" )
+		{
+			Log( "comments?" ) ;
+			inp.ReadUntil( "-->", DevNull() ) ;
 		}
 		
 		// element not in the white list. we will skip everything inside it
