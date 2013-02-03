@@ -134,6 +134,8 @@ void RootServer::Upload( Request *req, const Resource& res )
 {
 	FormData form( req->In(), req->ContentType() ) ;
 	form.Save( res.DataPath().parent_path() ) ;
+	
+	req->Success() ;
 }
 
 void RootServer::ServeLib( Request *req, const Resource& res )

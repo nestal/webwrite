@@ -52,6 +52,7 @@ public :
 	// HTTP status return
 	virtual void SeeOther( const std::string& location, bool query = false ) = 0 ;
 	virtual void NotFound( const std::string& message ) = 0 ;
+	virtual void Success() = 0 ;
 	
 	// for debugging
 	virtual void PrintEnv() const = 0 ;

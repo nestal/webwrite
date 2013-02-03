@@ -137,6 +137,11 @@ void FCGIRequest::NotFound( const std::string& message )
 		message.c_str() ) ;
 }
 
+void FCGIRequest::Success()
+{
+	FCGX_FPrintF( m_req->out, "Status: 200 OK\r\n\r\n" ) ;
+}
+
 std::string FCGIRequest::SansQueryURI() const
 {
 	std::string uri		= URI() ;

@@ -77,7 +77,9 @@ void FormData::Save( const fs::path& path )
 
 		// read the whole file
 		File f( path / fname, 0600 ) ;
-		p.ReadUntil( "\r\n--" + m_boundary, &f ) ;
+		StreamParser::Result r = p.ReadUntil( "\r\n--" + m_boundary, &f ) ;
+		
+		Log( "saved %1%: %2% bytes", (path/fname), r.consumed ) ;
 		
 		ending.Str("") ;
 		p.Consume( 2, &ending ) ;
