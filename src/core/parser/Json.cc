@@ -19,7 +19,7 @@
 
 #include "Json.hh"
 
-#include "util/File.hh"
+#include "util/DataStream.hh"
 
 #include <json/json_tokener.h>
 #include <json/linkhash.h>
@@ -268,10 +268,12 @@ std::ostream& operator<<( std::ostream& os, const Json& json )
 	return os << ::json_object_to_json_string( json.m_json ) ;
 }
 
-void Json::Write( File& file ) const
+void Json::Write( DataStream *out ) const
 {
+	assert( out != 0 ) ;
+
 	const char *str = ::json_object_to_json_string( m_json ) ;
-	file.Write( str, std::strlen(str) ) ;
+	out->Write( str, std::strlen(str) ) ;
 }
 
 Json::Type Json::DataType() const
@@ -363,17 +365,17 @@ Json Json::Parse( const std::string& str )
 /// Parse a file. The file is loaded from file system.
 /// \throw	Error	expt::ErrMsg contains a human-readable message describing the
 ///					error.
-Json Json::ParseFile( const std::string& filename )
+Json Json::Parse( DataStream *in )
 {
-	File file( filename ) ;
+	assert( in != 0 ) ;
+
 	struct json_tokener *tok = ::json_tokener_new() ;
-	
 	struct json_object *json = 0 ;
 	
 	char buf[1024] ;
 	std::size_t count = 0 ;
 
-	while ( (count = file.Read( buf, sizeof(buf) ) ) > 0 )
+	while ( (count = in->Read( buf, sizeof(buf) ) ) > 0 )
 		json = ::json_tokener_parse_ex( tok, buf, count ) ;
 	
 	if ( json == 0 )

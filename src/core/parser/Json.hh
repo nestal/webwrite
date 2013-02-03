@@ -29,7 +29,7 @@ struct json_object ;
 
 namespace wb {
 
-class File ;
+class DataStream ;
 
 /*!	\brief	Simple wrapper around JSON-C objects.
 
@@ -55,7 +55,7 @@ public :
 	~Json() ;
 	
 	static Json Parse( const std::string& str ) ;
-	static Json ParseFile( const std::string& filename ) ;
+	static Json Parse( DataStream *in ) ;
 	
 	Json operator[]( const std::string& key ) const ;
 	Json operator[]( const std::size_t& idx ) const ;
@@ -81,7 +81,7 @@ public :
 	bool FindInArray( const std::string& key, const std::string& value, Json& result ) const ;
 	
 	friend std::ostream& operator<<( std::ostream& os, const Json& json ) ;
-	void Write( File& file ) const ;
+	void Write( DataStream *out ) const ;
 
 	enum Type { null_type, bool_type, double_type, int_type, object_type, array_type, string_type } ;
 	

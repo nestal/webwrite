@@ -79,7 +79,8 @@ int main( int argc, char **argv )
 {
 	try
 	{
-		cfg::Inst( Json::ParseFile( argc < 2 ? "config.json" : argv[1] ) ) ;
+		File cfg_file( argc < 2 ? "config.json" : argv[1] ) ;
+		cfg::Inst( Json::Parse( &cfg_file ) ) ;
 		InitLog( ) ;
 		
 		RootServer srv ;

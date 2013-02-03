@@ -132,7 +132,8 @@ Json Resource::Meta() const
 	
 	try
 	{
-		meta = Json::ParseFile( file.string() ) ;
+		File in( file.string() ) ;
+		meta = Json::Parse( &in ) ;
 	}
 	catch ( Exception& e )
 	{
@@ -157,7 +158,7 @@ void Resource::SaveMeta(std::time_t modified) const
 	meta.Add( "last-modified", Json(modified) ) ;
 
 	File out( file, 0600 ) ;
-	meta.Write( out ) ; 
+	meta.Write( &out ) ; 
 }
 
 /**	Move the resource to attic. This function will deduce the name of
