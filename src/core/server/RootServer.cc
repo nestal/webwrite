@@ -111,13 +111,14 @@ void RootServer::Save( Request *req, const Resource& res )
 	fs::path file = res.DataPath() ;
 	Log( "writing to file %1%", file, log::verbose ) ;
 
+	res.MoveToAttic() ;
+	
 	fs::create_directories( file.parent_path() ) ;
 	File f( file, 0600 ) ;
 	
 	HTMLStreamFilter filter;
 	filter.Parse( req->In(), &f ) ;
 
-	res.MoveToAttic() ;
 	res.SaveMeta( std::time(0) ) ;
 
 	// ask client to load the new content again

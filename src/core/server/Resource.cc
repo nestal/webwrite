@@ -154,9 +154,7 @@ void Resource::SaveMeta(std::time_t modified) const
 	fs::create_directories( file.parent_path() ) ;
 	
 	Json meta = Meta() ;
-	Log( "last modified = %1%", meta["last-modified"] ) ;
-	meta["last-modified"] = Json(modified) ;
-	Log( "last modified = %1%", meta["last-modified"] ) ;
+	meta.Add( "last-modified", Json(modified) ) ;
 
 	File out( file, 0600 ) ;
 	meta.Write( out ) ; 
