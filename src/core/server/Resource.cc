@@ -105,6 +105,11 @@ fs::path Resource::UrlPath() const
 	return cfg::Path("wb_root") / m_path ;
 }
 
+fs::path Resource::AtticPath() const
+{
+	return (cfg::Inst()["attic"]["path"].Str() / m_path).parent_path() ;
+}
+
 std::string Resource::Type() const
 {
 	return cfg::MimeType( Path() ) ;

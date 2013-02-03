@@ -11,8 +11,10 @@
  	// the URI of WebWrite will be http://example.com/webwrite.
 	"wb_root"	: "/webwrite",
 	
-	"lib"		: { "path": "lib",  "redir": "/wb/lib" },
-	"data"		: { "path": "data", "redir": "/wb/data" },
+	"lib"		: { "path": "lib",  	"redir": "/wb/lib" },
+	"data"		: { "path": "data", 	"redir": "/wb/data" },
+	"attic"		: { "path": "attic",	"redir": "/wb/attic" },
+	
 	"mime"		:
 	{
 		".js"	: "application/javascript",

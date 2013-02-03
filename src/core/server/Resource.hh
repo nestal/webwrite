@@ -35,11 +35,10 @@ public :
 	/// a path to the resource relative to the "wb-root"
 	const fs::path& Path() const ;
 
-	fs::path DataPath() const ;
-
 	fs::path ReDirPath() const ;
-	
 	fs::path UrlPath() const ;
+	fs::path DataPath() const ;
+	fs::path AtticPath() const ;
 	
 	/// The "filename" in the URL (i.e. the string after the last slash)
 	std::string Filename() const ;
