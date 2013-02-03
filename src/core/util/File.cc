@@ -266,4 +266,18 @@ void File::UnMap( void *addr, std::size_t length )
 #endif
 }
 
+struct stat File::Stat() const
+{
+	struct stat result = {} ;
+	if ( ::fstat( m_fd, &result ) != 0 )
+	{
+		BOOST_THROW_EXCEPTION(
+			Error()
+				<< boost::errinfo_api_function("fstat")
+				<< boost::errinfo_errno(errno)
+		) ;
+	}
+	return result ;
+}
+
 } // end of namespace

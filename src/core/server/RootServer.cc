@@ -35,6 +35,8 @@
 #include <set>
 #include <sstream>
 
+#include <sys/stat.h>
+
 namespace wb {
 
 RootServer::RootServer( ) :
@@ -106,6 +108,20 @@ void RootServer::Load( Request *req, const Resource& res )
 		ServeFile( req, m_lib_redir / "newpage.html" ) ;
 }
 
+void RootServer::FilterHTML( DataStream *html, const Resource& res )
+{
+	fs::path file = res.DataPath() ;
+	
+	HTMLStreamFilter filter;
+	
+	fs::create_directories( file.parent_path() ) ;
+	File dest( file, 0600 ) ;
+	filter.Parse( html, &dest ) ;
+	
+	struct stat s = dest.Stat() ;
+	res.SaveMeta( s.st_mtime ) ;
+}
+
 void RootServer::Save( Request *req, const Resource& res )
 {
 	fs::path file = res.DataPath() ;
@@ -113,15 +129,8 @@ void RootServer::Save( Request *req, const Resource& res )
 
 	res.MoveToAttic() ;
 	
-	fs::create_directories( file.parent_path() ) ;
-	
 	// read and save the file
-	{
-		HTMLStreamFilter filter;
-		File f( file, 0600 ) ;
-		filter.Parse( req->In(), &f ) ;
-		res.SaveMeta( std::time(0) ) ;
-	}
+	FilterHTML( req->In(), res ) ;
 
 	std::size_t size = fs::file_size(file) ;
 	if ( size == 0 )

@@ -26,6 +26,8 @@
 
 #include <string>
 
+struct stat ;
+
 namespace wb {
 
 /**	\brief	A wrapper class for file read/write.
@@ -63,7 +65,9 @@ public :
 
 	void* Map( off_t offset, std::size_t length ) ;
 	static void UnMap( void *addr, std::size_t length ) ;
-	
+
+	struct stat Stat() const ;
+
 private :
 	void Open( const fs::path& path, int flags, int mode ) ;
 	

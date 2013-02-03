@@ -28,6 +28,7 @@
 namespace wb {
 
 class Request ;
+class DataStream ;
 
 class RootServer
 {
@@ -55,6 +56,8 @@ private :
 	// other helpers
 	static std::string GenerateMimeCss( ) ;
 	void ServeFile( Request *req, const fs::path& path ) ;
+
+	void FilterHTML( DataStream *html, const Resource& res ) ;
 
 private :
 	// configuration parameters
