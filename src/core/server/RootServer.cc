@@ -64,15 +64,6 @@ RootServer::RootServer( ) :
 	post.Add( "upload",	&RootServer::Upload ) ;
 }
 
-int RootServer::ReadOptionalIntConfig( const std::string& base, const std::string& item, int def_value )
-{
-	Json base_json, item_json;
-
-	return ( cfg::Inst().Get( base, base_json ) && base_json.Get( item, item_json ) )
-		? item_json.Int()
-		: def_value ;
-}
-
 void RootServer::Work( Request *req, const Resource& res ) 
 {
 	fs::path	rel		= res.Path() ;

@@ -55,7 +55,6 @@ private :
 	// other helpers
 	static std::string GenerateMimeCss( ) ;
 	void ServeFile( Request *req, const fs::path& path ) ;
-	static int ReadOptionalIntConfig( const std::string& base, const std::string& item, int def_value = 0 ) ;
 
 private :
 	// configuration parameters
