@@ -57,6 +57,7 @@ RootServer::RootServer( ) :
 	get.Add( "index",	&RootServer::ServeIndex ) ;
 	get.Add( "load",	&RootServer::Load ) ;
 	get.Add( "lib",		&RootServer::ServeLib ) ;
+	get.Add( "prop",	&RootServer::ServeProperties ) ;
 
 	// handlers for POST requests
 	Query<Handler>& post = m_srv.insert( std::make_pair( 
@@ -280,6 +281,19 @@ std::string RootServer::GenerateMimeCss( )
 	ss << "\r\n\r\n" ;
 	
 	return ss.str() ;
+}
+
+void RootServer::ServeProperties( Request *req, const Resource& res )
+{
+	PrintF fmt = req->Fmt() ;
+	fmt( "Cache-Control: max-age=%1%\r\n", 0 ) ;
+	fmt( "Content-type: application/json\r\n\r\n" ) ;
+	
+	Json meta = res.Meta() ;
+	meta.Add( "name", Json(res.Name()) ) ;
+	meta.Write( req->Out() ) ;
+	
+	fmt( "\r\n\r\n" ) ;
 }
 
 } // end of namespace

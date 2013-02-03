@@ -48,6 +48,7 @@ private :
 	void ServeIndex( Request *req, const Resource& res ) ;
 	void Load( Request *req, const Resource& res ) ;
 	void ServeMimeCss( Request *req, const Resource& res ) ;
+	void ServeProperties( Request *req, const Resource& res ) ;
 	
 	// POST requests
 	void Save( Request *req, const Resource& res ) ;
