@@ -58,6 +58,7 @@ add_definitions(
 
 # build bfd classes if libbfd is found
 if ( BFD_FOUND )
+	message( "found libbfd in ${BFD_LIBRARY}" )
 	set( OPT_LIBS   ${DL_LIBRARY} ${BFD_LIBRARY} )
 	file( GLOB_RECURSE OPT_SRC
 		${webwrite_SOURCE_DIR}/src/opt/bfd/*.cc

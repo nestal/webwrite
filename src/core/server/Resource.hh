@@ -22,7 +22,11 @@
 #include "util/FileSystem.hh"
 #include "util/Exception.hh"
 
+#include <ctime>
+
 namespace wb {
+
+class Json ;
 
 class Resource
 {
@@ -39,6 +43,7 @@ public :
 	fs::path UrlPath() const ;
 	fs::path DataPath() const ;
 	fs::path AtticPath() const ;
+	fs::path MetaPath() const ;
 	
 	/// The "filename" in the URL (i.e. the string after the last slash)
 	std::string Filename() const ;
@@ -49,8 +54,13 @@ public :
 	
 	std::string Type() const ;
 
-	static std::string DecodeName( const std::string& uri ) ;
+	Json Meta() const ;
 
+	void SaveMeta( std::time_t modified ) const ;
+	void MoveToAttic() const ;
+
+	static std::string DecodeName( const std::string& uri ) ;
+	
 private :
 	fs::path		m_path ;
 } ;

@@ -19,6 +19,11 @@
 
 #include "Resource.hh"
 #include "Config.hh"
+#include "parser/Json.hh"
+#include "util/File.hh"
+#include "log/Log.hh"
+
+#include <boost/exception/diagnostic_information.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -110,9 +115,73 @@ fs::path Resource::AtticPath() const
 	return (cfg::Inst()["attic"]["path"].Str() / m_path).parent_path() ;
 }
 
+fs::path Resource::MetaPath() const
+{
+	return cfg::Inst()["meta"]["path"].Str() / m_path ;
+}
+
 std::string Resource::Type() const
 {
 	return cfg::MimeType( Path() ) ;
+}
+
+Json Resource::Meta() const
+{
+	fs::path file = cfg::Inst()["meta"]["path"].Str() / m_path ;
+	Json meta ;
+	
+	try
+	{
+		meta = Json::ParseFile( file.string() ) ;
+	}
+	catch ( Exception& e )
+	{
+		boost::system::error_code ec ;
+
+		std::time_t write_time = fs::last_write_time( DataPath(), ec ) ;
+		if ( ec )
+			write_time = std::time(0) ;
+		
+		meta.Add( "last-modified", Json(write_time) ) ;
+	}
+	
+	return meta ;
+}
+
+void Resource::SaveMeta(std::time_t modified) const
+{
+	fs::path file = cfg::Inst()["meta"]["path"].Str() / m_path ;
+	fs::create_directories( file.parent_path() ) ;
+	
+	Json meta = Meta() ;
+	Log( "last modified = %1%", meta["last-modified"] ) ;
+	meta["last-modified"] = Json(modified) ;
+	Log( "last modified = %1%", meta["last-modified"] ) ;
+
+	File out( file, 0600 ) ;
+	meta.Write( out ) ; 
+}
+
+/**	Move the resource to attic. This function will deduce the name of
+	the file in attic. 
+*/
+void Resource::MoveToAttic() const
+{
+	// create the directory in the attic first
+	fs::path attic = AtticPath() ;
+	fs::create_directories( attic ) ;
+
+	// use the last modification time to name the file
+	Json meta = Meta() ;
+	int modified = meta["last-modified"].Int() ;
+	
+	// move file. ignore any error
+	boost::format attic_fn( "%1%-%2%" ) ;
+	boost::system::error_code oops ;
+	fs::path dest = attic / (attic_fn % Filename() % modified).str() ;	
+	fs::rename( DataPath(), dest, oops ) ;
+
+	Log( "moving to %1%", dest ) ;
 }
 
 } // end of namespace

@@ -108,25 +108,17 @@ void RootServer::Load( Request *req, const Resource& res )
 
 void RootServer::Save( Request *req, const Resource& res )
 {
-	fs::path file = res.DataPath(), attic = res.AtticPath() ;
+	fs::path file = res.DataPath() ;
 	Log( "writing to file %1%", file, log::verbose ) ;
 
-	boost::format attic_fn( "%1%-%2%" ) ;
-
-	// backup old file
-	boost::system::error_code oops ;
-	fs::create_directories( attic ) ;
-	fs::rename( file, attic /
-		(attic_fn % file.filename().string() % std::time(0)).str(),
-		oops ) ;
-	if ( oops )
-		Log( "Cannot create attic file %1%", oops.message() ) ;
-	
 	fs::create_directories( file.parent_path() ) ;
 	File f( file, 0600 ) ;
 	
 	HTMLStreamFilter filter;
 	filter.Parse( req->In(), &f ) ;
+
+	res.MoveToAttic() ;
+	res.SaveMeta( std::time(0) ) ;
 
 	// ask client to load the new content again
 	req->SeeOther( res.UrlPath().generic_string() + "?load" ) ;

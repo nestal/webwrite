@@ -14,6 +14,7 @@
 	"lib"		: { "path": "lib",  	"redir": "/wb/lib" },
 	"data"		: { "path": "data", 	"redir": "/wb/data" },
 	"attic"		: { "path": "attic",	"redir": "/wb/attic" },
+	"meta"		: { "path": "meta",		"redir": "/wb/meta" },
 	
 	"mime"		:
 	{
