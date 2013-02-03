@@ -60,6 +60,8 @@ private :
 
 	void FilterHTML( DataStream *html, const Resource& res ) ;
 
+	static std::string CssMimeType( const std::string& type ) ;
+
 private :
 	// configuration parameters
 	fs::path	m_lib_redir ;

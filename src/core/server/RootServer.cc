@@ -220,9 +220,7 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 				(res.UrlPath().parent_path() /
 				di->path().filename()).string() ) ;
 
-			std::string type = sibling.Type() ;
-			std::replace( type.begin(), type.end(), '/', '-' ) ;
-			std::replace( type.begin(), type.end(), '+', '-' ) ;
+			std::string type = CssMimeType(sibling.Type()) ;
 
 			fmt( "<li class=\"%1% menu_idx\"><a href=\"%2%\">%3%</a></li>",
 				(fs::is_directory( di->path() ) ? "inode-directory" : type),
@@ -256,13 +254,7 @@ std::string RootServer::GenerateMimeCss( )
 	// generate a unique list of configured mime type 
 	Json::Object mime = cfg::Inst()["mime"].AsObject() ;
 	for ( Json::Object::iterator i = mime.begin() ; i != mime.end() ; ++i )
-	{
-		std::string type = i->second.Str() ;
-		std::replace( type.begin(), type.end(), '/', '-' ) ;
-		std::replace( type.begin(), type.end(), '+', '-' ) ;
-		
-		mime_set.insert( type ) ;
-	}
+		mime_set.insert( CssMimeType(i->second.Str()) ) ;
 	
 	for ( std::set<std::string>::iterator i = mime_set.begin() ; i != mime_set.end() ; ++i )
 	{
@@ -283,6 +275,14 @@ std::string RootServer::GenerateMimeCss( )
 	return ss.str() ;
 }
 
+std::string RootServer::CssMimeType( const std::string& mime )
+{
+	std::string type( mime ) ;
+	std::replace( type.begin(), type.end(), '/', '-' ) ;
+	std::replace( type.begin(), type.end(), '+', '-' ) ;
+	return type ;
+}
+
 void RootServer::ServeProperties( Request *req, const Resource& res )
 {
 	PrintF fmt = req->Fmt() ;
@@ -291,6 +291,7 @@ void RootServer::ServeProperties( Request *req, const Resource& res )
 	
 	Json meta = res.Meta() ;
 	meta.Add( "name", Json(res.Name()) ) ;
+	meta.Add( "type", Json(CssMimeType(res.Type())) ) ;
 	meta.Write( req->Out() ) ;
 	
 	fmt( "\r\n\r\n" ) ;
