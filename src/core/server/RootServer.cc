@@ -114,12 +114,21 @@ void RootServer::Save( Request *req, const Resource& res )
 	res.MoveToAttic() ;
 	
 	fs::create_directories( file.parent_path() ) ;
-	File f( file, 0600 ) ;
 	
-	HTMLStreamFilter filter;
-	filter.Parse( req->In(), &f ) ;
+	// read and save the file
+	{
+		HTMLStreamFilter filter;
+		File f( file, 0600 ) ;
+		filter.Parse( req->In(), &f ) ;
+		res.SaveMeta( std::time(0) ) ;
+	}
 
-	res.SaveMeta( std::time(0) ) ;
+	std::size_t size = fs::file_size(file) ;
+	if ( size == 0 )
+	{
+		Log( "oops.. an empty file %1%", file ) ;
+		fs::remove(file) ;
+	}
 
 	// ask client to load the new content again
 	req->SeeOther( res.UrlPath().generic_string() + "?load" ) ;
