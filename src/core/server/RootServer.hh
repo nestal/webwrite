@@ -79,10 +79,11 @@ private :
 	{
 		Function			func ;
 		volatile unsigned	count ;
-		volatile unsigned	elapse ;
+		volatile unsigned	elapse_sec ;
+		volatile unsigned	elapse_nsec ;
 		
 		explicit Handler( const Function& f = Function())
-			: func(f), count(0), elapse(0) {};
+			: func(f), count(0), elapse_sec(0), elapse_nsec(0) {};
 	} ;
 	typedef std::map<std::string, Query<Handler> >	Map ;
 	Map	m_srv ;

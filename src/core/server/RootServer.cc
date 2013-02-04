@@ -94,9 +94,8 @@ void RootServer::Work( Request *req, const Resource& res )
 			assert( !h.func.empty() ) ;
 			h.func( this, req, res ) ;
 			cpu_times 		elapsed = timer.elapsed() ;
-			nanosecond_type nano	= (elapsed.system + elapsed.user) / 1000000 ;
-			
-			atomic_add32( &h.elapse, static_cast<unsigned>(nano) ) ;
+			atomic_add32( &h.elapse_sec,  static_cast<unsigned>(elapsed.wall / 1000000000) ) ;
+			atomic_add32( &h.elapse_nsec, static_cast<unsigned>(elapsed.wall % 1000000000) ) ;
 		}
 		else
 			NotFound( req ) ;
@@ -323,11 +322,12 @@ void RootServer::ServeStats( Request *req, const Resource& res )
 		{
 			// avoid volatile-ness
 			boost::uint64_t count  = i->second.count ;
-			boost::uint64_t elapse = i->second.elapse ;
+			double elapse = i->second.elapse_sec + i->second.elapse_nsec / 1000000000.0 ;
 		
 			Json j ;
 			j.Add( "count", Json( count ) ) ;
 			j.Add( "elapse", Json( elapse ) ) ;
+			j.Add( "average", Json( count == 0 ? 0 : elapse / count ) ) ;
 			srv.Add( i->first, j ) ;
 		}
 		result.Add( s->first, srv ) ;
