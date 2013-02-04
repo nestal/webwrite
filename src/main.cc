@@ -125,7 +125,7 @@ int main( int argc, char **argv )
 		RootServer srv ;
 		boost::mutex accept_mutex ;
 
-		for ( std::size_t i = 0 ; i < 5 ; i++ )
+		for ( std::size_t i = 0 ; i < Cfg::Inst().thread ; i++ )
 		{
 			boost::thread *t = new boost::thread(boost::bind( &Thread, sock, &srv, &accept_mutex )) ;
 			threads.push_back( t ) ;

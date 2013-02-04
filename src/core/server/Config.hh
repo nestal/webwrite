@@ -64,6 +64,11 @@ struct Cfg
 	
 	std::string		main_page ;
 
+	/**	Number of worker threads lauched by WebWrite. Natural it should be 
+		set to the number of CPUs + 2.
+	*/
+	std::size_t		thread ;
+
 	struct PathCfg
 	{
 		fs::path	path ;

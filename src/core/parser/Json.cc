@@ -244,6 +244,12 @@ bool Json::Is<bool>() const
 	return ::json_object_is_type( m_json, json_type_boolean ) == TRUE ;
 }
 
+template <>
+bool Json::As<bool>() const
+{
+	return Bool() ;
+}
+
 std::string Json::Str() const
 {
 	assert( m_json != 0 ) ;
@@ -257,6 +263,12 @@ bool Json::Is<std::string>() const
 	return ::json_object_is_type( m_json, json_type_string ) == TRUE ;
 }
 
+template <>
+std::string Json::As<std::string>() const
+{
+	return Str() ;
+}
+
 int Json::Int() const
 {
 	assert( m_json != 0 ) ;
@@ -268,6 +280,12 @@ bool Json::Is<int>() const
 {
 	assert( m_json != 0 ) ;
 	return ::json_object_is_type( m_json, json_type_int ) == TRUE ;
+}
+
+template <>
+int Json::As<int>() const
+{
+	return Int() ;
 }
 
 std::ostream& operator<<( std::ostream& os, const Json& json )
@@ -309,6 +327,12 @@ bool Json::Is<Json::Object>() const
 	return ::json_object_is_type( m_json, json_type_object ) == TRUE ;
 }
 
+template <>
+Json::Object Json::As<Json::Object>() const
+{
+	return AsObject() ;
+}
+
 Json::Array Json::AsArray() const
 {
 	std::size_t count = ::json_object_array_length( m_json ) ;
@@ -325,6 +349,12 @@ bool Json::Is<Json::Array>() const
 {
 	assert( m_json != 0 ) ;
 	return ::json_object_is_type( m_json, json_type_array ) == TRUE ;
+}
+
+template <>
+Json::Array Json::As<Json::Array>() const
+{
+	return AsArray() ;
 }
 
 ///	Finds an element in the array.

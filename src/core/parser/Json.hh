@@ -73,6 +73,9 @@ public :
 	template <typename T>
 	bool Is() const ;
 	
+	template <typename T>
+	T As() const ;
+	
 	bool Has( const std::string& key ) const ;
 	bool Get( const std::string& key, Json& json ) const ;
 	void Add( const std::string& key, const Json& json ) ;

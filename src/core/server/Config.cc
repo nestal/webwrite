@@ -37,14 +37,16 @@ namespace
 		return result ;
 	}
 	
-	std::string Optional(
+	template <typename T>
+	T Optional(
 		const Json&			json,
 		const std::string&	key,
-		const std::string&	def = "" )
+		const T&			def )
 	{
 		Json result ;
-		return json.Get(key, result) ? result.Str() : def ;
+		return json.Get(key, result) ? result.As<T>() : def ;
 	}
+	
 } // end of local namespace
 
 std::string Cfg::MimeType( const fs::path& file )
@@ -61,10 +63,11 @@ const Cfg& Cfg::Inst( const Json& json )
 {
 	static const Cfg inst =
 	{
-		Optional( json, "name", "WebWrite" ),
-		Optional( json, "socket" ),
+		Optional<std::string>( json, "name",		"WebWrite" ),
+		Optional<std::string>( json, "socket",	"" ),
 		json["wb_root"].Str(),
-		Optional( json, "main_page", "main" ),
+		Optional<std::string>( json, "main_page", "main" ),
+		Optional( json, "thread", 5 ),
 		
 		{
 			json["lib"]["path"].Str(),

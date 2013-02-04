@@ -81,6 +81,12 @@ body div.torso
 	font-family: 	Helvetica, Arial, Verdana;
 }
 
+.rich tt
+{
+	font-family:	Monaco, monospace;
+	font-size:		90%;
+}
+
 div#menu
 {
 	overflow:	hidden;

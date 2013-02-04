@@ -2,7 +2,8 @@
 	"wb_root"	: "/webwrite",
  	"name"		: "TestWrite",
   	"socket"	: ":9000",
-	
+	"thread"	: 5,
+  	
 	"lib"		: { "path": "lib",  	"redir": "/wb/lib" },
 	"data"		: { "path": "data", 	"redir": "/wb/data" },
 	"attic"		: { "path": "attic",	"redir": "/wb/attic" },

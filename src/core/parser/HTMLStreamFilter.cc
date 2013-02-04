@@ -41,7 +41,7 @@ namespace
 		"body",	"br",	"pre",
 		"div",	"b",	"strong",
 		"span",	"u",	"em",
-		"p",
+		"p",	"tt",
 		
 		"h1",	"ul",	"dd",	"table",
 		"h2",	"ol",			"tbody",
