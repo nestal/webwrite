@@ -19,6 +19,8 @@
 
 #include "DefaultLog.hh"
 
+#include <boost/thread/locks.hpp>
+
 #include <cassert>
 #include <iostream>
 
@@ -39,6 +41,8 @@ DefaultLog::DefaultLog( const std::string& filename ) :
 
 void DefaultLog::Log( const log::Fmt& msg, log::Serverity s )
 {
+	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
+
 	if ( IsEnabled(s) )
 	{
 		switch ( s )

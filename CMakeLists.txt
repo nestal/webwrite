@@ -36,7 +36,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(Boost_USE_MULTITHREADED ON )
 set(Boost_DETAILED_FAILURE_MSG ON )
 
-find_package(Boost COMPONENTS filesystem system regex date_time unit_test_framework REQUIRED )
+find_package(Boost COMPONENTS filesystem system regex date_time thread chrono unit_test_framework REQUIRED )
 find_package(JSONC REQUIRED)
 find_package(FCGI REQUIRED)
 find_package(BFD)

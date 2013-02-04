@@ -20,6 +20,7 @@
 #pragma once
 
 #include "CommonLog.hh"
+#include <boost/thread/mutex.hpp>
 
 #include <fstream>
 #include <string>
@@ -37,6 +38,7 @@ public :
 private :
 	std::ofstream	m_file ;
 	std::ostream&	m_log ;
+	mutable boost::mutex	m_mutex ;
 } ;
 
 } } // end of namespace

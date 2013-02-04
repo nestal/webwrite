@@ -133,7 +133,7 @@ void FCGIRequest::NotFound( const std::string& message )
 {
 	FCGX_FPrintF( m_req->out,
 		"Status: 404 Not Found\r\n\r\n"
-		"<html><body>%s</body></html>",
+		"<html><body>%s</body></html>\r\n\r\n",
 		message.c_str() ) ;
 }
 

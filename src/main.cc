@@ -31,6 +31,9 @@
 #include "util/CArray.hh"
 
 #include <boost/exception/all.hpp>
+#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/bind.hpp>
 
 #include <fcgiapp.h>
 
@@ -75,6 +78,35 @@ void InitLog( )
 	LogBase::Inst( std::auto_ptr<LogBase>(comp_log.release()) ) ;
 }
 
+void Thread( int sock, RootServer *srv, boost::mutex *mutex )
+{
+	FCGX_Request request ;
+	FCGX_InitRequest( &request, sock, 0 ) ;
+
+	while ( true )
+	{
+		mutex->lock() ;
+		int r = FCGX_Accept_r( &request ) ;
+		mutex->unlock() ;
+		if ( r < 0 )
+		{
+			Log( "oops %1%", r ) ;
+			break ;
+		}
+
+		std::clock_t start = std::clock() ;
+		
+		FCGIRequest req( &request ) ;
+		std::string uri = req.URI() ;
+		srv->Work( &req, Resource( req.SansQueryURI() ) ) ;
+
+		FCGX_Finish_r( &request ) ;
+
+		std::clock_t duration = std::clock() - start ;
+		Log( "request %1% finished in %2% milliseconds", uri, duration * 1000.0 / CLOCKS_PER_SEC ) ;
+	}
+}
+
 int main( int argc, char **argv )
 {
 	try
@@ -83,26 +115,20 @@ int main( int argc, char **argv )
 		cfg::Inst( Json::Parse( &cfg_file ) ) ;
 		InitLog( ) ;
 		
-		RootServer srv ;
-		
-		FCGX_Request request ;
-
 		FCGX_Init() ;
-		FCGX_InitRequest( &request, FCGX_OpenSocket( cfg::Inst()["socket"].Str().c_str(), 0 ), 0 ) ;
+		int sock = FCGX_OpenSocket( cfg::Inst()["socket"].Str().c_str(), 0 ) ;
 
-		int r ;
-		while ( (r = FCGX_Accept_r( &request )) == 0 )
-		{
-			std::clock_t start = std::clock() ;
-		
-			FCGIRequest req( &request ) ;
-			Log( "requesting: %1%", req.URI(), log::verbose ) ;
-			srv.Work( &req, Resource( req.SansQueryURI() ) ) ;
-			FCGX_Finish_r( &request ) ;
-			
-			std::clock_t duration = std::clock() - start ;
-			Log( "request finished in %1% milliseconds", duration * 1000.0 / CLOCKS_PER_SEC ) ;
-		}
+		std::vector<boost::thread> threads ;
+
+		RootServer srv ;
+		boost::mutex accept_mutex ;
+
+		for ( std::size_t i = 0 ; i < 5 ; i++ )
+			threads.push_back( boost::thread(boost::bind( &Thread, sock, &srv, &accept_mutex )) ) ;
+
+		for ( std::vector<boost::thread>::iterator i = threads.begin() ;
+			i != threads.end() ; ++i )
+			i->join() ;
 	}
 	catch ( Exception& e )
 	{

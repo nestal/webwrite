@@ -20,6 +20,7 @@
 #pragma once
 
 #include "util/Exception.hh"
+#include <boost/thread/mutex.hpp>
 
 #include <string>
 #include <map>
@@ -94,8 +95,8 @@ private :
 	Json( struct json_object *json, NotOwned ) ;
 	
 private :
-public :
 	struct json_object	*m_json ;
+	mutable boost::mutex		m_mutex ;
 } ;
 
 }

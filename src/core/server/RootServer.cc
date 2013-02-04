@@ -154,7 +154,7 @@ void RootServer::Upload( Request *req, const Resource& res )
 
 void RootServer::ServeLib( Request *req, const Resource& res )
 {
-	static const boost::regex re( "lib=(.+)" ) ;
+	const boost::regex re( "lib=(.+)" ) ;
 	boost::smatch m ;
 	
 	// must make a copy before calling regex_search
