@@ -30,6 +30,7 @@
 
 #include <boost/regex.hpp>
 #include <boost/bind.hpp>
+#include <boost/timer/timer.hpp>
 
 #include <ctime>
 #include <set>
@@ -81,14 +82,21 @@ void RootServer::Work( Request *req, const Resource& res )
 		Map::iterator i = m_srv.find( req->Method() ) ;
 		if ( i != m_srv.end() )
 		{
+			using boost::timer::cpu_timer;
+			using boost::timer::cpu_times;
+			using boost::timer::nanosecond_type;
+			
 			Handler& h = i->second.Parse( qstr ) ;
 			
 			atomic_inc32(&h.count) ;
 			
-			std::clock_t start = std::clock() ;
+			cpu_timer timer;
 			assert( !h.func.empty() ) ;
 			h.func( this, req, res ) ;
-			atomic_add32( &h.elapse, (std::clock() - start) * 1000 / CLOCKS_PER_SEC ) ;
+			cpu_times 		elapsed = timer.elapsed() ;
+			nanosecond_type nano	= (elapsed.system + elapsed.user) / 1000000 ;
+			
+			atomic_add32( &h.elapse, static_cast<unsigned>(nano) ) ;
 		}
 		else
 			NotFound( req ) ;
