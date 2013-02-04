@@ -24,6 +24,8 @@
 #include <json/json_tokener.h>
 #include <json/linkhash.h>
 
+#include <boost/cstdint.hpp>
+
 #include <cassert>
 #include <cstring>
 #include <iostream>
@@ -59,7 +61,7 @@ Json::Json( const std::string& str ) :
 }
 
 template <>
-Json::Json( const int& l ) :
+Json::Json( const boost::int32_t& l ) :
 	m_json( ::json_object_new_int( l ) )
 {
 	if ( m_json == 0 )
@@ -67,7 +69,7 @@ Json::Json( const int& l ) :
 }
 
 template <>
-Json::Json( const long& l ) :
+Json::Json( const boost::int64_t& l ) :
 	m_json( ::json_object_new_int( static_cast<int>(l) ) )
 {
 	if ( m_json == 0 )
@@ -75,7 +77,15 @@ Json::Json( const long& l ) :
 }
 
 template <>
-Json::Json( const unsigned long& l ) :
+Json::Json( const boost::uint32_t& l ) :
+	m_json( ::json_object_new_int( static_cast<int>(l) ) )
+{
+	if ( m_json == 0 )
+		BOOST_THROW_EXCEPTION( Error() << expt::ErrMsg( "cannot create json int" ) ) ;
+}
+
+template <>
+Json::Json( const boost::uint64_t& l ) :
 	m_json( ::json_object_new_int( static_cast<int>(l) ) )
 {
 	if ( m_json == 0 )
