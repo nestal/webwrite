@@ -55,4 +55,33 @@ std::string MimeType( const fs::path& file )
 		(cfg::Inst()["mime"].Get(ext, r) ? r.Str() : "application/octet-stream")) ;
 }
 
-}} // end of namespace
+} // end of namespace cfg
+
+const Cfg& Cfg::Inst( const Json& json )
+{
+	static const Cfg inst =
+	{
+		json["name"].Str(),
+		json["socket"].Str(),
+		json["wb_root"].Str(),
+		{
+			json["lib"]["path"].Str(),
+			json["lib"]["redir"].Str(),
+		},
+		{
+			json["data"]["path"].Str(),
+			json["data"]["redir"].Str(),
+		},
+		{
+			json["meta"]["path"].Str(),
+			json["meta"]["redir"].Str(),
+		},
+		{
+			json["attic"]["path"].Str(),
+			json["attic"]["redir"].Str(),
+		},
+	} ;
+	return inst ;
+}
+
+} // end of namespace wb

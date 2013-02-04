@@ -1,14 +1,6 @@
 {
-	// This is the name of the site. This string will be shown in the upper 
-	// left corner of the page.
  	"name"		: "WebWrite",
-	
- 	// The socket that WebWrite listens to. This must match with your FastCGI
-	// configuration of your web server.
- 	"socket"	: ":9000",
- 	
- 	// This is the path to WebWrite in the URI. If it is "/webwrite", then 
- 	// the URI of WebWrite will be http://example.com/webwrite.
+  	"socket"	: ":9000",
 	"wb_root"	: "/webwrite",
 	
 	"lib"		: { "path": "lib",  	"redir": "/wb/lib" },
@@ -31,12 +23,5 @@
 	{
 		"level"	: "debug",
 		"file"	: "webwrite.log"
-	},
-	
-	"cache"		:
-	{
-		"lib"	: 3600,			// library files caches longer
-		"data"	: 300,			// data files caches shorter
-		"index"	: 600,			// people don't create pages often, do they?
-	},
+	}
 }

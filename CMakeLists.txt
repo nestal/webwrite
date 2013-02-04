@@ -28,6 +28,7 @@ if ( WIN32 )
 
 	# disable msvc stupid warnings
 	add_definitions( -D_SCL_SECURE_NO_WARNINGS )
+
 endif ( WIN32 )
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")

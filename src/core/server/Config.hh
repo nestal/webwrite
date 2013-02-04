@@ -26,8 +26,7 @@
 
 namespace wb {
 
-/** 
-	\page	config	Configuration
+/**	\brief	Detailed configuration documentation
 	
 	The configuration file used by WebWrite is based on [JSON](http://www.json.org/).
 	This page documents the configuration items.
@@ -44,6 +43,57 @@ namespace wb {
 	
 	WebWrite is a FastCGI back-end. It communicates with the web server using
 	FastCGI protocol. 
+*/
+struct Cfg
+{
+	/**	This is the name of the site. This string will be shown in the upper 
+		left corner of the page. The default value is "WebWrite"
+	*/
+	std::string		name ;
+	
+	/**	The socket that WebWrite listens to. This must match with your FastCGI
+		configuration of your web server.
+	*/
+	std::string		socket ;
+
+	/**	This is the path to WebWrite in the URI. If it is "/webwrite", then 
+		the URI of WebWrite will be http://example.com/webwrite.
+	*/
+	std::string		wb_root ;
+
+	struct PathCfg
+	{
+		fs::path	path ;
+		fs::path	redir ;
+	} ;
+
+	/**	Path configuration for "lib" files. These files are not changed when
+		WebWrite is running.
+	*/
+	PathCfg 	lib ;
+	
+	/**	Path configuration for "data" files. This is where WebWrite stores the
+		the HTML for pages and other files. This is also the main directory
+		to backup.
+	*/
+	PathCfg 	data ;
+	
+	/**	Path configuration for files storing meta-data. Meta-data includes
+		last modification time or information like file owner.
+	*/
+	PathCfg 	meta ;
+
+	/**	Path configuration for files storing file history. When a page is modified
+		the old copy will be moved here.
+	*/
+	PathCfg 	attic ;
+	
+	static const Cfg& Inst( const Json& json = Json() ) ;
+} ;
+
+/** 
+	\page	config	Configuration
+	
 */
 namespace cfg
 {

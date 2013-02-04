@@ -113,22 +113,30 @@ int main( int argc, char **argv )
 	{
 		File cfg_file( argc < 2 ? "config.json" : argv[1] ) ;
 		cfg::Inst( Json::Parse( &cfg_file ) ) ;
+		File cfg_file2( argc < 2 ? "config.json" : argv[1] ) ;
+		Cfg::Inst( Json::Parse( &cfg_file2 ) ) ;
 		InitLog( ) ;
 		
 		FCGX_Init() ;
-		int sock = FCGX_OpenSocket( cfg::Inst()["socket"].Str().c_str(), 0 ) ;
+		int sock = FCGX_OpenSocket( Cfg::Inst().socket.c_str(), 0 ) ;
 
-		std::vector<boost::thread> threads ;
+		std::vector<boost::thread*> threads ;
 
 		RootServer srv ;
 		boost::mutex accept_mutex ;
 
 		for ( std::size_t i = 0 ; i < 5 ; i++ )
-			threads.push_back( boost::thread(boost::bind( &Thread, sock, &srv, &accept_mutex )) ) ;
-
-		for ( std::vector<boost::thread>::iterator i = threads.begin() ;
+		{
+			boost::thread *t = new boost::thread(boost::bind( &Thread, sock, &srv, &accept_mutex )) ;
+			threads.push_back( t ) ;
+		}
+		
+		for ( std::vector<boost::thread*>::iterator i = threads.begin() ;
 			i != threads.end() ; ++i )
-			i->join() ;
+		{
+			(*i)->join() ;
+			delete *i ;
+		}
 	}
 	catch ( Exception& e )
 	{
