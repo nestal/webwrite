@@ -28,6 +28,12 @@ namespace wb {
 template <typename T>
 class Query
 {
+private :
+	typedef std::map<std::string, T> Map ;
+
+public :
+	typedef typename Map::const_iterator	iterator ;
+
 public :
 	explicit Query( const T& def = T() ) : m_default( def )
 	{
@@ -38,16 +44,20 @@ public :
 		m_cb[param] = cb ;
 	}
 	
-	T Parse( const std::string& qstr ) const
+	T& Parse( const std::string& qstr )
 	{
 		std::string name = qstr.substr( 0, qstr.find_first_of( "&#=" ) ) ;
 		
-		typename Map::const_iterator i = m_cb.find( name ) ;
+		typename Map::iterator i = m_cb.find( name ) ;
 		return i != m_cb.end() ? i->second : m_default ;
 	}
+	
+	iterator begin() const { return m_cb.begin() ; }
+	iterator end() const { return m_cb.end() ; }
+
+	const T& Default() const { return m_default; }
 
 private :
-	typedef std::map<std::string, T> Map ;
 	Map	m_cb ;
 	T	m_default ;
 } ;

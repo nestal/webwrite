@@ -24,9 +24,9 @@
 #include "log/Log.hh"
 #include "parser/FormData.hh"
 #include "parser/HTMLStreamFilter.hh"
+#include "util/Atomic.hh"
 #include "util/File.hh"
 #include "util/PrintF.hh"
-#include "util/TeeStream.hh"
 
 #include <boost/regex.hpp>
 #include <boost/bind.hpp>
@@ -49,22 +49,23 @@ RootServer::RootServer( ) :
 	// handlers for GET requests
 	Query<Handler>& get = m_srv.insert( std::make_pair( 
 		"GET",
-		Query<Handler>(&RootServer::NotFound) ) ).first->second ;
+		Query<Handler>(Handler(&RootServer::NotFound)) ) ).first->second ;
 	
-	get.Add( "",		&RootServer::DefaultPage ) ;
-	get.Add( "mime",	&RootServer::ServeMimeCss ) ;
-	get.Add( "var",		&RootServer::ServeVar ) ;
-	get.Add( "index",	&RootServer::ServeIndex ) ;
-	get.Add( "load",	&RootServer::Load ) ;
-	get.Add( "lib",		&RootServer::ServeLib ) ;
-	get.Add( "prop",	&RootServer::ServeProperties ) ;
+	get.Add( "",		Handler(&RootServer::DefaultPage) ) ;
+	get.Add( "mime",	Handler(&RootServer::ServeMimeCss) ) ;
+	get.Add( "var",		Handler(&RootServer::ServeVar) ) ;
+	get.Add( "index",	Handler(&RootServer::ServeIndex) ) ;
+	get.Add( "load",	Handler(&RootServer::Load) ) ;
+	get.Add( "lib",		Handler(&RootServer::ServeLib) ) ;
+	get.Add( "prop",	Handler(&RootServer::ServeProperties) ) ;
+	get.Add( "stats",	Handler(&RootServer::ServeStats) ) ;
 
 	// handlers for POST requests
 	Query<Handler>& post = m_srv.insert( std::make_pair( 
 		"POST",
-		Query<Handler>(&RootServer::NotFound) ) ).first->second ;
-	post.Add( "save",	&RootServer::Save ) ;
-	post.Add( "upload",	&RootServer::Upload ) ;
+		Query<Handler>(Handler(&RootServer::NotFound)) ) ).first->second ;
+	post.Add( "save",	Handler(&RootServer::Save) ) ;
+	post.Add( "upload",	Handler(&RootServer::Upload) ) ;
 }
 
 void RootServer::Work( Request *req, const Resource& res ) 
@@ -77,12 +78,17 @@ void RootServer::Work( Request *req, const Resource& res )
 	{
 		std::string qstr	= req->Query() ;
 
-		Map::const_iterator i = m_srv.find( req->Method() ) ;
+		Map::iterator i = m_srv.find( req->Method() ) ;
 		if ( i != m_srv.end() )
 		{
-			Handler h = i->second.Parse( qstr ) ;
-			assert( !h.empty() ) ;
-			h( this, req, res ) ;
+			Handler& h = i->second.Parse( qstr ) ;
+			
+			atomic_inc32(&h.count) ;
+			
+			std::clock_t start = std::clock() ;
+			assert( !h.func.empty() ) ;
+			h.func( this, req, res ) ;
+			atomic_add32( &h.elapse, (std::clock() - start) * 1000 / CLOCKS_PER_SEC ) ;
 		}
 		else
 			NotFound( req ) ;
@@ -294,6 +300,35 @@ void RootServer::ServeProperties( Request *req, const Resource& res )
 	meta.Add( "type", Json(CssMimeType(res.Type())) ) ;
 	meta.Write( req->Out() ) ;
 	
+	fmt( "\r\n\r\n" ) ;
+}
+
+void RootServer::ServeStats( Request *req, const Resource& res )
+{
+	Json result ;
+	for ( Map::const_iterator s = m_srv.begin(); s != m_srv.end() ; ++s )
+	{
+		const Query<Handler>& q = s->second ;
+	
+		Json srv ;
+		for ( Query<Handler>::iterator i = q.begin() ; i != q.end() ; ++i )
+		{
+			// avoid volatile-ness
+			boost::uint64_t count  = i->second.count ;
+			boost::uint64_t elapse = i->second.elapse ;
+		
+			Json j ;
+			j.Add( "count", Json( count ) ) ;
+			j.Add( "elapse", Json( elapse ) ) ;
+			srv.Add( i->first, j ) ;
+		}
+		result.Add( s->first, srv ) ;
+	}
+	
+	PrintF fmt = req->Fmt() ;
+	fmt( "Cache-Control: max-age=%1%\r\n", 0 ) ;
+	fmt( "Content-type: application/json\r\n\r\n" ) ;
+	result.Write( req->Out() ) ;
 	fmt( "\r\n\r\n" ) ;
 }
 

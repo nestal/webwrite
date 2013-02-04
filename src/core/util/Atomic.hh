@@ -20,13 +20,10 @@
 
 #pragma once
 
+#include <boost/interprocess/detail/atomic.hpp>
+
 namespace wb {
 
-class Stats
-{
-public :
-	Stats( ) ;
-} ;
+using namespace boost::interprocess::ipcdetail ;
 
 } // end of namespace
-

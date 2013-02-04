@@ -49,6 +49,7 @@ private :
 	void Load( Request *req, const Resource& res ) ;
 	void ServeMimeCss( Request *req, const Resource& res ) ;
 	void ServeProperties( Request *req, const Resource& res ) ;
+	void ServeStats( Request *req, const Resource& res ) ;
 	
 	// POST requests
 	void Save( Request *req, const Resource& res ) ;
@@ -73,7 +74,16 @@ private :
 	std::string m_mime_css ;
 
 	// query string parser
-	typedef boost::function<void (RootServer*, Request*, const Resource&)> Handler ;
+	typedef boost::function<void (RootServer*, Request*, const Resource&)> Function ;
+	struct Handler
+	{
+		Function			func ;
+		volatile unsigned	count ;
+		volatile unsigned	elapse ;
+		
+		explicit Handler( const Function& f = Function())
+			: func(f), count(0), elapse(0) {};
+	} ;
 	typedef std::map<std::string, Query<Handler> >	Map ;
 	Map	m_srv ;
 } ;

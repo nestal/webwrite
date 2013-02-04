@@ -25,7 +25,6 @@
 #include <json/linkhash.h>
 
 #include <boost/cstdint.hpp>
-#include <boost/thread/locks.hpp>
 
 #include <cassert>
 #include <cstring>
@@ -59,6 +58,15 @@ Json::Json( const std::string& str ) :
 }
 
 template <>
+Json::Json( const double& val ) :
+	m_json( ::json_object_new_double( val ) )
+{
+	if ( m_json == 0 )
+		BOOST_THROW_EXCEPTION( 
+			Error() << expt::ErrMsg( "cannot create json double" ) ) ;
+}
+
+template <>
 Json::Json( const boost::int32_t& l ) :
 	m_json( ::json_object_new_int( l ) )
 {
@@ -68,10 +76,10 @@ Json::Json( const boost::int32_t& l ) :
 
 template <>
 Json::Json( const boost::int64_t& l ) :
-	m_json( ::json_object_new_int( static_cast<int>(l) ) )
+	m_json( ::json_object_new_int64( l ) )
 {
 	if ( m_json == 0 )
-		BOOST_THROW_EXCEPTION( Error() << expt::ErrMsg( "cannot create json int" ) ) ;
+		BOOST_THROW_EXCEPTION( Error() << expt::ErrMsg( "cannot create json int64" ) ) ;
 }
 
 template <>
@@ -84,10 +92,10 @@ Json::Json( const boost::uint32_t& l ) :
 
 template <>
 Json::Json( const boost::uint64_t& l ) :
-	m_json( ::json_object_new_int( static_cast<int>(l) ) )
+	m_json( ::json_object_new_int64( l ) )
 {
 	if ( m_json == 0 )
-		BOOST_THROW_EXCEPTION( Error() << expt::ErrMsg( "cannot create json int" ) ) ;
+		BOOST_THROW_EXCEPTION( Error() << expt::ErrMsg( "cannot create json int64" ) ) ;
 }
 
 template <>
