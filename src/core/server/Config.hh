@@ -23,6 +23,7 @@
 #include "util/FileSystem.hh"
 
 #include <string>
+#include <map>
 
 namespace wb {
 
@@ -60,6 +61,8 @@ struct Cfg
 		the URI of WebWrite will be http://example.com/webwrite.
 	*/
 	std::string		wb_root ;
+	
+	std::string		main_page ;
 
 	struct PathCfg
 	{
@@ -88,20 +91,19 @@ struct Cfg
 	*/
 	PathCfg 	attic ;
 	
+	struct Log
+	{
+		std::string	level ;
+		std::string	file ;
+	} log ;
+	
+	typedef std::map<fs::path,	std::string> MimeMap ;
+	MimeMap mime ;
+	
+	static std::string MimeType( const fs::path& ext ) ;
+	
+	/// Singleton object for easy access everywhere
 	static const Cfg& Inst( const Json& json = Json() ) ;
-} ;
-
-/** 
-	\page	config	Configuration
-	
-*/
-namespace cfg
-{
-	const Json& Inst( const Json& json = Json() ) ;
-	
-	fs::path Path( const std::string& cfg ) ;
-	
-	std::string MimeType( const fs::path& file ) ;
 } ;
 
 } // end of namespace

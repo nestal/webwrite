@@ -40,10 +40,10 @@
 namespace wb {
 
 RootServer::RootServer( ) :
-	m_lib_redir	( cfg::Inst()["lib"]["redir"].Str() ),
-	m_data_path	( cfg::Inst()["data"]["path"].Str() ),
-	m_wb_root	( cfg::Inst()["wb_root"].Str() ),
-	m_main_page	( cfg::Inst()["main_page"].Str() ),
+	m_lib_redir	( Cfg::Inst().lib.redir ),
+	m_data_path	( Cfg::Inst().data.path ),
+	m_wb_root	( Cfg::Inst().wb_root ),
+	m_main_page	( Cfg::Inst().main_page ),
 	m_mime_css	( GenerateMimeCss() )
 {
 	// handlers for GET requests
@@ -180,7 +180,7 @@ void RootServer::ServeLib( Request *req, const Resource& res )
 
 void RootServer::ServeFile( Request *req, const fs::path& path )
 {
-	Log( "serving file: %1% %2%", path.generic_string(), cfg::MimeType(path), log::verbose ) ;
+	Log( "serving file: %1% %2%", path.generic_string(), Cfg::MimeType(path), log::verbose ) ;
 	req->XSendFile( path.generic_string() ) ;
 }
 
@@ -188,7 +188,7 @@ void RootServer::ServeVar( Request *req, const Resource& )
 {
 	// path to URLs should be generic strings
 	Json var ;
-	var.Add( "name", Json( cfg::Inst()["name"] ) ) ;
+	var.Add( "name", Json( Cfg::Inst().name ) ) ;
 	var.Add( "wb_root", Json( m_wb_root ) ) ;
 	var.Add( "main", Json( m_main_page ) ) ;
 	
@@ -246,15 +246,15 @@ std::string RootServer::GenerateMimeCss( )
 	std::ostringstream ss ;
 	ss	<< "Content-type: text/css\r\n\r\n" ;
 
-	const fs::path icon_path = cfg::Inst()["lib"]["path"].Str() + "/icons" ;
+	const fs::path icon_path = Cfg::Inst().lib.path / "icons" ;
 	std::set<std::string> mime_set ;
 	mime_set.insert( "inode-directory" ) ;
 	mime_set.insert( "application-octet-stream" ) ;
 	
 	// generate a unique list of configured mime type 
-	Json::Object mime = cfg::Inst()["mime"].AsObject() ;
-	for ( Json::Object::iterator i = mime.begin() ; i != mime.end() ; ++i )
-		mime_set.insert( CssMimeType(i->second.Str()) ) ;
+	for ( Cfg::MimeMap::const_iterator i = Cfg::Inst().mime.begin() ;
+		i != Cfg::Inst().mime.end() ; ++i )
+		mime_set.insert( CssMimeType(i->second)) ;
 	
 	for ( std::set<std::string>::iterator i = mime_set.begin() ; i != mime_set.end() ; ++i )
 	{

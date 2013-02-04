@@ -50,9 +50,9 @@ void InitLog( )
 	LogBase* console_log = comp_log->Add( std::auto_ptr<LogBase>( new log::DefaultLog ) ) ;
 	
 	// initialize log object
-	if ( cfg::Inst().Has("log") )
+	if ( !Cfg::Inst().log.file.empty() )
 	{
-		std::auto_ptr<LogBase> file_log(new log::DefaultLog( cfg::Inst()["log"]["file"].Str() )) ;
+		std::auto_ptr<LogBase> file_log(new log::DefaultLog( Cfg::Inst().log.file )) ;
 		file_log->Enable( log::debug ) ;
 		file_log->Enable( log::verbose ) ;
 		file_log->Enable( log::info ) ;
@@ -65,12 +65,12 @@ void InitLog( )
 		
 		comp_log->Add( file_log ) ;
 	}
-	if ( cfg::Inst()["log"]["level"].Str() == "debug" )
+	if ( Cfg::Inst().log.level == "debug" )
 	{
 		console_log->Enable( log::verbose ) ;
 		console_log->Enable( log::debug ) ;
 	}
-	else if ( cfg::Inst()["log"]["level"].Str() == "verbose" )
+	else if ( Cfg::Inst().log.level == "verbose" )
 	{
 		console_log->Enable( log::verbose ) ;
 	}
@@ -90,7 +90,7 @@ void Thread( int sock, RootServer *srv, boost::mutex *mutex )
 		mutex->unlock() ;
 		if ( r < 0 )
 		{
-			Log( "oops %1%", r ) ;
+			Log( "FCGX_Accept_r() error %1%", r ) ;
 			break ;
 		}
 
@@ -98,6 +98,8 @@ void Thread( int sock, RootServer *srv, boost::mutex *mutex )
 		
 		FCGIRequest req( &request ) ;
 		std::string uri = req.URI() ;
+		Log( "received request %1%", uri ) ;
+		
 		srv->Work( &req, Resource( req.SansQueryURI() ) ) ;
 
 		FCGX_Finish_r( &request ) ;
@@ -112,9 +114,7 @@ int main( int argc, char **argv )
 	try
 	{
 		File cfg_file( argc < 2 ? "config.json" : argv[1] ) ;
-		cfg::Inst( Json::Parse( &cfg_file ) ) ;
-		File cfg_file2( argc < 2 ? "config.json" : argv[1] ) ;
-		Cfg::Inst( Json::Parse( &cfg_file2 ) ) ;
+		Cfg::Inst( Json::Parse( &cfg_file ) ) ;
 		InitLog( ) ;
 		
 		FCGX_Init() ;

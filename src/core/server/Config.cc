@@ -19,51 +19,53 @@
 
 #include "Config.hh"
 
-namespace wb { namespace cfg {
+namespace wb {
 
-Json Init( const Json& json )
+namespace
 {
-	Json copy( json ) ;
-	if ( !copy.Has("base") )
-		copy.Add( "base", Json(fs::current_path().string()) ) ;
+	std::string FindMime( const fs::path& ext, const Cfg::MimeMap& mime )
+	{
+		Cfg::MimeMap::const_iterator i = mime.find( ext ) ;
+		return i != mime.end() ? i->second : "application/octet-stream" ;
+	}
+
+	Cfg::MimeMap MakeMimeMap( const Json::Object& json )
+	{
+		Cfg::MimeMap result ;
+		for ( Json::Object::const_iterator i = json.begin() ; i != json.end() ; ++i )
+			result.insert( std::make_pair( fs::path( i->first ), i->second.Str() ) ) ;
+		return result ;
+	}
 	
-	if ( !copy.Has("main_page") )
-		copy.Add( "main_page", Json("main") ) ;
-	
-	return copy;
-}
+	std::string Optional(
+		const Json&			json,
+		const std::string&	key,
+		const std::string&	def = "" )
+	{
+		Json result ;
+		return json.Get(key, result) ? result.Str() : def ;
+	}
+} // end of local namespace
 
-const Json& Inst( const Json& json )
+std::string Cfg::MimeType( const fs::path& file )
 {
-	static const Json cfg = Init( json ) ;
-	return cfg ;
-}
+	const fs::path ext = file.extension() ;
 
-fs::path Path( const std::string& cfg )
-{
-	return fs::path(cfg::Inst()[cfg].Str()) ;
-}
-
-std::string MimeType( const fs::path& file )
-{
-	const std::string ext = file.extension().string() ;
-
-	Json r;
 	return 
 		fs::is_directory(file)	? "inode/directory" :
-		(ext.empty()			? "text/html" :
-		(cfg::Inst()["mime"].Get(ext, r) ? r.Str() : "application/octet-stream")) ;
+		(ext.string().empty()	? "text/html" :
+		(FindMime(ext, Cfg::Inst().mime))) ;
 }
-
-} // end of namespace cfg
 
 const Cfg& Cfg::Inst( const Json& json )
 {
 	static const Cfg inst =
 	{
-		json["name"].Str(),
-		json["socket"].Str(),
+		Optional( json, "name", "WebWrite" ),
+		Optional( json, "socket" ),
 		json["wb_root"].Str(),
+		Optional( json, "main_page", "main" ),
+		
 		{
 			json["lib"]["path"].Str(),
 			json["lib"]["redir"].Str(),
@@ -80,6 +82,11 @@ const Cfg& Cfg::Inst( const Json& json )
 			json["attic"]["path"].Str(),
 			json["attic"]["redir"].Str(),
 		},
+		{
+			json["log"]["level"].Str(),
+			json["log"]["file"].Str(),
+		},
+		MakeMimeMap( json["mime"].AsObject() ),
 	} ;
 	return inst ;
 }

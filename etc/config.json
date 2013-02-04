@@ -1,7 +1,7 @@
 {
- 	"name"		: "WebWrite",
-  	"socket"	: ":9000",
 	"wb_root"	: "/webwrite",
+ 	"name"		: "TestWrite",
+  	"socket"	: ":9000",
 	
 	"lib"		: { "path": "lib",  	"redir": "/wb/lib" },
 	"data"		: { "path": "data", 	"redir": "/wb/data" },

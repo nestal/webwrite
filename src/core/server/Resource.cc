@@ -32,13 +32,13 @@
 namespace wb {
 
 Resource::Resource() :
-	m_path( cfg::Inst()["main_page"].Str() )
+	m_path( Cfg::Inst().main_page )
 {
 }
 
 Resource::Resource( const std::string& uri )
 {
-	std::string wb_root = cfg::Inst()["wb_root"].Str() ;
+	const std::string& wb_root = Cfg::Inst().wb_root ;
 	
 	if ( uri.substr( 0, wb_root.size() ) != wb_root )
 		BOOST_THROW_EXCEPTION( Error() << expt::ErrMsg( "invalid resource path" ) ) ;
@@ -46,7 +46,7 @@ Resource::Resource( const std::string& uri )
 	m_path = uri.substr(wb_root.size()) ;
 	
 	if ( Filename().empty() || Filename() == "." || fs::is_directory(DataPath()) )
-		m_path /= cfg::Inst()["main_page"].Str() ; 
+		m_path /= Cfg::Inst().main_page ; 
 }
 
 const fs::path& Resource::Path() const
@@ -97,37 +97,37 @@ std::string Resource::DecodeName( const std::string& uri )
 
 fs::path Resource::DataPath() const
 {
-	return cfg::Inst()["data"]["path"].Str() / m_path ;
+	return Cfg::Inst().data.path / m_path ;
 }
 
 fs::path Resource::ReDirPath() const
 {
-	return cfg::Inst()["data"]["redir"].Str() / m_path ;
+	return Cfg::Inst().data.redir / m_path ;
 }
 
 fs::path Resource::UrlPath() const
 {
-	return cfg::Path("wb_root") / m_path ;
+	return Cfg::Inst().wb_root / m_path ;
 }
 
 fs::path Resource::AtticPath() const
 {
-	return (cfg::Inst()["attic"]["path"].Str() / m_path).parent_path() ;
+	return (Cfg::Inst().attic.path / m_path).parent_path() ;
 }
 
 fs::path Resource::MetaPath() const
 {
-	return cfg::Inst()["meta"]["path"].Str() / m_path ;
+	return Cfg::Inst().meta.path / m_path ;
 }
 
 std::string Resource::Type() const
 {
-	return cfg::MimeType( Path() ) ;
+	return Cfg::MimeType( Path() ) ;
 }
 
 Json Resource::Meta() const
 {
-	fs::path file = cfg::Inst()["meta"]["path"].Str() / m_path ;
+	fs::path file = Cfg::Inst().meta.path / m_path ;
 	Json meta ;
 	
 	try
@@ -151,7 +151,7 @@ Json Resource::Meta() const
 
 void Resource::SaveMeta(std::time_t modified) const
 {
-	fs::path file = cfg::Inst()["meta"]["path"].Str() / m_path ;
+	fs::path file = Cfg::Inst().meta.path / m_path ;
 	fs::create_directories( file.parent_path() ) ;
 	
 	Json meta = Meta() ;

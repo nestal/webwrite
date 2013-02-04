@@ -129,8 +129,6 @@ Json::Json( struct json_object *json, NotOwned ) :
 Json::Json( struct json_object *json ) :
 	m_json( json )
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( json != 0 ) ;
 	::json_object_get( m_json ) ;
 }
@@ -138,16 +136,12 @@ Json::Json( struct json_object *json ) :
 Json::Json( const Json& rhs ) :
 	m_json( rhs.m_json )
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	::json_object_get( m_json ) ;
 }
 
 Json::~Json( )
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	if ( m_json != 0 )
 		::json_object_put( m_json ) ;
@@ -169,8 +163,6 @@ void Json::Swap( Json& other )
 
 Json Json::operator[]( const std::string& key ) const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	
 	struct json_object *j = ::json_object_object_get( m_json, key.c_str() ) ;
@@ -185,8 +177,6 @@ Json Json::operator[]( const std::string& key ) const
 
 Json Json::operator[]( const std::size_t& idx ) const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 
 	struct json_object *j = ::json_object_array_get_idx( m_json, idx ) ;
@@ -205,16 +195,12 @@ Json Json::operator[]( const std::size_t& idx ) const
 
 bool Json::Has( const std::string& key ) const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	return ::json_object_object_get( m_json, key.c_str() ) != 0 ;
 }
 
 bool Json::Get( const std::string& key, Json& json ) const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	struct json_object *j = ::json_object_object_get( m_json, key.c_str() ) ;
 	if ( j != 0 )
@@ -229,8 +215,6 @@ bool Json::Get( const std::string& key, Json& json ) const
 
 void Json::Add( const std::string& key, const Json& json )
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	assert( json.m_json != 0 ) ;
 
@@ -240,8 +224,6 @@ void Json::Add( const std::string& key, const Json& json )
 
 void Json::Add( const Json& json )
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	assert( json.m_json != 0 ) ;
 	
@@ -251,8 +233,6 @@ void Json::Add( const Json& json )
 
 bool Json::Bool() const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	return ::json_object_get_boolean( m_json ) == TRUE ;
 }
@@ -260,16 +240,12 @@ bool Json::Bool() const
 template <>
 bool Json::Is<bool>() const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	return ::json_object_is_type( m_json, json_type_boolean ) == TRUE ;
 }
 
 std::string Json::Str() const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	return ::json_object_get_string( m_json ) ;
 }
@@ -277,16 +253,12 @@ std::string Json::Str() const
 template <>
 bool Json::Is<std::string>() const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	return ::json_object_is_type( m_json, json_type_string ) == TRUE ;
 }
 
 int Json::Int() const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	return ::json_object_get_int( m_json ) ;
 }
@@ -294,24 +266,18 @@ int Json::Int() const
 template <>
 bool Json::Is<int>() const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	return ::json_object_is_type( m_json, json_type_int ) == TRUE ;
 }
 
 std::ostream& operator<<( std::ostream& os, const Json& json )
 {
-	boost::lock_guard<boost::mutex> lock( json.m_mutex ) ;
-
 	assert( json.m_json != 0 ) ;
 	return os << ::json_object_to_json_string( json.m_json ) ;
 }
 
 void Json::Write( DataStream *out ) const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( out != 0 ) ;
 
 	const char *str = ::json_object_to_json_string( m_json ) ;
@@ -320,16 +286,12 @@ void Json::Write( DataStream *out ) const
 
 Json::Type Json::DataType() const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	return static_cast<Type>( ::json_object_get_type( m_json ) ) ;
 }
 
 Json::Object Json::AsObject() const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	Object result ;
 	
 	json_object_object_foreach( m_json, key, val )
@@ -343,16 +305,12 @@ Json::Object Json::AsObject() const
 template <>
 bool Json::Is<Json::Object>() const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	return ::json_object_is_type( m_json, json_type_object ) == TRUE ;
 }
 
 Json::Array Json::AsArray() const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	std::size_t count = ::json_object_array_length( m_json ) ;
 	Array result ;
 	
@@ -365,8 +323,6 @@ Json::Array Json::AsArray() const
 template <>
 bool Json::Is<Json::Array>() const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	assert( m_json != 0 ) ;
 	return ::json_object_is_type( m_json, json_type_array ) == TRUE ;
 }
@@ -376,8 +332,6 @@ bool Json::Is<Json::Array>() const
 ///	\return	*this[i] if *this[i][key] == value
 Json Json::FindInArray( const std::string& key, const std::string& value ) const
 {
-	boost::lock_guard<boost::mutex> lock( m_mutex ) ;
-
 	std::size_t count = ::json_object_array_length( m_json ) ;
 	
 	for ( std::size_t i = 0 ; i < count ; ++i )
