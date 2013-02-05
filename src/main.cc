@@ -40,7 +40,6 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cstdio>
-#include <ctime>
 
 using namespace wb ;
 
@@ -94,18 +93,10 @@ void Thread( int sock, RootServer *srv, boost::mutex *mutex )
 			break ;
 		}
 
-		std::clock_t start = std::clock() ;
-		
 		FCGIRequest req( &request ) ;
 		std::string uri = req.URI() ;
-		Log( "received request %1%", uri ) ;
-		
 		srv->Work( &req, Resource( req.SansQueryURI() ) ) ;
-
 		FCGX_Finish_r( &request ) ;
-
-		std::clock_t duration = std::clock() - start ;
-		Log( "request %1% finished in %2% milliseconds", uri, duration * 1000.0 / CLOCKS_PER_SEC ) ;
 	}
 }
 

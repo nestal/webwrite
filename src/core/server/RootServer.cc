@@ -38,7 +38,22 @@
 
 #include <sys/stat.h>
 
+#ifdef WIN32
+	#include <windows.h>
+#endif
+
 namespace wb {
+
+#ifdef WIN32
+void atomic_add32( volatile long *val, long add )
+{
+	InterlockedExchangeAdd( val, add ) ;
+}
+void atomic_inc32( volatile long *val )
+{
+	InterlockedIncrement( val ) ;
+}
+#endif
 
 RootServer::RootServer( ) :
 	m_lib_redir	( Cfg::Inst().lib.redir ),
@@ -94,8 +109,8 @@ void RootServer::Work( Request *req, const Resource& res )
 			assert( !h.func.empty() ) ;
 			h.func( this, req, res ) ;
 			cpu_times 		elapsed = timer.elapsed() ;
-			atomic_add32( &h.elapse_sec,  static_cast<unsigned>(elapsed.wall / 1000000000) ) ;
-			atomic_add32( &h.elapse_nsec, static_cast<unsigned>(elapsed.wall % 1000000000) ) ;
+			atomic_add32( &h.elapse_sec,  static_cast<long>(elapsed.wall / 1000000000) ) ;
+			atomic_add32( &h.elapse_nsec, static_cast<long>(elapsed.wall % 1000000000) ) ;
 		}
 		else
 			NotFound( req ) ;
@@ -146,7 +161,7 @@ void RootServer::Save( Request *req, const Resource& res )
 	// read and save the file
 	FilterHTML( req->In(), res ) ;
 
-	std::size_t size = fs::file_size(file) ;
+	boost::uintmax_t size = fs::file_size(file) ;
 	if ( size == 0 )
 	{
 		Log( "oops.. an empty file %1%", file ) ;
@@ -322,7 +337,7 @@ void RootServer::ServeStats( Request *req, const Resource& res )
 		{
 			// avoid volatile-ness
 			boost::uint64_t count  = i->second.count ;
-			double elapse = i->second.elapse_sec + i->second.elapse_nsec / 1000000000.0 ;
+			double elapse = i->second.elapse_sec + i->second.elapse_nsec / 1000.0 ;
 		
 			Json j ;
 			j.Add( "count", Json( count ) ) ;

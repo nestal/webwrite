@@ -22,7 +22,24 @@
 
 #include <boost/interprocess/detail/atomic.hpp>
 
-namespace wb {
+namespace wb
+{
+	template <typename T>
+	class Atomic
+	{
+	public :
+		Atomic( T t ) : m_(t) {}
+
+		operator T() const { return m_ ; }
+
+		Atomic& operator++() ;
+		Atomic& operator++(int) ;
+		Atomic& operator--() ;
+		Atomic& operator--(int) ;
+
+		Atomic& operator+=( T t ) ;
+		Atomic& operator-=( T t ) ;
+	} ;
 
 using namespace boost::interprocess::ipcdetail ;
 

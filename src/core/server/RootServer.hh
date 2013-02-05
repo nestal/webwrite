@@ -78,9 +78,9 @@ private :
 	struct Handler
 	{
 		Function			func ;
-		volatile unsigned	count ;
-		volatile unsigned	elapse_sec ;
-		volatile unsigned	elapse_nsec ;
+		volatile long	count ;
+		volatile long	elapse_sec ;
+		volatile long	elapse_nsec ;
 		
 		explicit Handler( const Function& f = Function())
 			: func(f), count(0), elapse_sec(0), elapse_nsec(0) {};
