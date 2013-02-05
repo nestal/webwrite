@@ -62,19 +62,22 @@ private :
 template <typename P1>
 PrintF& PrintF::operator()( const std::string& fmt, const P1& p1 )
 {
-	return operator()((boost::format(fmt) % p1).str());
+	const boost::format bf(fmt) ;
+	return operator()((boost::format(bf) % p1).str());
 }
 
 template <typename P1, typename P2>
 PrintF& PrintF::operator()( const std::string& fmt, const P1& p1, const P2& p2 )
 {
-	return operator()((boost::format(fmt) % p1 % p2).str()) ;
+	const boost::format bf(fmt) ;
+	return operator()((boost::format(bf) % p1 % p2).str()) ;
 }
 
 template <typename P1, typename P2, typename P3>
 PrintF& PrintF::operator()( const std::string& fmt, const P1& p1, const P2& p2, const P3& p3 )
 {
-	return operator()((boost::format(fmt) % p1 % p2 % p3).str()) ;
+	const boost::format bf(fmt) ;
+	return operator()((boost::format(bf) % p1 % p2 % p3).str()) ;
 }
 
 template <typename P1, typename P2, typename P3, typename P4>
@@ -85,7 +88,8 @@ PrintF& PrintF::operator()(
 	const P3& p3,
 	const P4& p4 )
 {
-	return operator()((boost::format(fmt) % p1 % p2 % p3 % p4).str()) ;
+	const boost::format bf(fmt) ;
+	return operator()((boost::format(bf) % p1 % p2 % p3 % p4).str()) ;
 }
 
 } // end of namespace

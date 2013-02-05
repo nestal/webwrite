@@ -86,6 +86,11 @@ RootServer::RootServer( ) :
 
 void RootServer::Work( Request *req, const Resource& res ) 
 {
+	using boost::timer::cpu_timer;
+	using boost::timer::cpu_times;
+	using boost::timer::nanosecond_type;
+	
+	cpu_timer timer;
 	fs::path	rel		= res.Path() ;
 	
 	if ( res.UrlPath() != req->SansQueryURI() )
@@ -97,17 +102,16 @@ void RootServer::Work( Request *req, const Resource& res )
 		Map::iterator i = m_srv.find( req->Method() ) ;
 		if ( i != m_srv.end() )
 		{
-			using boost::timer::cpu_timer;
-			using boost::timer::cpu_times;
-			using boost::timer::nanosecond_type;
-			
 			Handler& h = i->second.Parse( qstr ) ;
 			
+			// bump stats
 			atomic_inc32(&h.count) ;
-			
-			cpu_timer timer;
+	
+			// do real work
 			assert( !h.func.empty() ) ;
 			h.func( this, req, res ) ;
+
+			// calculate time elapsed for processing
 			cpu_times 		elapsed = timer.elapsed() ;
 			atomic_add32( &h.elapse_sec,  static_cast<long>(elapsed.wall / 1000000000) ) ;
 			atomic_add32( &h.elapse_nsec, static_cast<long>(elapsed.wall % 1000000000) ) ;
@@ -129,7 +133,7 @@ void RootServer::DefaultPage( Request *req, const Resource& res )
 void RootServer::Load( Request *req, const Resource& res )
 {
 	// don't cache for dynamic contents
-	req->Fmt()( "Cache-Control: max-age=%1%\r\n", 0 ) ;
+	req->Fmt()( "Cache-Control: max-age=0\r\n" ) ;
 	
 	if ( fs::exists( res.DataPath() ) )
 		ServeFile( req, res.ReDirPath() ) ;
@@ -164,11 +168,12 @@ void RootServer::Save( Request *req, const Resource& res )
 	boost::uintmax_t size = fs::file_size(file) ;
 	if ( size == 0 )
 	{
-		Log( "oops.. an empty file %1%", file ) ;
+		Log( "Removing file %1%", file ) ;
 		fs::remove(file) ;
 	}
 
-	// ask client to load the new content again
+	// ask client to load the new content again. the client may not reload the page with the
+	// new content (because it has it anyway), but this will update the client's cache.
 	req->SeeOther( res.UrlPath().generic_string() + "?load" ) ;
 }
 	
@@ -208,7 +213,6 @@ void RootServer::ServeLib( Request *req, const Resource& res )
 
 void RootServer::ServeFile( Request *req, const fs::path& path )
 {
-	Log( "serving file: %1% %2%", path.generic_string(), Cfg::MimeType(path), log::verbose ) ;
 	req->XSendFile( path.generic_string() ) ;
 }
 
@@ -221,8 +225,10 @@ void RootServer::ServeVar( Request *req, const Resource& )
 	var.Add( "main", Json( m_main_page ) ) ;
 	
 	PrintF fmt = req->Fmt() ;
-	fmt( "Cache-Control: max-age=%1%\r\n", 3600 ) ;
-	fmt( "Content-type: application/json\r\n\r\n%s\r\n\r\n", var.Str() ) ;
+	fmt(
+		"Content-type: application/json\r\n\r\n" ) ;
+	var.Write( req->Out() ) ;
+	fmt( "\r\n\r\n" ) ;
 }
 
 void RootServer::ServeIndex( Request *req, const Resource& res )
@@ -314,8 +320,9 @@ std::string RootServer::CssMimeType( const std::string& mime )
 void RootServer::ServeProperties( Request *req, const Resource& res )
 {
 	PrintF fmt = req->Fmt() ;
-	fmt( "Cache-Control: max-age=%1%\r\n", 0 ) ;
-	fmt( "Content-type: application/json\r\n\r\n" ) ;
+	fmt(
+		"Cache-Control: max-age=0\r\n"
+		"Content-type: application/json\r\n\r\n" ) ;
 	
 	Json meta = res.Meta() ;
 	meta.Add( "name", Json(res.Name()) ) ;
@@ -349,8 +356,9 @@ void RootServer::ServeStats( Request *req, const Resource& res )
 	}
 	
 	PrintF fmt = req->Fmt() ;
-	fmt( "Cache-Control: max-age=%1%\r\n", 0 ) ;
-	fmt( "Content-type: application/json\r\n\r\n" ) ;
+	fmt(
+		"Cache-Control: max-age=0\r\n"
+		"Content-type: application/json\r\n\r\n" ) ;
 	result.Write( req->Out() ) ;
 	fmt( "\r\n\r\n" ) ;
 }

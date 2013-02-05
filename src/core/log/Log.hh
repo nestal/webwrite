@@ -88,19 +88,22 @@ void Log( const std::string& str, log::Serverity s = log::info ) ;
 template <typename P1>
 void Log( const std::string& fmt, const P1& p1, log::Serverity s = log::info )
 {
-	LogBase::Inst()->Log( log::Fmt(fmt) % p1, s ) ;
+	const log::Fmt bf(fmt) ;
+	LogBase::Inst()->Log( log::Fmt(bf) % p1, s ) ;
 }
 
 template <typename P1, typename P2>
 void Log( const std::string& fmt, const P1& p1, const P2& p2, log::Serverity s = log::info )
 {
-	LogBase::Inst()->Log( log::Fmt(fmt) % p1 % p2, s ) ;
+	const log::Fmt bf(fmt) ;
+	LogBase::Inst()->Log( log::Fmt(bf) % p1 % p2, s ) ;
 }
 
 template <typename P1, typename P2, typename P3>
 void Log( const std::string& fmt, const P1& p1, const P2& p2, const P3& p3, log::Serverity s = log::info )
 {
-	LogBase::Inst()->Log( log::Fmt(fmt) % p1 % p2 % p3, s ) ;
+	const log::Fmt bf(fmt) ;
+	LogBase::Inst()->Log( log::Fmt(bf) % p1 % p2 % p3, s ) ;
 }
 
 template <typename P1, typename P2, typename P3, typename P4>
@@ -112,7 +115,8 @@ void Log(
 	const P4& p4,
 	log::Serverity s = log::info )
 {
-	LogBase::Inst()->Log( log::Fmt(fmt) % p1 % p2 % p3 % p4, s ) ;
+	const log::Fmt bf(fmt) ;
+	LogBase::Inst()->Log( log::Fmt(bf) % p1 % p2 % p3 % p4, s ) ;
 }
 
 void Trace( const std::string& str ) ;
@@ -120,25 +124,29 @@ void Trace( const std::string& str ) ;
 template <typename P1>
 void Trace( const std::string& fmt, const P1& p1 )
 {
-	LogBase::Inst()->Log( log::Fmt(fmt) % p1, log::debug ) ;
+	const log::Fmt bf(fmt) ;
+	LogBase::Inst()->Log( log::Fmt(bf) % p1, log::debug ) ;
 }
 
 template <typename P1, typename P2>
 void Trace( const std::string& fmt, const P1& p1, const P2& p2 )
 {
-	LogBase::Inst()->Log( log::Fmt(fmt) % p1 % p2, log::debug ) ;
+	const log::Fmt bf(fmt) ;
+	LogBase::Inst()->Log( log::Fmt(bf) % p1 % p2, log::debug ) ;
 }
 
 template <typename P1, typename P2, typename P3>
 void Trace( const std::string& fmt, const P1& p1, const P2& p2, const P3& p3 )
 {
-	LogBase::Inst()->Log( log::Fmt(fmt) % p1 % p2 % p3, log::debug ) ;
+	const log::Fmt bf(fmt) ;
+	LogBase::Inst()->Log( log::Fmt(bf) % p1 % p2 % p3, log::debug ) ;
 }
 
 template <typename P1, typename P2, typename P3, typename P4>
 void Trace( const std::string& fmt, const P1& p1, const P2& p2, const P3& p3, const P4& p4 )
 {
-	LogBase::Inst()->Log( log::Fmt(fmt) % p1 % p2 % p3 % p4, log::debug ) ;
+	const log::Fmt bf(fmt) ;
+	LogBase::Inst()->Log( log::Fmt(bf) % p1 % p2 % p3 % p4, log::debug ) ;
 }
 
 } // end of namespace

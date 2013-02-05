@@ -179,8 +179,6 @@ void Resource::MoveToAttic() const
 	boost::system::error_code oops ;
 	fs::path dest = attic / (attic_fn % Filename() % modified).str() ;	
 	fs::rename( DataPath(), dest, oops ) ;
-
-	Log( "moving to %1%", dest ) ;
 }
 
 } // end of namespace
