@@ -32,13 +32,65 @@ namespace wb
 
 		operator T() const { return m_ ; }
 
-		Atomic& operator++() ;
-		Atomic& operator++(int) ;
-		Atomic& operator--() ;
-		Atomic& operator--(int) ;
+		Atomic& operator++()
+#ifdef __GNUC__
+		{
+			__sync_fetch_and_add( &m_, 1 ) ;
+			return *this ;
+		}
+#else
+		;
+#endif
+		
+		Atomic operator++(int)
+#ifdef __GNUC__
+		{
+			return __sync_fetch_and_add( &m_, 1 ) ;
+		}
+#else
+		;
+#endif
 
-		Atomic& operator+=( T t ) ;
-		Atomic& operator-=( T t ) ;
+		Atomic& operator--()
+#ifdef __GNUC__
+		{
+			__sync_fetch_and_sub( &m_, 1 ) ;
+			return *this ;
+		}
+#else
+		;
+#endif
+		Atomic& operator--(int)
+#ifdef __GNUC__
+		{
+			return __sync_fetch_and_sub( &m_, 1 ) ;
+		}
+#else
+		;
+#endif
+
+		Atomic& operator+=( T t )
+#ifdef __GNUC__
+		{
+			__sync_fetch_and_add( &m_, t ) ;
+			return *this ;
+		}
+#else
+		;
+#endif
+		
+		Atomic& operator-=( T t )
+#ifdef __GNUC__
+		{
+			__sync_fetch_and_sub( &m_, t ) ;
+			return *this ;
+		}
+#else
+		;
+#endif
+	
+	private :
+		volatile T	m_ ;
 	} ;
 
 using namespace boost::interprocess::ipcdetail ;

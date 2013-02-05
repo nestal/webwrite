@@ -19,7 +19,9 @@
 
 #pragma once
 
+#include "util/Atomic.hh"
 #include "util/FileSystem.hh"
+
 #include "parser/Query.hh"
 #include "Resource.hh"
 
@@ -77,13 +79,12 @@ private :
 	typedef boost::function<void (RootServer*, Request*, const Resource&)> Function ;
 	struct Handler
 	{
-		Function			func ;
-		volatile long	count ;
-		volatile long	elapse_sec ;
-		volatile long	elapse_nsec ;
+		Function		func ;
+		Atomic<long>	count ;
+		Atomic<long>	elapse ;	//!< in nano-second
 		
 		explicit Handler( const Function& f = Function())
-			: func(f), count(0), elapse_sec(0), elapse_nsec(0) {};
+			: func(f), count(0), elapse(0) {}
 	} ;
 	typedef std::map<std::string, Query<Handler> >	Map ;
 	Map	m_srv ;

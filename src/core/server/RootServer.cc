@@ -38,22 +38,7 @@
 
 #include <sys/stat.h>
 
-#ifdef WIN32
-	#include <windows.h>
-#endif
-
 namespace wb {
-
-#ifdef WIN32
-void atomic_add32( volatile long *val, long add )
-{
-	InterlockedExchangeAdd( val, add ) ;
-}
-void atomic_inc32( volatile long *val )
-{
-	InterlockedIncrement( val ) ;
-}
-#endif
 
 RootServer::RootServer( ) :
 	m_lib_redir	( Cfg::Inst().lib.redir ),
@@ -105,16 +90,14 @@ void RootServer::Work( Request *req, const Resource& res )
 			Handler& h = i->second.Parse( qstr ) ;
 			
 			// bump stats
-			atomic_inc32(&h.count) ;
+			h.count++ ;
 	
 			// do real work
 			assert( !h.func.empty() ) ;
 			h.func( this, req, res ) ;
 
 			// calculate time elapsed for processing
-			cpu_times 		elapsed = timer.elapsed() ;
-			atomic_add32( &h.elapse_sec,  static_cast<long>(elapsed.wall / 1000000000) ) ;
-			atomic_add32( &h.elapse_nsec, static_cast<long>(elapsed.wall % 1000000000) ) ;
+			h.elapse += timer.elapsed().wall ;
 		}
 		else
 			NotFound( req ) ;
@@ -344,7 +327,7 @@ void RootServer::ServeStats( Request *req, const Resource& res )
 		{
 			// avoid volatile-ness
 			boost::uint64_t count  = i->second.count ;
-			double elapse = i->second.elapse_sec + i->second.elapse_nsec / 1000.0 ;
+			double elapse = i->second.elapse / 1000.0 ;
 		
 			Json j ;
 			j.Add( "count", Json( count ) ) ;

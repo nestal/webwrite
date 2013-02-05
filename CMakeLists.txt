@@ -109,3 +109,9 @@ target_link_libraries( unittest wb_core
 	${Boost_LIBRARIES}
 	${OPT_LIBS}
 )
+
+if ( WIN32 )
+else ( WIN32 )
+	set_target_properties( unittest
+		PROPERTIES COMPILE_FLAGS	 -DBOOST_TEST_DYN_LINK )
+endif (WIN32)
