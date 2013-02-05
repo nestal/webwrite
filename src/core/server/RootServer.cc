@@ -31,6 +31,7 @@
 #include <boost/regex.hpp>
 #include <boost/bind.hpp>
 #include <boost/timer/timer.hpp>
+#include <boost/tokenizer.hpp>
 
 #include <ctime>
 #include <set>
@@ -170,14 +171,18 @@ void RootServer::Upload( Request *req, const Resource& res )
 
 void RootServer::ServeLib( Request *req, const Resource& res )
 {
-	const boost::regex re( "lib=(.+)" ) ;
-	boost::smatch m ;
-	
-	// must make a copy before calling regex_search
+	// must make a copy before calling tokenizer
 	std::string qstr = req->Query() ;
-	if ( boost::regex_search( qstr, m, re ) )
+	
+	typedef boost::tokenizer<boost::char_separator<char> > 
+		tokenizer;
+	boost::char_separator<char> sep("&#=");
+	tokenizer tokens(qstr.begin(), qstr.end(), sep);
+	
+	tokenizer::iterator i = tokens.begin() ;
+	if ( i != tokens.end() && *i == "lib" && ++i != tokens.end() )
 	{
-		fs::path p( m[1].str() ) ;
+		fs::path p( *i ) ;
 
 		if ( std::find( p.begin(), p.end(), ".." ) != p.end() )
 			NotFound( req ) ;
