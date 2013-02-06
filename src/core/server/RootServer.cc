@@ -246,6 +246,7 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 				<< (fs::is_directory( di->path() ) ? "inode-directory" : type)
 				<< " menu_idx\"><a href=\""
 				<< sibling.UrlPath().generic_string()
+				<< ((type == "text-html" || fs::is_directory(di->path())) ? "" : "#meta")
 				<< "\">"
 				<< (fs::is_directory( di->path() ) ? sibling.ParentName() : sibling.Name())
 				<< "</a></li>" ;
