@@ -18,36 +18,23 @@
 	MA  02110-1301, USA.
 */
 
-#include "Atomic.hh"
+#include "StreamSink.hh"
 
-#include <boost/cstdint.hpp>
+#include "DataStream.hh"
 
-#ifdef WIN32
-	#include <windows.h>
-#endif
+#include <cassert>
 
 namespace wb {
 
-#ifdef WIN32
-template <>
-Atomic<long>& Atomic<long>::operator++()
+StreamSink::StreamSink( DataStream *out ) :
+	m_out( out )
 {
-	::InterlockedIncrement( &m_ ) ;
-	return *this ;
+	assert( m_out != 0 ) ;
 }
 
-template <>
-Atomic<long> Atomic<long>::operator++( int )
+std::streamsize StreamSink::write( const char* s, std::streamsize n )
 {
-	return ::InterlockedIncrement( &m_ ) ;
+	return m_out->Write( s, n ) ;
 }
-
-template <>
-Atomic<long>& Atomic<long>::operator+=( long v )
-{
-	::InterlockedExchangeAdd( &m_, v ) ;
-	return *this ;
-}
-#endif
 
 } // end of namespace

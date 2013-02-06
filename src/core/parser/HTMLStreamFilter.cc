@@ -24,7 +24,6 @@
 #include "log/Log.hh"
 #include "util/CArray.hh"
 #include "util/DataStream.hh"
-#include "util/PrintF.hh"
 #include "util/StringStream.hh"
 
 #include <cassert>
@@ -110,11 +109,9 @@ void HTMLStreamFilter::Parse( DataStream *in, DataStream *out )
 				inp.ReadUntil( '>', out ) ;
 		}
 		
+		// skip comments
 		else if ( tag.Str() == "!--" )
-		{
-			Log( "comments?" ) ;
 			inp.ReadUntil( "-->", DevNull() ) ;
-		}
 		
 		// element not in the white list. we will skip everything inside it
 		// until its end tag

@@ -22,7 +22,6 @@
 #include "util/DataStream.hh"
 #include "util/Exception.hh"
 #include "util/File.hh"
-#include "util/PrintF.hh"
 
 #include "log/Log.hh"
 
@@ -66,11 +65,6 @@ DataStream* FCGIRequest::In()
 DataStream* FCGIRequest::Out()
 {
 	return m_out.get() ;
-}
-
-PrintF FCGIRequest::Fmt()
-{
-	return PrintF( m_out.get() ) ;
 }
 
 void FCGIRequest::XSendFile( const std::string& file )

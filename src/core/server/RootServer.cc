@@ -26,7 +26,7 @@
 #include "parser/HTMLStreamFilter.hh"
 #include "util/Atomic.hh"
 #include "util/File.hh"
-#include "util/PrintF.hh"
+#include "util/OutputStream.hh"
 
 #include <boost/regex.hpp>
 #include <boost/bind.hpp>
@@ -117,7 +117,8 @@ void RootServer::DefaultPage( Request *req, const Resource& res )
 void RootServer::Load( Request *req, const Resource& res )
 {
 	// don't cache for dynamic contents
-	req->Fmt()( "Cache-Control: max-age=0\r\n" ) ;
+	static const std::string cc = "Cache-Control: max-age=0\r\n" ;
+	req->Out()->Write( cc.c_str(), cc.size() ) ;
 	
 	if ( fs::exists( res.DataPath() ) )
 		ServeFile( req, res.ReDirPath() ) ;
@@ -212,26 +213,26 @@ void RootServer::ServeVar( Request *req, const Resource& )
 	var.Add( "wb_root", Json( m_wb_root ) ) ;
 	var.Add( "main", Json( m_main_page ) ) ;
 	
-	PrintF fmt = req->Fmt() ;
-	fmt(
-		"Content-type: application/json\r\n\r\n" ) ;
+	OutputStream os( req->Out() ) ;
+	os << "Content-type: application/json\r\n\r\n" << std::flush ;
 	var.Write( req->Out() ) ;
-	fmt( "\r\n\r\n" ) ;
+	os << "\r\n\r\n" ;
 }
 
 void RootServer::ServeIndex( Request *req, const Resource& res )
 {
-	PrintF fmt = req->Fmt() ;
-	
-	fmt( "Cache-Control: max-age=%1%\r\n", 0 ) ;
-	fmt( "Content-type: text/html\r\n\r\n" ) ;
-	fmt( "<ul>" ) ;
+	OutputStream os( req->Out() ) ;
+	os << 
+		"Cache-Control: max-age=0\r\n"
+		"Content-type: text/html\r\n\r\n"
+		"<ul>" ;
 	
 	// show the [parent] entry
 	if ( res.Path().parent_path() != "/" )
-		fmt( "<li class=\"inode-directory menu_idx\"><a href=\"%1%/%2%\">[parent]</a></li>",
-			res.UrlPath().parent_path().parent_path().generic_string(),
-			m_main_page) ;
+		os	<< "<li class=\"inode-directory menu_idx\"><a href=\""
+			<< res.UrlPath().parent_path().parent_path().generic_string()
+			<< '/' << m_main_page
+			<< ">[parent]</a></li>" ;
 	
 	if ( fs::is_directory(res.DataPath().parent_path()) )
 	{
@@ -244,13 +245,16 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 
 			std::string type = CssMimeType(sibling.Type()) ;
 
-			fmt( "<li class=\"%1% menu_idx\"><a href=\"%2%\">%3%</a></li>",
-				(fs::is_directory( di->path() ) ? "inode-directory" : type),
-				sibling.UrlPath().generic_string(),
-				(fs::is_directory( di->path() ) ? sibling.ParentName() : sibling.Name()) ) ;
+			os	<< "<li class=\""
+				<< (fs::is_directory( di->path() ) ? "inode-directory" : type)
+				<< " menu_idx\"><a href=\""
+				<< sibling.UrlPath().generic_string()
+				<< "\">"
+				<< (fs::is_directory( di->path() ) ? sibling.ParentName() : sibling.Name())
+				<< "</a></li>" ;
 		}
 	}
-	fmt( "</ul>\r\n\r\n" ) ;
+	os << "</ul>\r\n\r\n" ;
 }
 
 void RootServer::ServeMimeCss( Request *req, const Resource& )
@@ -307,17 +311,17 @@ std::string RootServer::CssMimeType( const std::string& mime )
 
 void RootServer::ServeProperties( Request *req, const Resource& res )
 {
-	PrintF fmt = req->Fmt() ;
-	fmt(
+	OutputStream os( req->Out() ) ;
+	os << 
 		"Cache-Control: max-age=0\r\n"
-		"Content-type: application/json\r\n\r\n" ) ;
+		"Content-type: application/json\r\n\r\n" << std::flush ;
 	
 	Json meta = res.Meta() ;
 	meta.Add( "name", Json(res.Name()) ) ;
 	meta.Add( "type", Json(CssMimeType(res.Type())) ) ;
 	meta.Write( req->Out() ) ;
 	
-	fmt( "\r\n\r\n" ) ;
+	os << "\r\n\r\n" << std::flush ;
 }
 
 void RootServer::ServeStats( Request *req, const Resource& res )
@@ -343,12 +347,12 @@ void RootServer::ServeStats( Request *req, const Resource& res )
 		result.Add( s->first, srv ) ;
 	}
 	
-	PrintF fmt = req->Fmt() ;
-	fmt(
+	OutputStream os( req->Out() ) ;
+	os << 
 		"Cache-Control: max-age=0\r\n"
-		"Content-type: application/json\r\n\r\n" ) ;
+		"Content-type: application/json\r\n\r\n" << std::flush ;
 	result.Write( req->Out() ) ;
-	fmt( "\r\n\r\n" ) ;
+	os << "\r\n\r\n" << std::flush ;
 }
 
 } // end of namespace

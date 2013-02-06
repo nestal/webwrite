@@ -18,31 +18,13 @@
 	MA  02110-1301, USA.
 */
 
-#include "PrintF.hh"
-
-#include "DataStream.hh"
-
-#include <cassert>
+#include "OutputStream.hh"
 
 namespace wb {
 
-PrintF::PrintF( DataStream *out ) :
-	m_out( out )
+OutputStream::OutputStream( DataStream *out ) :
+	stream( out )
 {
-	assert( m_out != 0 ) ;
-}
-
-PrintF& PrintF::PutS( const char *str, std::size_t size )
-{
-	m_out->Write( str, size ) ;
-	return *this ;
-}
-
-/// Note that the terminating null is not written. In general, there is no
-/// need to specially handle null-terminating strings in this project. 
-PrintF& PrintF::operator()( const std::string& fmt )
-{
-	return PutS( fmt.c_str(), fmt.size() ) ;
 }
 
 } // end of namespace

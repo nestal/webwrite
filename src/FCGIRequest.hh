@@ -53,7 +53,6 @@ public :
 	
 	DataStream* In() ;
 	DataStream* Out() ;
-	PrintF Fmt() ;
 
 	// tell the web server to send this file
 	void XSendFile( const std::string& file ) ;

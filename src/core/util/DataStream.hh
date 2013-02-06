@@ -50,4 +50,6 @@ public :
 /// Stream for /dev/null, i.e. read and writing nothing
 DataStream* DevNull() ;
 
+
+
 } // end of namespace

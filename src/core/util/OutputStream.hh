@@ -20,42 +20,19 @@
 
 #pragma once
 
-#include <string>
+#include "StreamSink.hh"
+
+#include <boost/iostreams/stream.hpp>
 
 namespace wb {
 
 class DataStream ;
-class OutputStream ;
-class PrintF ;
 
-class Request
+class OutputStream : public boost::iostreams::stream<StreamSink>
 {
-protected :
-	virtual ~Request() {} ;
-	
 public :
-	// request environment
-	virtual std::string URI() const = 0 ;
-	virtual std::string SansQueryURI() const = 0 ;
-	virtual std::string Method() const = 0 ;
-	virtual std::string Referer() const = 0 ;
-	virtual std::string Query() const = 0 ;
-	virtual std::string ContentType() const = 0 ;
-
-	// input and output
-	virtual DataStream* In() = 0 ;
-	virtual DataStream* Out() = 0 ;
-
-	// tell the web server to send this file
-	virtual void XSendFile( const std::string& file ) = 0 ;
-
-	// HTTP status return
-	virtual void SeeOther( const std::string& location, bool query = false ) = 0 ;
-	virtual void NotFound( const std::string& message ) = 0 ;
-	virtual void Success() = 0 ;
-	
-	// for debugging
-	virtual void PrintEnv() const = 0 ;
+	explicit OutputStream( DataStream *out ) ;
 } ;
 
 } // end of namespace
+
