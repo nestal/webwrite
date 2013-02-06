@@ -98,7 +98,7 @@ void RootServer::Work( Request *req, const Resource& res )
 			h.func( this, req, res ) ;
 
 			// calculate time elapsed for processing
-			h.elapse += timer.elapsed().wall ;
+			h.elapse += static_cast<long>(timer.elapsed().wall) ;
 		}
 		else
 			NotFound( req ) ;

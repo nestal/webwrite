@@ -28,5 +28,24 @@
 
 namespace wb {
 
+template <>
+Atomic<long>& Atomic<long>::operator++()
+{
+	::InterlockedIncrement( &m_ ) ;
+	return *this ;
+}
+
+template <>
+Atomic<long> Atomic<long>::operator++( int )
+{
+	return ::InterlockedIncrement( &m_ ) ;
+}
+
+template <>
+Atomic<long>& Atomic<long>::operator+=( long v )
+{
+	::InterlockedExchangeAdd( &m_, v ) ;
+	return *this ;
+}
 
 } // end of namespace
