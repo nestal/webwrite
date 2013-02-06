@@ -158,7 +158,7 @@ void RootServer::Save( Request *req, const Resource& res )
 
 	// ask client to load the new content again. the client may not reload the page with the
 	// new content (because it has it anyway), but this will update the client's cache.
-	req->SeeOther( res.UrlPath().generic_string() + "?load" ) ;
+	req->SeeOther( res.UrlPath().generic_string() + "?data" ) ;
 }
 	
 void RootServer::Upload( Request *req, const Resource& res )

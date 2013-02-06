@@ -36,17 +36,20 @@ namespace
 	// hard code the HTML element white list for now
 	const std::string white_list_array[] =
 	{
-		"html",	"a",	"img",		"sub",
-		"body",	"br",	"pre",		"sup",
-		"div",	"b",	"strong",
-		"span",	"u",	"em",
-		"p",	"tt",
+		"html",	"a",	"img",	"sub",
+		"body",	"br",	"pre",	"sup",
+		"div",	"b",	"p",	"hr",
+		"span",	"u",	"em",	"q",
+		"code",	"i",	"tt",
 		
-		"h1",	"ul",	"dd",	"table",
-		"h2",	"ol",			"tbody",
-		"h3",	"li",			"tr",
-		"h4",	"dl",			"td",
-		"h5",	"dt",
+		"strong",
+		
+		"h1",	"ul",	"dd",	"table",	"caption",
+		"h2",	"ol",	"nav",	"tbody",	"blockquote",
+		"h3",	"li",			"thead",
+		"h4",	"dl",			"tr",
+		"h5",	"dt",			"td",
+		"h6",	"var",	"dfn",	"th",
 	} ;
 
 	const std::set<std::string> white_list(
