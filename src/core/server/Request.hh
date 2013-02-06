@@ -26,7 +26,7 @@ namespace wb {
 
 class DataStream ;
 class OutputStream ;
-class PrintF ;
+class Json ;
 
 class Request
 {
@@ -46,7 +46,9 @@ public :
 	virtual DataStream* In() = 0 ;
 	virtual DataStream* Out() = 0 ;
 
-	// tell the web server to send this file
+	// helpers
+	virtual void CacheControl( std::size_t max_age ) = 0 ;
+	virtual void Send( const Json& json ) = 0 ;
 	virtual void XSendFile( const std::string& file ) = 0 ;
 
 	// HTTP status return

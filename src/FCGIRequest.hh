@@ -28,7 +28,7 @@
 
 namespace wb {
 
-class Config ;
+class Json ;
 class DataStream ;
 class PrintF ;
 
@@ -54,7 +54,9 @@ public :
 	DataStream* In() ;
 	DataStream* Out() ;
 
-	// tell the web server to send this file
+	// helps
+	void CacheControl( std::size_t max_age ) ;
+	void Send( const Json& json ) ;
 	void XSendFile( const std::string& file ) ;
 	
 	// HTTP status return

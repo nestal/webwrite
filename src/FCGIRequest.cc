@@ -22,6 +22,7 @@
 #include "util/DataStream.hh"
 #include "util/Exception.hh"
 #include "util/File.hh"
+#include "parser/Json.hh"
 
 #include "log/Log.hh"
 
@@ -67,6 +68,19 @@ DataStream* FCGIRequest::Out()
 	return m_out.get() ;
 }
 
+void FCGIRequest::CacheControl( std::size_t max_age )
+{
+	FCGX_FPrintF( m_req->out, "Cache-Control: max-age=0\r\n", max_age ) ;
+}
+
+void FCGIRequest::Send( const Json& json )
+{
+	FCGX_FPrintF( m_req->out, "Content-type: application/json\r\n\r\n" ) ;
+	json.Write( m_out.get() ) ;
+	FCGX_FPrintF( m_req->out, "\r\n\r\n" ) ;
+}
+
+/// Tell the web server to send this file
 void FCGIRequest::XSendFile( const std::string& file )
 {
 	FCGX_FPrintF( m_req->out, "X-Accel-Redirect: %s\r\n\r\n", file.c_str() ) ;

@@ -90,15 +90,15 @@ void RootServer::Work( Request *req, const Resource& res )
 		{
 			Handler& h = i->second.Parse( qstr ) ;
 			
-			// bump stats
-			h.count++ ;
-	
 			// do real work
 			assert( !h.func.empty() ) ;
 			h.func( this, req, res ) ;
 
 			// calculate time elapsed for processing
 			h.elapse += static_cast<long>(timer.elapsed().wall) ;
+			
+			// bump stats
+			h.count++ ;
 		}
 		else
 			NotFound( req ) ;
@@ -117,8 +117,7 @@ void RootServer::DefaultPage( Request *req, const Resource& res )
 void RootServer::Load( Request *req, const Resource& res )
 {
 	// don't cache for dynamic contents
-	static const std::string cc = "Cache-Control: max-age=0\r\n" ;
-	req->Out()->Write( cc.c_str(), cc.size() ) ;
+	req->CacheControl(0) ;
 	
 	if ( fs::exists( res.DataPath() ) )
 		ServeFile( req, res.ReDirPath() ) ;
@@ -213,17 +212,15 @@ void RootServer::ServeVar( Request *req, const Resource& )
 	var.Add( "wb_root", Json( m_wb_root ) ) ;
 	var.Add( "main", Json( m_main_page ) ) ;
 	
-	OutputStream os( req->Out() ) ;
-	os << "Content-type: application/json\r\n\r\n" << std::flush ;
-	var.Write( req->Out() ) ;
-	os << "\r\n\r\n" ;
+	req->Send( var ) ;
 }
 
 void RootServer::ServeIndex( Request *req, const Resource& res )
 {
+	req->CacheControl(0) ;
+	
 	OutputStream os( req->Out() ) ;
 	os << 
-		"Cache-Control: max-age=0\r\n"
 		"Content-type: text/html\r\n\r\n"
 		"<ul>" ;
 	
@@ -232,7 +229,7 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 		os	<< "<li class=\"inode-directory menu_idx\"><a href=\""
 			<< res.UrlPath().parent_path().parent_path().generic_string()
 			<< '/' << m_main_page
-			<< ">[parent]</a></li>" ;
+			<< "\">[parent]</a></li>" ;
 	
 	if ( fs::is_directory(res.DataPath().parent_path()) )
 	{
@@ -311,17 +308,13 @@ std::string RootServer::CssMimeType( const std::string& mime )
 
 void RootServer::ServeProperties( Request *req, const Resource& res )
 {
-	OutputStream os( req->Out() ) ;
-	os << 
-		"Cache-Control: max-age=0\r\n"
-		"Content-type: application/json\r\n\r\n" << std::flush ;
-	
 	Json meta = res.Meta() ;
 	meta.Add( "name", Json(res.Name()) ) ;
 	meta.Add( "type", Json(CssMimeType(res.Type())) ) ;
 	meta.Write( req->Out() ) ;
 	
-	os << "\r\n\r\n" << std::flush ;
+	req->CacheControl(0) ;
+	req->Send( meta ) ;
 }
 
 void RootServer::ServeStats( Request *req, const Resource& res )
@@ -347,12 +340,8 @@ void RootServer::ServeStats( Request *req, const Resource& res )
 		result.Add( s->first, srv ) ;
 	}
 	
-	OutputStream os( req->Out() ) ;
-	os << 
-		"Cache-Control: max-age=0\r\n"
-		"Content-type: application/json\r\n\r\n" << std::flush ;
-	result.Write( req->Out() ) ;
-	os << "\r\n\r\n" << std::flush ;
+	req->CacheControl(0) ;
+	req->Send( result ) ;
 }
 
 } // end of namespace
