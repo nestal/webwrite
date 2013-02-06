@@ -72,6 +72,12 @@ body div.torso
             box-sizing: border-box;
 }
 
+.rich table p
+{
+    margin-top:     0.2em;
+    margin-bottom:  0.2em;
+}
+
 .rich
 {
 	margin:			0;
