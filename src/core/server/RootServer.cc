@@ -57,7 +57,7 @@ RootServer::RootServer( ) :
 	get.Add( "mime",	Handler(&RootServer::ServeMimeCss) ) ;
 	get.Add( "var",		Handler(&RootServer::ServeVar) ) ;
 	get.Add( "index",	Handler(&RootServer::ServeIndex) ) ;
-	get.Add( "load",	Handler(&RootServer::Load) ) ;
+	get.Add( "data",	Handler(&RootServer::Load) ) ;
 	get.Add( "lib",		Handler(&RootServer::ServeLib) ) ;
 	get.Add( "prop",	Handler(&RootServer::ServeProperties) ) ;
 	get.Add( "stats",	Handler(&RootServer::ServeStats) ) ;
@@ -66,7 +66,7 @@ RootServer::RootServer( ) :
 	Query<Handler>& post = m_srv.insert( std::make_pair( 
 		"POST",
 		Query<Handler>(Handler(&RootServer::NotFound)) ) ).first->second ;
-	post.Add( "save",	Handler(&RootServer::Save) ) ;
+	post.Add( "data",	Handler(&RootServer::Save) ) ;
 	post.Add( "upload",	Handler(&RootServer::Upload) ) ;
 }
 
