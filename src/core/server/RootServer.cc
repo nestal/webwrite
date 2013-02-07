@@ -79,7 +79,7 @@ void RootServer::Work( Request *req, const Resource& res )
 	cpu_timer timer;
 	fs::path	rel		= res.Path() ;
 	
-	if ( res.UrlPath() != req->SansQueryURI() )
+	if ( res.CheckRedir(req->SansQueryURI()) )
 		req->SeeOther( res.UrlPath().string(), true ) ;
 	else
 	{

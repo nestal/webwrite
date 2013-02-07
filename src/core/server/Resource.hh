@@ -35,7 +35,9 @@ public :
 
 	Resource() ;
 	explicit Resource( const std::string& uri ) ;
-	
+
+	bool CheckRedir( const std::string& uri ) const ;
+
 	/// a path to the resource relative to the "wb-root"
 	const fs::path& Path() const ;
 
@@ -60,7 +62,11 @@ public :
 	void MoveToAttic() const ;
 
 	static std::string DecodeName( const std::string& uri ) ;
-	
+
+private :
+	template <typename Pred>
+	static std::string DecodePercent( const std::string& uri, Pred pred ) ;
+
 private :
 	fs::path		m_path ;
 } ;

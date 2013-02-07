@@ -92,10 +92,12 @@ void Thread( int sock, RootServer *srv, boost::mutex *mutex )
 			Log( "FCGX_Accept_r() error %1%", r ) ;
 			break ;
 		}
-
-		FCGIRequest req( &request ) ;
-		std::string uri = req.URI() ;
-		srv->Work( &req, Resource( req.SansQueryURI() ) ) ;
+		else
+		{
+			// make sure FCGIRequest destroys before calling FCGX_Finish_r()
+			FCGIRequest req( &request ) ;
+			srv->Work( &req, Resource( req.SansQueryURI() ) ) ;
+		}
 		FCGX_Finish_r( &request ) ;
 	}
 }

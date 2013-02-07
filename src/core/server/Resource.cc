@@ -26,8 +26,47 @@
 #include <boost/exception/diagnostic_information.hpp>
 
 #include <algorithm>
+#include <bitset>
 #include <cassert>
 #include <string>
+
+namespace
+{
+	struct TruePred
+	{
+		template <typename T>
+		bool operator()( T ) const
+		{
+			return true ;
+		}
+	} ;
+	
+	struct Marked
+	{
+		// according to RFC2396, these characters are allowed and no need to
+		// be escaped
+		static std::bitset<256> Map()
+		{
+			std::bitset<256> result ;
+			result['-']  = true ;
+			result['_']  = true ;
+			result['.']  = true ;
+			result['!']  = true ;
+			result['~']  = true ;
+			result['*']  = true ;
+			result['\''] = true ;
+			result['(']  = true ;
+			result[')']  = true ;
+			return result ;
+		}
+	
+		bool operator()( char t ) const
+		{
+			static const std::bitset<256> map = Map() ;
+			return map[static_cast<unsigned char>(t)] ;
+		}
+	} ;
+}
 
 namespace wb {
 
@@ -43,10 +82,16 @@ Resource::Resource( const std::string& uri )
 	if ( uri.substr( 0, wb_root.size() ) != wb_root )
 		BOOST_THROW_EXCEPTION( Error() << expt::ErrMsg( "invalid resource path" ) ) ;
 	
-	m_path = uri.substr(wb_root.size()) ;
+	// decode the marked characters. firefox sometimes encoded them in % format.
+	m_path = DecodePercent( uri.substr(wb_root.size()), Marked() ) ;
 	
 	if ( Filename().empty() || Filename() == "." || fs::is_directory(DataPath()) )
 		m_path /= Cfg::Inst().main_page ; 
+}
+
+bool Resource::CheckRedir( const std::string& uri ) const
+{
+	return UrlPath() != DecodePercent( uri, Marked() ) ;
 }
 
 const fs::path& Resource::Path() const
@@ -75,6 +120,12 @@ std::string Resource::ParentName() const
 
 std::string Resource::DecodeName( const std::string& uri )
 {
+	return DecodePercent( uri, TruePred() ) ;
+}
+
+template <typename Pred>
+std::string Resource::DecodePercent( const std::string& uri, Pred pred )
+{
 	std::string result ;
 	for ( std::string::const_iterator i = uri.begin() ; i != uri.end() ; ++i )
 	{
@@ -85,7 +136,12 @@ std::string Resource::DecodeName( const std::string& uri )
 			{
 				long r = std::strtol( c.c_str()+1, 0, 16 ) ;
 				if ( r >= 0 && r <= std::numeric_limits<unsigned char>::max() )
-					result.push_back( static_cast<char>( r ) ) ;
+				{
+					if ( pred( static_cast<char>(r) ) )
+						result.push_back( static_cast<char>(r) ) ;
+					else
+						result.insert( result.end(), c.begin(), c.end() ) ;
+				}
 				i += 2 ;
 			}
 		}
