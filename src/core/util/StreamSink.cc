@@ -34,7 +34,7 @@ StreamSink::StreamSink( DataStream *out ) :
 
 std::streamsize StreamSink::write( const char* s, std::streamsize n )
 {
-	return m_out->Write( s, n ) ;
+	return m_out->Write( s, static_cast<std::size_t>(n) ) ;
 }
 
 } // end of namespace
