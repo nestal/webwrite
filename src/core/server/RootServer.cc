@@ -122,7 +122,36 @@ void RootServer::Load( Request *req, const Resource& res )
 	if ( fs::exists( res.DataPath() ) )
 		ServeFile( req, res.ReDirPath() ) ;
 	else
-		ServeFile( req, m_lib_redir / "newpage.html" ) ;
+	{
+		std::string percent20name, space_name, tmp = res.DataPath().string() ;
+		for ( std::string::iterator i = tmp.begin(); i != tmp.end() ; i++ )
+		{
+			if ( *i == '_' )
+			{
+				percent20name.insert( percent20name.size(), "%20" ) ;
+				space_name.push_back( ' ' ) ;
+			}
+			else
+			{
+				percent20name.push_back( *i ) ;
+				space_name.push_back( *i ) ;
+			}
+		}
+		fs::path percent20path( percent20name ), space_path( space_name ) ;
+
+		if ( fs::exists( percent20path ) )
+		{
+			fs::rename( percent20path, res.DataPath() ) ;
+			ServeFile( req, res.ReDirPath() ) ;
+		}
+		else if ( fs::exists( space_path ) )
+		{
+			fs::rename( space_path, res.DataPath() ) ;
+			ServeFile( req, res.ReDirPath() ) ;
+		}
+		else
+			ServeFile( req, m_lib_redir / "newpage.html" ) ;
+	}
 }
 
 void RootServer::FilterHTML( DataStream *html, const Resource& res )

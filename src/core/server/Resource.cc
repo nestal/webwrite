@@ -110,7 +110,9 @@ std::string Resource::Name() const
 {
 	// the file name on disk is using the URI encoding. i.e. it has %20 instead of
 	// space. this way there is no need to re-encode the name when reading and writing.
-	return DecodeName( Filename() ) ;
+	std::string name = DecodeName( Filename() ) ;
+	std::replace( name.begin(), name.end(), '_', ' ' ) ;
+	return name ;
 }
 
 std::string Resource::ParentName() const
@@ -137,7 +139,9 @@ std::string Resource::DecodePercent( const std::string& uri, Pred pred )
 				long r = std::strtol( c.c_str()+1, 0, 16 ) ;
 				if ( r >= 0 && r <= std::numeric_limits<unsigned char>::max() )
 				{
-					if ( pred( static_cast<char>(r) ) )
+					if ( r == ' ' )
+						result.push_back( '_' ) ;
+					else if ( pred( static_cast<char>(r) ) )
 						result.push_back( static_cast<char>(r) ) ;
 					else
 						result.insert( result.end(), c.begin(), c.end() ) ;
