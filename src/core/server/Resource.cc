@@ -24,6 +24,7 @@
 #include "log/Log.hh"
 
 #include <boost/exception/diagnostic_information.hpp>
+#include <boost/iterator/iterator_facade.hpp>
 
 #include <algorithm>
 #include <bitset>
@@ -32,6 +33,76 @@
 
 namespace
 {
+	struct UriChar
+	{
+		enum Type { alphanum, escaped, mark } ;
+
+		short	type:8 ;
+		short	ch:8 ;
+	} ;
+
+	template <typename Iterator=std::string::const_iterator>
+	class UriCharIterator : public boost::iterator_facade<
+		UriCharIterator<Iterator>,
+		std::pair<Iterator, Iterator>,
+		boost::incrementable_traversal_tag,
+		std::pair<Iterator, Iterator> >
+	{
+	public :
+		UriCharIterator()
+		{
+		}
+
+		UriCharIterator( Iterator current, Iterator end ) :
+			m_current( current ),
+			m_end( end )
+		{
+		}
+
+	private:
+		friend class boost::iterator_core_access;
+
+		bool equal( const UriCharIterator<Iterator>& other ) const
+		{
+			return m_current == other.m_current ;
+		}
+
+		std::pair<Iterator, Iterator> dereference() const
+		{
+			return std::make_pair( m_current, Next() ) ;
+		}
+
+		void increment()
+		{
+			m_current = Next() ;
+		}
+
+		Iterator Next() const
+		{
+			Iterator i = m_current ;
+			if ( i != m_end )
+			{
+				if ( *i == '%' )
+					Bump(i,2) ;
+				Bump(i) ;
+			}
+			return i ;
+		}
+
+		void Bump( Iterator& i, std::size_t n = 1 ) const
+		{
+			while ( n-- > 0 )
+			{
+				if ( i != m_end )
+					i++ ;
+			}
+		}
+
+	private :
+		Iterator	m_current, m_end ;
+		UriChar		m_val ;
+	} ;
+
 	struct TruePred
 	{
 		template <typename T>
@@ -43,10 +114,10 @@ namespace
 	
 	struct Marked
 	{
-		// according to RFC2396, these characters are allowed and no need to
-		// be escaped
 		static std::bitset<256> Map()
 		{
+			// according to RFC2396, these characters are allowed and no need to
+			// be escaped
 			std::bitset<256> result ;
 			result['-']  = true ;
 			result['_']  = true ;
@@ -57,13 +128,34 @@ namespace
 			result['\''] = true ;
 			result['(']  = true ;
 			result[')']  = true ;
+
+			// we will change space to _ ourselves
+			result[' ']  = true ;
 			return result ;
 		}
-	
+		static const std::bitset<256> m_map ;
+
 		bool operator()( char t ) const
 		{
-			static const std::bitset<256> map = Map() ;
-			return map[static_cast<unsigned char>(t)] ;
+			return m_map[static_cast<unsigned char>(t)] ;
+		}
+	} ;
+	const std::bitset<256> Marked::m_map = Marked::Map() ;
+
+	template <char src, char target>
+	struct CharMap
+	{
+		char operator()( char in ) const
+		{
+			return in == src ? target : in ;
+		}
+	} ;
+
+	struct IdentCharMap
+	{
+		char operator()( char in ) const
+		{
+			return in ;
 		}
 	} ;
 }
@@ -83,7 +175,7 @@ Resource::Resource( const std::string& uri )
 		BOOST_THROW_EXCEPTION( Error() << expt::ErrMsg( "invalid resource path" ) ) ;
 	
 	// decode the marked characters. firefox sometimes encoded them in % format.
-	m_path = DecodePercent( uri.substr(wb_root.size()), Marked() ) ;
+	m_path = DecodePercent( uri.substr(wb_root.size()), Marked(), CharMap<' ', '_'>() ) ;
 	
 	if ( Filename().empty() || Filename() == "." || fs::is_directory(DataPath()) )
 		m_path /= Cfg::Inst().main_page ; 
@@ -91,7 +183,7 @@ Resource::Resource( const std::string& uri )
 
 bool Resource::CheckRedir( const std::string& uri ) const
 {
-	return UrlPath() != DecodePercent( uri, Marked() ) ;
+	return UrlPath() != DecodePercent( uri, Marked(), IdentCharMap() ) ;
 }
 
 const fs::path& Resource::Path() const
@@ -108,11 +200,7 @@ std::string Resource::Filename() const
 /// the web server is using UTF8, this string should be in UTF8 encoding.
 std::string Resource::Name() const
 {
-	// the file name on disk is using the URI encoding. i.e. it has %20 instead of
-	// space. this way there is no need to re-encode the name when reading and writing.
-	std::string name = DecodeName( Filename() ) ;
-	std::replace( name.begin(), name.end(), '_', ' ' ) ;
-	return name ;
+	return DecodeName( Filename() ) ;
 }
 
 std::string Resource::ParentName() const
@@ -122,36 +210,36 @@ std::string Resource::ParentName() const
 
 std::string Resource::DecodeName( const std::string& uri )
 {
-	return DecodePercent( uri, TruePred() ) ;
+	return DecodePercent( uri, TruePred(), CharMap<'_', ' '>() ) ;
 }
 
-template <typename Pred>
-std::string Resource::DecodePercent( const std::string& uri, Pred pred )
+template <typename Pred, typename CharMapT>
+std::string Resource::DecodePercent( const std::string& uri, Pred pred, CharMapT cmap )
 {
 	std::string result ;
-	for ( std::string::const_iterator i = uri.begin() ; i != uri.end() ; ++i )
+	UriCharIterator<> it( uri.begin(), uri.end() ), end( uri.end(), uri.end() ) ;
+	for ( ; it != end ; ++it )
 	{
-		if ( *i == '%' )
+		std::pair<std::string::const_iterator, std::string::const_iterator>
+			ch = *it ;
+		if ( ch.first != ch.second )
 		{
-			std::string c = uri.substr( i-uri.begin(), 3 ) ;
-			if ( c.size() == 3 )
+			if ( *ch.first == '%' && ch.second - ch.first == 3 )
 			{
-				long r = std::strtol( c.c_str()+1, 0, 16 ) ;
+				long r = std::strtol( std::string(ch.first+1, ch.second).c_str(), 0, 16 ) ;
 				if ( r >= 0 && r <= std::numeric_limits<unsigned char>::max() )
 				{
-					if ( r == ' ' )
-						result.push_back( '_' ) ;
-					else if ( pred( static_cast<char>(r) ) )
-						result.push_back( static_cast<char>(r) ) ;
+					if ( pred( static_cast<char>(r) ) )
+						result.push_back( cmap( static_cast<char>(r) ) ) ;
 					else
-						result.insert( result.end(), c.begin(), c.end() ) ;
+						result.insert( result.end(), ch.first, ch.second ) ;
 				}
-				i += 2 ;
 			}
+			else
+				result.push_back( cmap( *ch.first ) ) ;
 		}
-		else
-			result.push_back( *i );
 	}
+
 	return result ;
 }
 

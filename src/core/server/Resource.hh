@@ -64,8 +64,8 @@ public :
 	static std::string DecodeName( const std::string& uri ) ;
 
 private :
-	template <typename Pred>
-	static std::string DecodePercent( const std::string& uri, Pred pred ) ;
+	template <typename Pred, typename CharMapT>
+	static std::string DecodePercent( const std::string& uri, Pred pred, CharMapT cmap ) ;
 
 private :
 	fs::path		m_path ;

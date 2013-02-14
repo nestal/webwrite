@@ -80,7 +80,10 @@ void RootServer::Work( Request *req, const Resource& res )
 	fs::path	rel		= res.Path() ;
 	
 	if ( res.CheckRedir(req->SansQueryURI()) )
+	{
+		Log( "redirecting %1% to %2%", req->URI(), res.UrlPath() ) ;
 		req->SeeOther( res.UrlPath().string(), true ) ;
+	}
 	else
 	{
 		std::string qstr	= req->Query() ;
