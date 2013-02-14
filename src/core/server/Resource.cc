@@ -33,20 +33,104 @@
 
 namespace
 {
-	struct UriChar
+	struct Marked
 	{
-		enum Type { alphanum, escaped, mark } ;
+		static std::bitset<256> Map()
+		{
+			// according to RFC2396, these characters are allowed and no need to
+			// be escaped
+			std::bitset<256> result ;
+			result['-']  = true ;
+			result['_']  = true ;
+			result['.']  = true ;
+			result['!']  = true ;
+			result['~']  = true ;
+			result['*']  = true ;
+			result['\''] = true ;
+			result['(']  = true ;
+			result[')']  = true ;
 
-		short	type:8 ;
-		short	ch:8 ;
+			// we will change space to _ ourselves
+			result[' ']  = true ;
+			return result ;
+		}
+		static const std::bitset<256> m_map ;
+
+		bool operator()( char t ) const
+		{
+			return m_map[static_cast<unsigned char>(t)] ;
+		}
+	} ;
+	const std::bitset<256> Marked::m_map = Marked::Map() ;
+	
+	template <typename Iterator=std::string::const_iterator>
+	class UriChar
+	{
+	public :
+		enum Type { null, alphanum, escape, mark } ;
+
+		UriChar( Iterator begin, Iterator end ) :
+			m_begin(begin),
+			m_end(end)
+		{
+		}
+
+		Iterator begin() const
+		{
+			return m_begin;
+		}
+
+		Iterator end() const
+		{
+			return m_end;
+		}
+
+		std::string Str() const
+		{
+			return std::string(m_begin, m_end) ;
+		}
+
+		Type CharType() const
+		{
+			return
+				(m_begin == m_end ? null :
+					(*m_begin == '%' ? escape :
+						(Marked::m_map[*m_begin] ? mark : alphanum)
+					)
+				);
+		}
+
+		operator void*() const
+		{
+			return m_begin != m_end ? this : 0 ;
+		}
+
+		operator char() const
+		{
+			if ( m_begin == m_end )
+				return '\0' ;
+
+			else if ( *m_begin == '%' )
+			{
+				Iterator i = m_begin;
+				long r = std::strtol( std::string(++i, m_end).c_str(), 0, 16 ) ;
+				return r >= 0 && r <= std::numeric_limits<unsigned char>::max() ? static_cast<char>(r) : '\0' ;
+			}
+			
+			else
+				return *m_begin ;
+		}
+
+	private :
+		Iterator m_begin, m_end ;
 	} ;
 
 	template <typename Iterator=std::string::const_iterator>
 	class UriCharIterator : public boost::iterator_facade<
 		UriCharIterator<Iterator>,
-		std::pair<Iterator, Iterator>,
+		UriChar<Iterator>,
 		boost::incrementable_traversal_tag,
-		std::pair<Iterator, Iterator> >
+		UriChar<Iterator> >
 	{
 	public :
 		UriCharIterator()
@@ -67,9 +151,9 @@ namespace
 			return m_current == other.m_current ;
 		}
 
-		std::pair<Iterator, Iterator> dereference() const
+		UriChar<Iterator> dereference() const
 		{
-			return std::make_pair( m_current, Next() ) ;
+			return UriChar<Iterator>( m_current, Next() ) ;
 		}
 
 		void increment()
@@ -100,7 +184,6 @@ namespace
 
 	private :
 		Iterator	m_current, m_end ;
-		UriChar		m_val ;
 	} ;
 
 	struct TruePred
@@ -112,36 +195,6 @@ namespace
 		}
 	} ;
 	
-	struct Marked
-	{
-		static std::bitset<256> Map()
-		{
-			// according to RFC2396, these characters are allowed and no need to
-			// be escaped
-			std::bitset<256> result ;
-			result['-']  = true ;
-			result['_']  = true ;
-			result['.']  = true ;
-			result['!']  = true ;
-			result['~']  = true ;
-			result['*']  = true ;
-			result['\''] = true ;
-			result['(']  = true ;
-			result[')']  = true ;
-
-			// we will change space to _ ourselves
-			result[' ']  = true ;
-			return result ;
-		}
-		static const std::bitset<256> m_map ;
-
-		bool operator()( char t ) const
-		{
-			return m_map[static_cast<unsigned char>(t)] ;
-		}
-	} ;
-	const std::bitset<256> Marked::m_map = Marked::Map() ;
-
 	template <char src, char target>
 	struct CharMap
 	{
@@ -220,23 +273,18 @@ std::string Resource::DecodePercent( const std::string& uri, Pred pred, CharMapT
 	UriCharIterator<> it( uri.begin(), uri.end() ), end( uri.end(), uri.end() ) ;
 	for ( ; it != end ; ++it )
 	{
-		std::pair<std::string::const_iterator, std::string::const_iterator>
-			ch = *it ;
-		if ( ch.first != ch.second )
+		UriChar<> ch = *it ;
+		if ( ch )
 		{
-			if ( *ch.first == '%' && ch.second - ch.first == 3 )
+			if ( ch.CharType() == UriChar<>::escape )
 			{
-				long r = std::strtol( std::string(ch.first+1, ch.second).c_str(), 0, 16 ) ;
-				if ( r >= 0 && r <= std::numeric_limits<unsigned char>::max() )
-				{
-					if ( pred( static_cast<char>(r) ) )
-						result.push_back( cmap( static_cast<char>(r) ) ) ;
-					else
-						result.insert( result.end(), ch.first, ch.second ) ;
-				}
+				if ( pred( ch ) )
+					result.push_back( cmap( ch ) ) ;
+				else
+					result.insert( result.end(), ch.begin(), ch.end() ) ;
 			}
 			else
-				result.push_back( cmap( *ch.first ) ) ;
+				result.push_back( cmap( ch ) ) ;
 		}
 	}
 
