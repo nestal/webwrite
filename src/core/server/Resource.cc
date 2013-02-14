@@ -94,8 +94,9 @@ namespace
 		{
 			return
 				(m_begin == m_end ? null :
-					(*m_begin == '%' ? escape :
-						(Marked::m_map[*m_begin] ? mark : alphanum)
+					(*m_begin == '%'
+						? (Marked::m_map[operator char()] ? mark : escape)
+						: (Marked::m_map[*m_begin]        ? mark : alphanum)
 					)
 				);
 		}
@@ -129,7 +130,7 @@ namespace
 	class UriCharIterator : public boost::iterator_facade<
 		UriCharIterator<Iterator>,
 		UriChar<Iterator>,
-		boost::incrementable_traversal_tag,
+		std::input_iterator_tag,
 		UriChar<Iterator> >
 	{
 	public :
@@ -184,15 +185,6 @@ namespace
 
 	private :
 		Iterator	m_current, m_end ;
-	} ;
-
-	struct TruePred
-	{
-		template <typename T>
-		bool operator()( T ) const
-		{
-			return true ;
-		}
 	} ;
 	
 	template <char src, char target>
@@ -263,7 +255,10 @@ std::string Resource::ParentName() const
 
 std::string Resource::DecodeName( const std::string& uri )
 {
-	return DecodePercent( uri, TruePred(), CharMap<'_', ' '>() ) ;
+	std::string out ;
+	UriCharIterator<> it( uri.begin(), uri.end() ), end( uri.end(), uri.end() ) ;
+	std::transform( it, end, std::back_inserter(out), CharMap<'_', ' '>() ) ;
+	return out ;
 }
 
 template <typename Pred, typename CharMapT>
@@ -274,17 +269,20 @@ std::string Resource::DecodePercent( const std::string& uri, Pred pred, CharMapT
 	for ( ; it != end ; ++it )
 	{
 		UriChar<> ch = *it ;
-		if ( ch )
+		switch ( ch.CharType() )
 		{
-			if ( ch.CharType() == UriChar<>::escape )
+		case UriChar<>::escape :
+			if ( !pred( ch ) )
 			{
-				if ( pred( ch ) )
-					result.push_back( cmap( ch ) ) ;
-				else
-					result.insert( result.end(), ch.begin(), ch.end() ) ;
+				result.insert( result.end(), ch.begin(), ch.end() ) ;
+				break ;
 			}
-			else
-				result.push_back( cmap( ch ) ) ;
+			// fall-through
+		
+		case UriChar<>::mark :
+		case UriChar<>::alphanum :
+			result.push_back( cmap( ch ) ) ;
+			break ;
 		}
 	}
 
