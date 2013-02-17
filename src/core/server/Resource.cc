@@ -20,11 +20,12 @@
 #include "Resource.hh"
 #include "Config.hh"
 #include "parser/Json.hh"
+#include "parser/UriChar.hh"
+#include "parser/UriCharIterator.hh"
 #include "util/File.hh"
 #include "log/Log.hh"
 
 #include <boost/exception/diagnostic_information.hpp>
-#include <boost/iterator/iterator_facade.hpp>
 
 #include <algorithm>
 #include <bitset>
@@ -33,160 +34,6 @@
 
 namespace
 {
-	struct Marked
-	{
-		static std::bitset<256> Map()
-		{
-			// according to RFC2396, these characters are allowed and no need to
-			// be escaped
-			std::bitset<256> result ;
-			result['-']  = true ;
-			result['_']  = true ;
-			result['.']  = true ;
-			result['!']  = true ;
-			result['~']  = true ;
-			result['*']  = true ;
-			result['\''] = true ;
-			result['(']  = true ;
-			result[')']  = true ;
-
-			// we will change space to _ ourselves
-			result[' ']  = true ;
-			return result ;
-		}
-		static const std::bitset<256> m_map ;
-
-		bool operator()( char t ) const
-		{
-			return m_map[static_cast<unsigned char>(t)] ;
-		}
-	} ;
-	const std::bitset<256> Marked::m_map = Marked::Map() ;
-	
-	template <typename Iterator=std::string::const_iterator>
-	class UriChar
-	{
-	public :
-		enum Type { null, alphanum, escape, mark } ;
-
-		UriChar( Iterator begin, Iterator end ) :
-			m_begin(begin),
-			m_end(end)
-		{
-		}
-
-		Iterator begin() const
-		{
-			return m_begin;
-		}
-
-		Iterator end() const
-		{
-			return m_end;
-		}
-
-		std::string Str() const
-		{
-			return std::string(m_begin, m_end) ;
-		}
-
-		Type CharType() const
-		{
-			return
-				(m_begin == m_end ? null :
-					(*m_begin == '%'
-						? (Marked::m_map[operator char()] ? mark : escape)
-						: (Marked::m_map[*m_begin]        ? mark : alphanum)
-					)
-				);
-		}
-
-		operator void*() const
-		{
-			return m_begin != m_end ? this : 0 ;
-		}
-
-		operator char() const
-		{
-			if ( m_begin == m_end )
-				return '\0' ;
-
-			else if ( *m_begin == '%' )
-			{
-				Iterator i = m_begin;
-				long r = std::strtol( std::string(++i, m_end).c_str(), 0, 16 ) ;
-				return r >= 0 && r <= std::numeric_limits<unsigned char>::max() ? static_cast<char>(r) : '\0' ;
-			}
-			
-			else
-				return *m_begin ;
-		}
-
-	private :
-		Iterator m_begin, m_end ;
-	} ;
-
-	template <typename Iterator=std::string::const_iterator>
-	class UriCharIterator : public boost::iterator_facade<
-		UriCharIterator<Iterator>,
-		UriChar<Iterator>,
-		std::input_iterator_tag,
-		UriChar<Iterator> >
-	{
-	public :
-		UriCharIterator()
-		{
-		}
-
-		UriCharIterator( Iterator current, Iterator end ) :
-			m_current( current ),
-			m_end( end )
-		{
-		}
-
-	private:
-		friend class boost::iterator_core_access;
-
-		bool equal( const UriCharIterator<Iterator>& other ) const
-		{
-			return m_current == other.m_current ;
-		}
-
-		UriChar<Iterator> dereference() const
-		{
-			return UriChar<Iterator>( m_current, Next() ) ;
-		}
-
-		void increment()
-		{
-			m_current = Next() ;
-		}
-
-		Iterator Next() const
-		{
-			Iterator i = m_current ;
-			if ( i != m_end )
-			{
-				if ( *i == '%' )
-					Bump(i,2) ;
-				Bump(i) ;
-			}
-			return i ;
-		}
-
-		void Bump( Iterator& i, std::size_t n = 1 ) const
-		{
-			while ( n-- > 0 )
-			{
-				if ( i != m_end )
-					i++ ;
-			}
-		}
-
-	private :
-		Iterator	m_current, m_end ;
-	} ;
-	
 	template <char src, char target>
 	struct CharMap
 	{
@@ -203,6 +50,7 @@ namespace
 			return in ;
 		}
 	} ;
+
 }
 
 namespace wb {
