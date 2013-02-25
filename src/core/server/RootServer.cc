@@ -176,11 +176,13 @@ void RootServer::Save( Request *req, const Resource& res )
 	fs::path file = res.DataPath() ;
 	Log( "writing to file %1%", file, log::verbose ) ;
 
+	// first move the original file to attic without any modification
 	res.MoveToAttic() ;
 	
-	// read and save the file
+	// read input data, do filtering and save the file
 	FilterHTML( req->In(), res ) ;
 
+	// if the new file is empty, that means the user wants to delete the file
 	boost::uintmax_t size = fs::file_size(file) ;
 	if ( size == 0 )
 	{
@@ -196,9 +198,18 @@ void RootServer::Save( Request *req, const Resource& res )
 void RootServer::Upload( Request *req, const Resource& res )
 {
 	FormData form( req->In(), req->ContentType() ) ;
-	form.Save( res.DataPath().parent_path() ) ;
+	form.Save( res.DataPath().parent_path(), OnFileUploaded ) ;
 	
 	req->Success() ;
+}
+
+void RootServer::OnFileUploaded(
+		const fs::path&		path,
+		const std::string&	filename,
+		File&				file,
+		const std::string&	mime )
+{
+	// TODO: construct a Resource and setup the right metadata
 }
 
 void RootServer::ServeLib( Request *req, const Resource& res )

@@ -31,6 +31,7 @@ namespace wb {
 
 class Request ;
 class DataStream ;
+class File ;
 
 class RootServer
 {
@@ -64,6 +65,12 @@ private :
 	void FilterHTML( DataStream *html, const Resource& res ) ;
 
 	static std::string CssMimeType( const std::string& type ) ;
+
+	static void OnFileUploaded(
+		const fs::path&		path,
+		const std::string&	filename,
+		File&				file,
+		const std::string&	mime ) ;
 
 private :
 	// configuration parameters

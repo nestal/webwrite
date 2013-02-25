@@ -49,6 +49,10 @@ public :
 	File( const fs::path& path, int mode ) ;
 	~File( ) ;
 
+	File( const File& rhs ) ;
+	File& operator=( const File& rhs ) ;
+	void Swap( File& other ) ;
+
 	void OpenForRead( const fs::path& path ) ;
 	void OpenForWrite( const fs::path& path, int mode = 0600 ) ;
 	void Close() ;

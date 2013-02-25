@@ -25,6 +25,14 @@
 
 using namespace wb ;
 
+void DummyCallback(
+		const fs::path&		path,
+		const std::string&	filename,
+		File&				file,
+		const std::string&	mime )
+{
+}
+
 BOOST_AUTO_TEST_SUITE( FormDataTest )
 
 BOOST_AUTO_TEST_CASE( Test )
@@ -32,12 +40,12 @@ BOOST_AUTO_TEST_CASE( Test )
 	File form_data( TEST_DATA "test.pdf.form" ) ;
 	FormData subject( &form_data, "multipart/form-data; boundary="
 		"---------------------------101378736882613805899358823" ) ;
-	subject.Save( "./" ) ;
+	subject.Save( "./", DummyCallback ) ;
 	
 	File form_data2( TEST_DATA "textures.form" ) ;
 	FormData subject2( &form_data2, "multipart/form-data; boundary="
 		"---------------------------11351845291583120309948566114" ) ;
-	subject2.Save( "./" ) ;
+	subject2.Save( "./", DummyCallback ) ;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

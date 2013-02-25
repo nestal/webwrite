@@ -22,10 +22,12 @@
 #include "util/Exception.hh"
 #include "util/FileSystem.hh"
 #include <string>
+#include <boost/function.hpp>
 
 namespace wb {
 
 class DataStream ;
+class File ;
 
 /*!	\brief	HTTP multi-part form data. Defined in RFC2388/1867.
 */
@@ -37,10 +39,14 @@ public :
 	typedef boost::error_info<struct ExpB, std::string>	ExpectedBoundary ;
 	typedef boost::error_info<struct ActB, std::string>	ActualBoundary ;
 
+	typedef boost::function<
+		void ( const fs::path& path, const std::string& filename, File& file, const std::string& mime )
+	> Callback ;
+
 public :
 	FormData( DataStream *in, const std::string& ctype ) ;
 
-	void Save( const fs::path& path ) ;
+	void Save( const fs::path& path, const Callback& callback = Callback() ) ;
 
 private :
 	static std::size_t ReadUntil( DataStream *out, const std::string& target ) ;

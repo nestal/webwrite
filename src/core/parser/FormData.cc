@@ -47,7 +47,7 @@ FormData::FormData( DataStream *in, const std::string& ctype ) :
 		m_boundary = m[1] ;
 }
 
-void FormData::Save( const fs::path& path )
+void FormData::Save( const fs::path& path, const Callback& callback )
 {
 	StreamParser p( m_in ) ;
 
@@ -79,6 +79,7 @@ void FormData::Save( const fs::path& path )
 		File f( path / fname, 0600 ) ;
 		StreamParser::Result r = p.ReadUntil( "\r\n--" + m_boundary, &f ) ;
 		
+		callback( path, fname, f, "mime?" ) ;
 		Log( "saved %1%: %2% bytes", (path/fname), r.consumed ) ;
 		
 		ending.Str("") ;
