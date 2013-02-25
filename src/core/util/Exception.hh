@@ -42,13 +42,15 @@ struct Exception :
 	virtual public boost::exception
 {
 	Exception( ) ;
+	
+	virtual const char* what() const throw() ;
 } ;
 
 /// Exception informations
 namespace expt
 {
 	// back-trace information. should be present for all exceptions
-	typedef boost::error_info<struct BacktraceTag, Backtrace>	BacktraceInfo ;
+	typedef boost::error_info<struct Backtrace, wb::Backtrace>	Backtrace_ ;
 
 	/// generic error message
 	typedef boost::error_info<struct MsgTag, std::string>		ErrMsg ;

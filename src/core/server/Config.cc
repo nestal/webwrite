@@ -19,6 +19,8 @@
 
 #include "Config.hh"
 
+#include <memory>
+
 namespace wb {
 
 namespace
@@ -59,14 +61,25 @@ std::string Cfg::MimeType( const fs::path& file )
 		(FindMime(ext, Cfg::Inst().mime))) ;
 }
 
-const Cfg& Cfg::Inst( const Json& json )
+Cfg& TheInst()
 {
-	static const Cfg inst =
+	static Cfg inst ;
+	return inst ;
+}
+
+const Cfg& Cfg::Inst()
+{
+	return TheInst() ;
+}
+
+void Cfg::Init( const Json& json )
+{
+	const Cfg json_cfg =
 	{
 		Optional<std::string>( json, "name",		"WebWrite" ),
-		Optional<std::string>( json, "socket",	"" ),
+		Optional<std::string>( json, "socket",		"" ),
 		json["wb_root"].Str(),
-		Optional<std::string>( json, "main_page", "main" ),
+		Optional<std::string>( json, "main_page",	"main" ),
 		Optional( json, "thread", 5 ),
 		
 		{
@@ -86,12 +99,12 @@ const Cfg& Cfg::Inst( const Json& json )
 			json["attic"]["redir"].Str(),
 		},
 		{
-			json["log"]["level"].Str(),
-			json["log"]["file"].Str(),
+			Optional<std::string>( json["log"], "level",	"debug" ),
+			Optional<std::string>( json["log"], "file",		"webwrite.log" ),
 		},
 		MakeMimeMap( json["mime"].AsObject() ),
 	} ;
-	return inst ;
+	TheInst() = json_cfg ;
 }
 
 } // end of namespace wb

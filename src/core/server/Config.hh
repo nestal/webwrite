@@ -108,7 +108,10 @@ struct Cfg
 	static std::string MimeType( const fs::path& ext ) ;
 	
 	/// Singleton object for easy access everywhere
-	static const Cfg& Inst( const Json& json = Json() ) ;
+	static const Cfg& Inst() ;
+	
+	/// should only call once
+	static void Init( const Json& json ) ;
 } ;
 
 } // end of namespace

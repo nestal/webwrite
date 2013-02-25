@@ -43,8 +43,17 @@ public :
 	typedef std::vector<Json>			Array ;
 
 	struct Error : virtual Exception {} ;
-	typedef boost::error_info<struct JsonTag, Json>	JsonInfo ;
-	
+	typedef boost::error_info<struct Json, 				std::string>	Json_ ;
+	typedef boost::error_info<struct OutOfRange,		std::size_t>	OutOfRange_ ;
+	typedef boost::error_info<struct KeyNotFound,		std::string>	KeyNotFound_ ;
+	typedef boost::error_info<struct JsonCApi,			std::string>	JsonCApi_ ;
+
+	template <typename T>
+	struct Val_
+	{
+		typedef boost::error_info<struct Value, T> Err ;
+	} ;
+
 public :
 	template <typename T>
 	explicit Json( const T& val ) ;
@@ -95,7 +104,13 @@ private :
 	
 	struct NotOwned {} ;
 	Json( struct json_object *json, NotOwned ) ;
-	
+
+	// helper for throwing exception
+	template <typename T> static typename Val_<T>::Err ValueErr( const T& t )
+	{
+		return typename Val_<T>::Err(t);
+	}
+
 private :
 	struct json_object	*m_json ;
 } ;

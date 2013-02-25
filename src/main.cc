@@ -107,7 +107,7 @@ int main( int argc, char **argv )
 	try
 	{
 		File cfg_file( argc < 2 ? "config.json" : argv[1] ) ;
-		Cfg::Inst( Json::Parse( &cfg_file ) ) ;
+		Cfg::Init( Json::Parse( &cfg_file ) ) ;
 		InitLog( ) ;
 		
 		FCGX_Init() ;

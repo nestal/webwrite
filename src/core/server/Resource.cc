@@ -34,11 +34,14 @@
 
 namespace
 {
+	using namespace wb ;
+
 	template <char src, char target>
 	struct CharMap
 	{
-		char operator()( char in ) const
+		char operator()( const UriChar<>& uc ) const
 		{
+			char in = uc;
 			return in == src ? target : in ;
 		}
 	} ;
@@ -68,7 +71,7 @@ Resource::Resource( const std::string& uri )
 		BOOST_THROW_EXCEPTION( Error() << expt::ErrMsg( "invalid resource path" ) ) ;
 	
 	// decode the marked characters. firefox sometimes encoded them in % format.
-	m_path = DecodePercent( uri.substr(wb_root.size()), Marked(), CharMap<' ', '_'>() ) ;
+	m_path = DecodePercent( uri.substr(wb_root.size()), CharMap<' ', '_'>() ) ;
 	
 	if ( Filename().empty() || Filename() == "." || fs::is_directory(DataPath()) )
 		m_path /= Cfg::Inst().main_page ; 
@@ -76,7 +79,7 @@ Resource::Resource( const std::string& uri )
 
 bool Resource::CheckRedir( const std::string& uri ) const
 {
-	return UrlPath() != DecodePercent( uri, Marked(), IdentCharMap() ) ;
+	return UrlPath() != DecodePercent( uri, IdentCharMap() ) ;
 }
 
 const fs::path& Resource::Path() const
@@ -109,8 +112,8 @@ std::string Resource::DecodeName( const std::string& uri )
 	return out ;
 }
 
-template <typename Pred, typename CharMapT>
-std::string Resource::DecodePercent( const std::string& uri, Pred pred, CharMapT cmap )
+template <typename CharMapT>
+std::string Resource::DecodePercent( const std::string& uri, CharMapT cmap )
 {
 	std::string result ;
 	UriCharIterator<> it( uri.begin(), uri.end() ), end( uri.end(), uri.end() ) ;
@@ -120,7 +123,7 @@ std::string Resource::DecodePercent( const std::string& uri, Pred pred, CharMapT
 		switch ( ch.CharType() )
 		{
 		case UriChar<>::escape :
-			if ( !pred( ch ) )
+			if ( !Marked()( ch ) )
 			{
 				result.insert( result.end(), ch.begin(), ch.end() ) ;
 				break ;
