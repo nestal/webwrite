@@ -172,7 +172,8 @@ fs::path Resource::MetaPath() const
 
 std::string Resource::Type() const
 {
-	return m_meta.get() != 0 ? m_meta->type : DeduceType() ;
+	LoadMeta() ;
+	return m_meta->type ;
 }
 
 Resource::Meta Resource::GetMeta() const
@@ -195,15 +196,18 @@ void Resource::LoadMeta() const
 
 	// load meta from file
 	m_meta.reset(new Meta) ;
+	m_meta->sequence = 0 ;
+
 	fs::path file = Cfg::Inst().meta.path / m_path ;
 	try
 	{
 		File in( file.string() ) ;
 		Json meta = Json::Parse( &in ) ;
 
-		m_meta->modified = 	meta["last-modified"].As<std::time_t>() ;
-		m_meta->name	= 	meta["name"].Str() ;
-		m_meta->type	= 	meta["type"].Str() ;
+		m_meta->modified	= meta["last-modified"].As<std::time_t>() ;
+		m_meta->name		= meta["name"].Str() ;
+		m_meta->type		= meta["type"].Str() ;
+		m_meta->sequence	= meta["sequence"].Int() ;
 	}
 	catch ( Exception& )
 	{
@@ -230,10 +234,13 @@ void Resource::SaveMeta() const
 	fs::create_directories( file.parent_path() ) ;
 	
 	LoadMeta() ;
+	++m_meta->sequence ;
+
 	Json meta ;
 	meta.Add( "last-modified",	Json(m_meta->modified) ) ;
 	meta.Add( "name",			Json(m_meta->name) ) ;
 	meta.Add( "type",			Json(m_meta->type) ) ;
+	meta.Add( "sequence",		Json(m_meta->sequence) ) ;
 
 	File out( file, 0600 ) ;
 	meta.Write( &out ) ; 

@@ -40,6 +40,7 @@ public :
 		std::string		name ;
 		std::string		type ;
 		std::time_t		modified ;
+		std::size_t		sequence ;
 	} ;
 
 public :
@@ -64,7 +65,6 @@ public :
 	std::string ParentName() const ;
 
 	std::string Name() const ;
-	
 	std::string Type() const ;
 
 	Meta GetMeta() const ;
