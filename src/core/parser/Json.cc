@@ -297,12 +297,6 @@ std::string Json::Str() const
 }
 
 template <>
-bool Json::Is<void>() const
-{
-	
-}
-
-template <>
 bool Json::Is<std::string>() const
 {
 	assert( m_json != 0 ) ;
@@ -332,6 +326,18 @@ template <>
 int Json::As<int>() const
 {
 	return Int() ;
+}
+
+template <>
+boost::uint32_t Json::As<boost::uint32_t>() const
+{
+	return static_cast<boost::uint32_t>(Int()) ;
+}
+
+template <>
+boost::int64_t Json::As<boost::int64_t>() const
+{
+	return ::json_object_get_int64( m_json ) ;
 }
 
 std::ostream& operator<<( std::ostream& os, const Json& json )

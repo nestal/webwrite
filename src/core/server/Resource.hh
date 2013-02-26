@@ -23,6 +23,7 @@
 #include "util/Exception.hh"
 
 #include <ctime>
+#include <memory>
 
 namespace wb {
 
@@ -32,9 +33,19 @@ class Resource
 {
 public :
 	struct Error : virtual public Exception {} ;
+	typedef boost::error_info<struct InvalidUri, std::string>	InvalidUri_ ;
 
+	struct Meta
+	{
+		std::string		name ;
+		std::string		type ;
+		std::time_t		modified ;
+	} ;
+
+public :
 	Resource() ;
 	explicit Resource( const std::string& uri ) ;
+	~Resource() ;
 
 	bool CheckRedir( const std::string& uri ) const ;
 
@@ -56,9 +67,9 @@ public :
 	
 	std::string Type() const ;
 
-	Json Meta() const ;
-
-	void SaveMeta( std::time_t modified ) const ;
+	Meta GetMeta() const ;
+	void SaveMeta() const ;
+	
 	void MoveToAttic() const ;
 
 	static std::string DecodeName( const std::string& uri ) ;
@@ -67,8 +78,14 @@ private :
 	template <typename CharMapT>
 	static std::string DecodePercent( const std::string& uri, CharMapT cmap ) ;
 
+	void LoadMeta() const ;
+
+	std::string DeduceType() const ;
+	std::string DeduceName() const ;
+
 private :
-	fs::path		m_path ;
+	fs::path					m_path ;
+	mutable std::auto_ptr<Meta>	m_meta ;
 } ;
 
 } // end of namespace

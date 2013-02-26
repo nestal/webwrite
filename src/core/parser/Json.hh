@@ -43,7 +43,7 @@ public :
 	typedef std::vector<Json>			Array ;
 
 	struct Error : virtual Exception {} ;
-	typedef boost::error_info<struct Json, 				std::string>	Json_ ;
+	typedef boost::error_info<struct JsonTag, 			std::string>	Json_ ;
 	typedef boost::error_info<struct OutOfRange,		std::size_t>	OutOfRange_ ;
 	typedef boost::error_info<struct KeyNotFound,		std::string>	KeyNotFound_ ;
 	typedef boost::error_info<struct JsonCApi,			std::string>	JsonCApi_ ;

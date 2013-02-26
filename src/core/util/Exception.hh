@@ -50,13 +50,10 @@ struct Exception :
 namespace expt
 {
 	// back-trace information. should be present for all exceptions
-	typedef boost::error_info<struct Backtrace, wb::Backtrace>	Backtrace_ ;
+	typedef boost::error_info<struct BacktraceTag, wb::Backtrace>	Backtrace_ ;
 
 	/// generic error message
-	typedef boost::error_info<struct MsgTag, std::string>		ErrMsg ;
-	
-	/// nested exception
-	typedef boost::error_info<struct ExceptionTag, Exception>	Nested ;
+	typedef boost::error_info<struct MsgTag, std::string>			ErrMsg ;
 }
 
 } // end of namespace

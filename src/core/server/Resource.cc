@@ -68,13 +68,17 @@ Resource::Resource( const std::string& uri )
 	const std::string& wb_root = Cfg::Inst().wb_root ;
 	
 	if ( uri.substr( 0, wb_root.size() ) != wb_root )
-		BOOST_THROW_EXCEPTION( Error() << expt::ErrMsg( "invalid resource path" ) ) ;
+		BOOST_THROW_EXCEPTION( Error() << InvalidUri_( uri ) ) ;
 	
 	// decode the marked characters. firefox sometimes encoded them in % format.
 	m_path = DecodePercent( uri.substr(wb_root.size()), CharMap<' ', '_'>() ) ;
 	
 	if ( Filename().empty() || Filename() == "." || fs::is_directory(DataPath()) )
 		m_path /= Cfg::Inst().main_page ; 
+}
+
+Resource::~Resource()
+{
 }
 
 bool Resource::CheckRedir( const std::string& uri ) const
@@ -96,7 +100,8 @@ std::string Resource::Filename() const
 /// the web server is using UTF8, this string should be in UTF8 encoding.
 std::string Resource::Name() const
 {
-	return DecodeName( Filename() ) ;
+	// deducing the name is fasting than reading it from the meta
+	return m_meta.get() != 0 ? m_meta->name : DeduceName() ;
 }
 
 std::string Resource::ParentName() const
@@ -167,40 +172,68 @@ fs::path Resource::MetaPath() const
 
 std::string Resource::Type() const
 {
-	return Cfg::MimeType( Path() ) ;
+	return m_meta.get() != 0 ? m_meta->type : DeduceType() ;
 }
 
-Json Resource::Meta() const
+Resource::Meta Resource::GetMeta() const
 {
+	LoadMeta() ;
+	return *m_meta ;
+}
+
+/**	Load metadata from file (i.e. from the MetaPath()). If the meta file doesn't exist or it
+	doesn't contain a particular field (e.g. no last-modified), this function will try to
+	deduce the missing metadata itself.
+
+	\note Parsing JSON and possibly deducing metadata makes this function potentially slow.
+*/
+void Resource::LoadMeta() const
+{
+	// it's good if we already loaded it
+	if ( m_meta.get() != 0 )
+		return ;
+
+	// load meta from file
+	m_meta.reset(new Meta) ;
 	fs::path file = Cfg::Inst().meta.path / m_path ;
-	Json meta ;
-	
 	try
 	{
 		File in( file.string() ) ;
-		meta = Json::Parse( &in ) ;
+		Json meta = Json::Parse( &in ) ;
+
+		m_meta->modified = 	meta["last-modified"].As<std::time_t>() ;
+		m_meta->name	= 	meta["name"].Str() ;
+		m_meta->type	= 	meta["type"].Str() ;
 	}
 	catch ( Exception& )
 	{
+	}
+
+	if ( m_meta->modified == 0 )
+	{
 		boost::system::error_code ec ;
 
-		std::time_t write_time = fs::last_write_time( DataPath(), ec ) ;
+		m_meta->modified = fs::last_write_time( DataPath(), ec ) ;
 		if ( ec )
-			write_time = std::time(0) ;
-		
-		meta.Add( "last-modified", Json(write_time) ) ;
+			m_meta->modified = std::time(0) ;
 	}
-	
-	return meta ;
+
+	if ( m_meta->name.empty() )
+		m_meta->name	= DeduceName() ;
+	if ( m_meta->type.empty() )
+		m_meta->type	= DeduceType() ;
 }
 
-void Resource::SaveMeta(std::time_t modified) const
+void Resource::SaveMeta() const
 {
 	fs::path file = Cfg::Inst().meta.path / m_path ;
 	fs::create_directories( file.parent_path() ) ;
 	
-	Json meta = Meta() ;
-	meta.Add( "last-modified", Json(modified) ) ;
+	LoadMeta() ;
+	Json meta ;
+	meta.Add( "last-modified",	Json(m_meta->modified) ) ;
+	meta.Add( "name",			Json(m_meta->name) ) ;
+	meta.Add( "type",			Json(m_meta->type) ) ;
 
 	File out( file, 0600 ) ;
 	meta.Write( &out ) ; 
@@ -216,14 +249,23 @@ void Resource::MoveToAttic() const
 	fs::create_directories( attic ) ;
 
 	// use the last modification time to name the file
-	Json meta = Meta() ;
-	int modified = meta["last-modified"].Int() ;
+	LoadMeta() ;
 	
 	// move file. ignore any error
 	boost::format attic_fn( "%1%-%2%" ) ;
 	boost::system::error_code oops ;
-	fs::path dest = attic / (attic_fn % Filename() % modified).str() ;	
+	fs::path dest = attic / (attic_fn % Filename() % m_meta->modified).str() ;	
 	fs::rename( DataPath(), dest, oops ) ;
+}
+
+std::string Resource::DeduceType() const
+{
+	return Cfg::MimeType( Path() ) ;
+}
+
+std::string Resource::DeduceName() const
+{
+	return DecodeName( Filename() ) ;
 }
 
 } // end of namespace

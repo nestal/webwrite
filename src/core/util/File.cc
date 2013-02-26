@@ -24,7 +24,6 @@
 // boost headers
 #include <boost/throw_exception.hpp>
 #include <boost/exception/errinfo_api_function.hpp>
-#include <boost/exception/errinfo_at_line.hpp>
 #include <boost/exception/errinfo_errno.hpp>
 #include <boost/exception/errinfo_file_name.hpp>
 #include <boost/exception/errinfo_file_open_mode.hpp>

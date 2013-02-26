@@ -43,6 +43,7 @@ namespace wb {
 
 RootServer::RootServer( ) :
 	m_lib_redir	( Cfg::Inst().lib.redir ),
+	m_meta_redir( Cfg::Inst().meta.redir ),
 	m_data_path	( Cfg::Inst().data.path ),
 	m_wb_root	( Cfg::Inst().wb_root ),
 	m_main_page	( Cfg::Inst().main_page ),
@@ -164,11 +165,13 @@ void RootServer::FilterHTML( DataStream *html, const Resource& res )
 	HTMLStreamFilter filter;
 	
 	fs::create_directories( file.parent_path() ) ;
-	File dest( file, 0600 ) ;
-	filter.Parse( html, &dest ) ;
+	{
+		File dest( file, 0600 ) ;
+		filter.Parse( html, &dest ) ;
+	}
 	
-	struct stat s = dest.Stat() ;
-	res.SaveMeta( s.st_mtime ) ;
+	// save metadata after closing the file	
+	res.SaveMeta() ;
 }
 
 void RootServer::Save( Request *req, const Resource& res )
@@ -352,13 +355,15 @@ std::string RootServer::CssMimeType( const std::string& mime )
 
 void RootServer::ServeProperties( Request *req, const Resource& res )
 {
+	fs::path meta = res.MetaPath();
+	if ( !fs::exists(meta) )
+		res.SaveMeta() ;
+/*
 	Json meta = res.Meta() ;
-	meta.Add( "name", Json(res.Name()) ) ;
-	meta.Add( "type", Json(CssMimeType(res.Type())) ) ;
 	meta.Write( req->Out() ) ;
-	
+*/
 	req->CacheControl(0) ;
-	req->Send( meta ) ;
+	req->XSendFile( (m_meta_redir / res.Path()).string() ) ;
 }
 
 void RootServer::ServeStats( Request *req, const Resource& res )

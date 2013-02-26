@@ -75,6 +75,7 @@ private :
 private :
 	// configuration parameters
 	fs::path	m_lib_redir ;
+	fs::path	m_meta_redir ;
 	fs::path	m_data_path ;
 	std::string	m_wb_root ;
 	std::string	m_main_page ;
