@@ -128,12 +128,8 @@ std::string Resource::DecodePercent( const std::string& uri, CharMapT cmap )
 		switch ( ch.CharType() )
 		{
 		case UriChar<>::escape :
-			if ( !Marked()( ch ) )
-			{
-				result.insert( result.end(), ch.begin(), ch.end() ) ;
-				break ;
-			}
-			// fall-through
+			result.insert( result.end(), ch.begin(), ch.end() ) ;
+			break ;
 		
 		case UriChar<>::mark :
 		case UriChar<>::alphanum :

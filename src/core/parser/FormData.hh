@@ -46,7 +46,7 @@ public :
 public :
 	FormData( DataStream *in, const std::string& ctype ) ;
 
-	void Save( const fs::path& path, const Callback& callback = Callback() ) ;
+	void Save( const fs::path& path, const Callback& callback ) ;
 
 private :
 	static std::size_t ReadUntil( DataStream *out, const std::string& target ) ;

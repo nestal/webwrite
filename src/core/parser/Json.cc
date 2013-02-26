@@ -54,16 +54,22 @@ Json::Json( const char *str ) :
 		) ;
 }
 
-template <>
-Json::Json( const std::string& str ) :
-	m_json( ::json_object_new_string( str.c_str() ) )
+struct json_object* Json::InitStr( const char *str, std::size_t n )
 {
-	if ( m_json == 0 )
+	struct json_object *j = ::json_object_new_string_len( str, n ) ;
+	if ( j == 0 )
 		BOOST_THROW_EXCEPTION(
 			Error()
-				<< JsonCApi_( "json_object_new_string" )
-				<< ValueErr( std::string(str) )
+				<< JsonCApi_( "json_object_new_string_len" )
+				<< ValueErr( std::string(str, n) )
 		) ;
+	return j ;
+}
+
+template <>
+Json::Json( const std::string& str ) :
+	m_json( InitStr( str.c_str(), str.size() ) )
+{
 }
 
 template <>
@@ -205,14 +211,15 @@ Json Json::operator[]( const std::string& key ) const
 {
 	assert( m_json != 0 ) ;
 	
-	struct json_object *j = ::json_object_object_get( m_json, key.c_str() ) ;
-	if ( j == 0 )
+	struct json_object *j = 0 ;
+	if ( !::json_object_object_get_ex( m_json, key.c_str(), &j ) )
 		BOOST_THROW_EXCEPTION(
 			Error()
 				<< JsonCApi_( "json_object_object_get" )
 				<< KeyNotFound_( key )
 				<< Json_( ::json_object_to_json_string(m_json) ) ) ;
 	
+	assert( j != 0 ) ;
 	return Json( j ) ;
 }
 
@@ -236,15 +243,17 @@ Json Json::operator[]( const std::size_t& idx ) const
 bool Json::Has( const std::string& key ) const
 {
 	assert( m_json != 0 ) ;
-	return ::json_object_object_get( m_json, key.c_str() ) != 0 ;
+	return ::json_object_object_get_ex( m_json, key.c_str(), 0 ) ;
 }
 
 bool Json::Get( const std::string& key, Json& json ) const
 {
 	assert( m_json != 0 ) ;
-	struct json_object *j = ::json_object_object_get( m_json, key.c_str() ) ;
-	if ( j != 0 )
+	struct json_object *j = 0 ;
+	if ( ::json_object_object_get_ex( m_json, key.c_str(), &j ) )
 	{
+		assert( j != 0 ) ;
+		
 		Json tmp( j ) ;
 		json.Swap( tmp ) ;
 		return true ;
@@ -323,7 +332,7 @@ bool Json::Is<int>() const
 }
 
 template <>
-int Json::As<int>() const
+boost::int32_t Json::As<boost::int32_t>() const
 {
 	return Int() ;
 }
@@ -336,6 +345,12 @@ boost::uint32_t Json::As<boost::uint32_t>() const
 
 template <>
 boost::int64_t Json::As<boost::int64_t>() const
+{
+	return ::json_object_get_int64( m_json ) ;
+}
+
+template <>
+boost::uint64_t Json::As<boost::uint64_t>() const
 {
 	return ::json_object_get_int64( m_json ) ;
 }
@@ -427,7 +442,7 @@ Json Json::FindInArray( const std::string& key, const std::string& value ) const
 		Error()
 			<< JsonCApi_( "Json::FindInArray" )
 			<< KeyNotFound_( key )
-			<< ValueErr( value )
+			<< Value_(value)
 	) ;
 	
 	// shut off compiler warnings

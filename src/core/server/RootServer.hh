@@ -89,7 +89,7 @@ private :
 	{
 		Function		func ;
 		Atomic<long>	count ;
-		Atomic<long>	elapse ;	//!< in nano-second
+		Atomic<long>	elapse ;	///< in nano-second
 		
 		explicit Handler( const Function& f = Function())
 			: func(f), count(0), elapse(0) {}

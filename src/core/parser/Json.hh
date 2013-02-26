@@ -47,6 +47,7 @@ public :
 	typedef boost::error_info<struct OutOfRange,		std::size_t>	OutOfRange_ ;
 	typedef boost::error_info<struct KeyNotFound,		std::string>	KeyNotFound_ ;
 	typedef boost::error_info<struct JsonCApi,			std::string>	JsonCApi_ ;
+	typedef boost::error_info<struct Value,				std::string>	Value_ ;
 
 	template <typename T>
 	struct Val_
@@ -57,6 +58,12 @@ public :
 public :
 	template <typename T>
 	explicit Json( const T& val ) ;
+	
+	template <std::size_t n>
+	explicit Json( const char (&str)[n] ) :
+		m_json( InitStr( str, n ) )
+	{
+	}
 	
 	Json() ;
 	Json( const Json& rhs ) ;
@@ -104,6 +111,8 @@ private :
 	
 	struct NotOwned {} ;
 	Json( struct json_object *json, NotOwned ) ;
+
+	static struct json_object* InitStr( const char *str, std::size_t n ) ;
 
 	// helper for throwing exception
 	template <typename T> static typename Val_<T>::Err ValueErr( const T& t )
