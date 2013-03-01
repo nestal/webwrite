@@ -21,10 +21,19 @@
 
 #include "util/DataStream.hh"
 
+// needs to include stdint.h before json-c to avoid macro re-def warning
+#include <boost/cstdint.hpp>
+
+// disable macro re-def warning for json-c headers
+#ifdef _MSC_VER
+	#pragma warning(push)
+	#pragma warning(disable: 4005)
+#endif
 #include <json/json_tokener.h>
 #include <json/linkhash.h>
-
-#include <boost/cstdint.hpp>
+#ifdef _MSC_VER
+	#pragma warning(pop)
+#endif
 
 #include <cassert>
 #include <cstring>
@@ -243,7 +252,7 @@ Json Json::operator[]( const std::size_t& idx ) const
 bool Json::Has( const std::string& key ) const
 {
 	assert( m_json != 0 ) ;
-	return ::json_object_object_get_ex( m_json, key.c_str(), 0 ) ;
+	return ::json_object_object_get_ex( m_json, key.c_str(), 0 ) == TRUE ;
 }
 
 bool Json::Get( const std::string& key, Json& json ) const
