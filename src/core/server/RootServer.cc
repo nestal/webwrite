@@ -55,6 +55,8 @@ RootServer::RootServer( ) :
 		Query<Handler>(Handler(&RootServer::NotFound)) ) ).first->second ;
 	
 	get.Add( "",		Handler(&RootServer::DefaultPage) ) ;
+	get.Add( "meta",	Handler(&RootServer::ServeIndexPage) ) ;
+	get.Add( "page",	Handler(&RootServer::ServeIndexPage) ) ;
 	get.Add( "mime",	Handler(&RootServer::ServeMimeCss) ) ;
 	get.Add( "var",		Handler(&RootServer::ServeVar) ) ;
 	get.Add( "index",	Handler(&RootServer::ServeIndex) ) ;
@@ -109,10 +111,15 @@ void RootServer::Work( Request *req, const Resource& res )
 	}
 }
 
+void RootServer::ServeIndexPage( Request *req, const Resource& )
+{
+	ServeFile( req, m_lib_redir / "index.html" ) ;
+}
+
 void RootServer::DefaultPage( Request *req, const Resource& res )
 {
 	if ( res.Type() == "text/html" )
-		ServeFile( req, m_lib_redir / "index.html" ) ;
+		ServeIndexPage( req, res ) ;
 
 	else
 		ServeFile( req, res.ReDirPath() ) ;
@@ -292,7 +299,7 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 				<< (fs::is_directory( di->path() ) ? "inode-directory" : type)
 				<< " menu_idx\"><a href=\""
 				<< sibling.UrlPath().generic_string()
-				<< ((type == "text-html" || fs::is_directory(di->path())) ? "" : "#meta")
+				<< ((type == "text-html" || fs::is_directory(di->path())) ? "" : "?meta")
 				<< "\">"
 				<< (fs::is_directory( di->path() ) ? sibling.ParentName() : sibling.Name())
 				<< "</a></li>" ;

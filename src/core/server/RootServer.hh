@@ -46,6 +46,7 @@ private :
 
 	// GET requests
 	void DefaultPage( Request *req, const Resource& res ) ;
+	void ServeIndexPage( Request *req, const Resource& res ) ;
 	void ServeLib( Request *req, const Resource& res ) ;
 	void ServeVar( Request *req, const Resource& ) ;
 	void ServeIndex( Request *req, const Resource& res ) ;
