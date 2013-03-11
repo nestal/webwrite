@@ -192,7 +192,6 @@ void Resource::LoadMeta() const
 
 	// load meta from file
 	m_meta.reset(new Meta) ;
-	m_meta->sequence = 0 ;
 
 	fs::path file = Cfg::Inst().meta.path / m_path ;
 	try
@@ -231,6 +230,7 @@ void Resource::SaveMeta() const
 	
 	LoadMeta() ;
 	++m_meta->sequence ;
+	m_meta->modified = std::time(0) ;
 
 	Json meta ;
 	meta.Add( "last-modified",	Json(m_meta->modified) ) ;

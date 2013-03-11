@@ -41,6 +41,8 @@ public :
 		std::string		type ;
 		std::time_t		modified ;
 		std::size_t		sequence ;
+
+		Meta() : modified(0), sequence(0) {}
 	} ;
 
 public :
