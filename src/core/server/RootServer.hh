@@ -52,7 +52,7 @@ private :
 	void ServeIndex( Request *req, const Resource& res ) ;
 	void Load( Request *req, const Resource& res ) ;
 	void ServeMimeCss( Request *req, const Resource& res ) ;
-	void ServeProperties( Request *req, const Resource& res ) ;
+	void ServeMeta( Request *req, const Resource& res ) ;
 	void ServeStats( Request *req, const Resource& res ) ;
 	
 	// POST requests

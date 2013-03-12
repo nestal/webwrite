@@ -55,14 +55,14 @@ RootServer::RootServer( ) :
 		Query<Handler>(Handler(&RootServer::NotFound)) ) ).first->second ;
 	
 	get.Add( "",		Handler(&RootServer::DefaultPage) ) ;
-	get.Add( "meta",	Handler(&RootServer::ServeIndexPage) ) ;
+	get.Add( "prop",	Handler(&RootServer::ServeIndexPage) ) ;
 	get.Add( "page",	Handler(&RootServer::ServeIndexPage) ) ;
 	get.Add( "mime",	Handler(&RootServer::ServeMimeCss) ) ;
 	get.Add( "var",		Handler(&RootServer::ServeVar) ) ;
 	get.Add( "index",	Handler(&RootServer::ServeIndex) ) ;
 	get.Add( "data",	Handler(&RootServer::Load) ) ;
 	get.Add( "lib",		Handler(&RootServer::ServeLib) ) ;
-	get.Add( "prop",	Handler(&RootServer::ServeProperties) ) ;
+	get.Add( "meta",	Handler(&RootServer::ServeMeta) ) ;
 	get.Add( "stats",	Handler(&RootServer::ServeStats) ) ;
 
 	// handlers for POST requests
@@ -362,15 +362,12 @@ std::string RootServer::CssMimeType( const std::string& mime )
 	return type ;
 }
 
-void RootServer::ServeProperties( Request *req, const Resource& res )
+void RootServer::ServeMeta( Request *req, const Resource& res )
 {
 	fs::path meta = res.MetaPath();
 	if ( !fs::exists(meta) )
 		res.SaveMeta() ;
-/*
-	Json meta = res.Meta() ;
-	meta.Write( req->Out() ) ;
-*/
+	
 	req->CacheControl(0) ;
 	req->XSendFile( (m_meta_redir / res.Path()).string() ) ;
 }
