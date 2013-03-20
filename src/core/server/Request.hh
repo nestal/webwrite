@@ -49,6 +49,7 @@ public :
 	// helpers
 	virtual void CacheControl( std::size_t max_age ) = 0 ;
 	virtual void Send( const Json& json ) = 0 ;
+	virtual void Send( const std::string& context ) = 0 ;
 	virtual void XSendFile( const std::string& file ) = 0 ;
 
 	// HTTP status return

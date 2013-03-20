@@ -47,7 +47,8 @@ RootServer::RootServer( ) :
 	m_data_path	( Cfg::Inst().data.path ),
 	m_wb_root	( Cfg::Inst().wb_root ),
 	m_main_page	( Cfg::Inst().main_page ),
-	m_mime_css	( GenerateMimeCss() )
+	m_mime_css	( GenerateMimeCss() ),
+	m_index_html( IndexHtml() )
 {
 	// handlers for GET requests
 	Query<Handler>& get = m_srv.insert( std::make_pair( 
@@ -113,7 +114,8 @@ void RootServer::Work( Request *req, const Resource& res )
 
 void RootServer::ServeIndexPage( Request *req, const Resource& )
 {
-	ServeFile( req, m_lib_redir / "index.html" ) ;
+	req->CacheControl(0) ;
+	req->Send( m_index_html ) ;
 }
 
 void RootServer::DefaultPage( Request *req, const Resource& res )
@@ -226,32 +228,7 @@ void RootServer::OnFileUploaded(
 
 void RootServer::ServeLib( Request *req, const Resource& res )
 {
-	// must make a copy before calling tokenizer
-	std::string qstr = req->Query() ;
-	
-	typedef boost::tokenizer<boost::char_separator<char> > 
-		tokenizer;
-	boost::char_separator<char> sep("&#=");
-	tokenizer tokens(qstr.begin(), qstr.end(), sep);
-	
-	tokenizer::iterator i = tokens.begin() ;
-	if ( i != tokens.end() && *i == "lib" && ++i != tokens.end() )
-	{
-		fs::path p( *i ) ;
-
-		if ( std::find( p.begin(), p.end(), ".." ) != p.end() )
-			NotFound( req ) ;
-
-		// only serve file if it is in the root path
-		else if ( res.Path().parent_path() == "/" )
-			ServeFile( req, m_lib_redir/p ) ;
-
-		// request for lib file using non-root paths will get a redirect
-		else
-		{
-			req->SeeOther( m_wb_root + "/" + m_main_page + "?lib=" + p.string() ) ;
-		}
-	}
+	ServeFile( req, m_lib_redir/res.Path() ) ;
 }
 
 void RootServer::ServeFile( Request *req, const fs::path& path )
@@ -338,7 +315,7 @@ std::string RootServer::GenerateMimeCss( )
 	for ( std::set<std::string>::iterator i = mime_set.begin() ; i != mime_set.end() ; ++i )
 	{
 		ss	<< "." << *i << ":hover, ." << *i
-			<< "{background-image:url(\"?lib=icons/" ;
+			<< "{background-image:url(\"" << Cfg::Inst().wb_root << "/icons/" ;
 		
 		if ( fs::exists(icon_path / (*i + ".png")) )
 			ss << *i << ".png" ;
@@ -347,11 +324,26 @@ std::string RootServer::GenerateMimeCss( )
 		else
 			ss << "application-octet-stream.svg" ;
 		
-		ss << "\");}\n" ;
+		ss << "?lib\");}\n" ;
 	}
 	ss << "\r\n\r\n" ;
 	
 	return ss.str() ;
+}
+
+std::string RootServer::IndexHtml( )
+{
+	File idx(Cfg::Inst().lib.path / "index.html") ;
+
+	std::string result ;
+	char temp[80] ;
+	
+	std::size_t count = 0 ;
+	while ( (count = idx.Read( &temp[0], sizeof(temp) ) ) > 0 )
+		result.insert( result.end(), temp, temp + count ) ;
+
+	boost::format fmt(result) ;
+	return (fmt % "" % Cfg::Inst().wb_root).str() ;
 }
 
 std::string RootServer::CssMimeType( const std::string& mime )

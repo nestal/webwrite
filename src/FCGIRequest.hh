@@ -54,9 +54,10 @@ public :
 	DataStream* In() ;
 	DataStream* Out() ;
 
-	// helps
+	// helpers
 	void CacheControl( std::size_t max_age ) ;
 	void Send( const Json& json ) ;
+	void Send( const std::string& context ) ;
 	void XSendFile( const std::string& file ) ;
 	
 	// HTTP status return

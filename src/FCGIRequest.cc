@@ -75,9 +75,16 @@ void FCGIRequest::CacheControl( std::size_t max_age )
 
 void FCGIRequest::Send( const Json& json )
 {
-	FCGX_FPrintF( m_req->out, "Content-type: application/json\r\n\r\n" ) ;
+	::FCGX_FPrintF( m_req->out, "Content-type: application/json\r\n\r\n" ) ;
 	json.Write( m_out.get() ) ;
-	FCGX_FPrintF( m_req->out, "\r\n\r\n" ) ;
+	::FCGX_FPrintF( m_req->out, "\r\n\r\n" ) ;
+}
+
+void FCGIRequest::Send( const std::string& context )
+{
+	::FCGX_FPrintF( m_req->out, "Content-type: text/html\r\n\r\n" ) ;
+	::FCGX_PutStr( context.c_str(), context.size(), m_req->out ) ;
+	::FCGX_FPrintF( m_req->out, "\r\n\r\n" ) ;
 }
 
 /// Tell the web server to send this file

@@ -60,12 +60,14 @@ private :
 	void Upload( Request *req, const Resource& res ) ;
 
 	// other helpers
-	static std::string GenerateMimeCss( ) ;
 	void ServeFile( Request *req, const fs::path& path ) ;
+	static std::string CssMimeType( const std::string& type ) ;
 
 	void FilterHTML( DataStream *html, const Resource& res ) ;
 
-	static std::string CssMimeType( const std::string& type ) ;
+	// static content generators
+	static std::string GenerateMimeCss( ) ;
+	static std::string IndexHtml( ) ;
 
 	static void OnFileUploaded(
 		const fs::path&		path,
@@ -82,6 +84,7 @@ private :
 	std::string	m_main_page ;
 
 	// pre-generated content
+	std::string	m_index_html ;
 	std::string m_mime_css ;
 
 	// query string parser
