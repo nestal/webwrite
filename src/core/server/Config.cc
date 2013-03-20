@@ -80,6 +80,7 @@ void Cfg::Init( const Json& json )
 		Optional<std::string>( json, "socket",		"" ),
 		json["wb_root"].Str(),
 		Optional<std::string>( json, "main_page",	"main" ),
+		Optional<std::string>( json, "dep_uri",		"" ),
 		Optional( json, "thread", 5 ),
 		
 		{

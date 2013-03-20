@@ -355,15 +355,15 @@ std::string RootServer::IndexHtml( )
 {
 	File idx(Cfg::Inst().lib.path / "index.html") ;
 
-	std::string result ;
+	std::string html ;
 	char temp[80] ;
 	
 	std::size_t count = 0 ;
 	while ( (count = idx.Read( &temp[0], sizeof(temp) ) ) > 0 )
-		result.insert( result.end(), temp, temp + count ) ;
+		html.insert( html.end(), temp, temp + count ) ;
 
-	boost::format fmt(result) ;
-	return (fmt % "" % Cfg::Inst().wb_root).str() ;
+	boost::format fmt(html) ;
+	return (fmt % Cfg::Inst().dep_uri % Cfg::Inst().wb_root).str() ;
 }
 
 std::string RootServer::CssMimeType( const std::string& mime )

@@ -64,6 +64,12 @@ struct Cfg
 	
 	std::string		main_page ;
 
+	/**	Base URI of the external dependencies, e.g. ckeditor and jquery. If
+		jquery is installed at http://example.com/somewhere/jquery-.19.0.min.js, put
+		"/somewhere" here.
+	*/
+	std::string		dep_uri ;
+
 	/**	Number of worker threads lauched by WebWrite. Natural it should be 
 		set to the number of CPUs + 2.
 	*/
