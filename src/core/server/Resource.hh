@@ -73,6 +73,7 @@ public :
 	void SaveMeta() const ;
 	
 	void MoveToAttic() const ;
+	void Remove() const ;
 
 	static std::string DecodeName( const std::string& uri ) ;
 

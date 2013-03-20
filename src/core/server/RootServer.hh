@@ -47,7 +47,6 @@ private :
 	// GET requests
 	void DefaultPage( Request *req, const Resource& res ) ;
 	void ServeIndexPage( Request *req, const Resource& res ) ;
-	void ServeLib( Request *req, const Resource& res ) ;
 	void ServeVar( Request *req, const Resource& ) ;
 	void ServeIndex( Request *req, const Resource& res ) ;
 	void Load( Request *req, const Resource& res ) ;
@@ -61,6 +60,8 @@ private :
 
 	// other helpers
 	void ServeFile( Request *req, const fs::path& path ) ;
+	bool IsLibFile( const Resource& res ) const ;
+	void ServeLib( Request *req, const Resource& res ) ;
 	static std::string CssMimeType( const std::string& type ) ;
 
 	void FilterHTML( DataStream *html, const Resource& res ) ;
@@ -78,6 +79,7 @@ private :
 private :
 	// configuration parameters
 	fs::path	m_lib_redir ;
+	fs::path	m_lib_path ;
 	fs::path	m_meta_redir ;
 	fs::path	m_data_path ;
 	std::string	m_wb_root ;

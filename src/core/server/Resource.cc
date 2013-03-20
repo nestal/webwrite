@@ -261,6 +261,14 @@ void Resource::MoveToAttic() const
 	fs::rename( DataPath(), dest, oops ) ;
 }
 
+void Resource::Remove() const
+{
+	fs::remove( DataPath() ) ;
+	fs::remove( MetaPath() ) ;
+
+	// TODO: remove parent directory if it is empty
+}
+
 std::string Resource::DeduceType() const
 {
 	return Cfg::MimeType( Path() ) ;

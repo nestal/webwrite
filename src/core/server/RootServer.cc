@@ -43,6 +43,7 @@ namespace wb {
 
 RootServer::RootServer( ) :
 	m_lib_redir	( Cfg::Inst().lib.redir ),
+	m_lib_path	( Cfg::Inst().lib.path ),
 	m_meta_redir( Cfg::Inst().meta.redir ),
 	m_data_path	( Cfg::Inst().data.path ),
 	m_wb_root	( Cfg::Inst().wb_root ),
@@ -62,7 +63,6 @@ RootServer::RootServer( ) :
 	get.Add( "var",		Handler(&RootServer::ServeVar) ) ;
 	get.Add( "index",	Handler(&RootServer::ServeIndex) ) ;
 	get.Add( "data",	Handler(&RootServer::Load) ) ;
-	get.Add( "lib",		Handler(&RootServer::ServeLib) ) ;
 	get.Add( "meta",	Handler(&RootServer::ServeMeta) ) ;
 	get.Add( "stats",	Handler(&RootServer::ServeStats) ) ;
 
@@ -120,7 +120,10 @@ void RootServer::ServeIndexPage( Request *req, const Resource& )
 
 void RootServer::DefaultPage( Request *req, const Resource& res )
 {
-	if ( res.Type() == "text/html" )
+	if ( IsLibFile(res) )
+		ServeLib( req, res ) ;
+
+	else if ( res.Type() == "text/html" )
 		ServeIndexPage( req, res ) ;
 
 	else
@@ -134,6 +137,10 @@ void RootServer::Load( Request *req, const Resource& res )
 	
 	if ( fs::exists( res.DataPath() ) )
 		ServeFile( req, res.ReDirPath() ) ;
+	
+	else if ( IsLibFile(res) )
+		ServeLib( req, res ) ;
+
 	else
 	{
 		std::string percent20name, space_name, tmp = res.DataPath().string() ;
@@ -180,29 +187,36 @@ void RootServer::FilterHTML( DataStream *html, const Resource& res )
 	}
 	
 	// save metadata after closing the file	
-	res.SaveMeta() ;
+	if ( fs::file_size(file) > 0 )
+		res.SaveMeta() ;
 }
 
 void RootServer::Save( Request *req, const Resource& res )
 {
-	fs::path file = res.DataPath() ;
-	Log( "writing to file %1%", file, log::verbose ) ;
-
-	// first move the original file to attic without any modification
-	res.MoveToAttic() ;
-	
-	// read input data, do filtering and save the file
-	FilterHTML( req->In(), res ) ;
-
-	// if the new file is empty, that means the user wants to delete the file
-	boost::uintmax_t size = fs::file_size(file) ;
-	if ( size == 0 )
+	// only save when the file is NOT a lib file
+	if ( !IsLibFile(res) )
 	{
-		Log( "Removing file %1%", file ) ;
-		fs::remove(file) ;
-	}
+		fs::path file = res.DataPath() ;
+		Log( "writing to file %1%", file, log::verbose ) ;
 
-	res.SaveMeta() ;
+		// first move the original file to attic without any modification
+		res.MoveToAttic() ;
+	
+		// read input data, do filtering and save the file
+		FilterHTML( req->In(), res ) ;
+
+		// if the new file is empty, that means the user wants to delete the file
+		boost::uintmax_t size = fs::file_size(file) ;
+		if ( size == 0 )
+		{
+			Log( "Removing file %1%", file ) ;
+			res.Remove() ;
+		}
+
+		// only save meta if the file is not removed
+		else
+			res.SaveMeta() ;
+	}
 
 	// ask client to load the new content again. the client may not reload the page with the
 	// new content (because it has it anyway), but this will update the client's cache.
@@ -224,6 +238,12 @@ void RootServer::OnFileUploaded(
 		const std::string&	mime )
 {
 	// TODO: construct a Resource and setup the right metadata
+}
+
+bool RootServer::IsLibFile( const Resource& res ) const
+{
+	fs::path p = m_lib_path/res.Path() ;
+	return fs::exists(p) && !fs::is_directory(p) ;
 }
 
 void RootServer::ServeLib( Request *req, const Resource& res )
@@ -324,7 +344,7 @@ std::string RootServer::GenerateMimeCss( )
 		else
 			ss << "application-octet-stream.svg" ;
 		
-		ss << "?lib\");}\n" ;
+		ss << "\");}\n" ;
 	}
 	ss << "\r\n\r\n" ;
 	
@@ -357,7 +377,7 @@ std::string RootServer::CssMimeType( const std::string& mime )
 void RootServer::ServeMeta( Request *req, const Resource& res )
 {
 	fs::path meta = res.MetaPath();
-	if ( !fs::exists(meta) )
+	if ( !IsLibFile(res) && !fs::exists(meta) )
 		res.SaveMeta() ;
 	
 	req->CacheControl(0) ;
