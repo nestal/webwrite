@@ -298,7 +298,7 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 				<< (fs::is_directory( di->path() ) ? "inode-directory" : type)
 				<< " menu_idx\"><a href=\""
 				<< sibling.UrlPath().generic_string()
-				<< ((type == "text-html" || fs::is_directory(di->path())) ? "" : "?meta")
+				<< ((type == "text-html" || fs::is_directory(di->path())) ? "" : "?prop")
 				<< "\">"
 				<< (fs::is_directory( di->path() ) ? sibling.ParentName() : sibling.Name())
 				<< "</a></li>" ;
@@ -371,6 +371,7 @@ std::string RootServer::CssMimeType( const std::string& mime )
 	std::string type( mime ) ;
 	std::replace( type.begin(), type.end(), '/', '-' ) ;
 	std::replace( type.begin(), type.end(), '+', '-' ) ;
+	std::replace( type.begin(), type.end(), '.', '-' ) ;
 	return type ;
 }
 

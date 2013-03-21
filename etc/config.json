@@ -19,6 +19,9 @@
 		".jpeg"	: "image/jpeg",
 		".svg"	: "image/svg+xml",
 		".png"	: "image/png",
+		".doc"	: "application/msword",
+		".docx"	: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+		".zip"	: "application/zip",
 	},
 	"log"		:
 	{

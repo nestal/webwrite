@@ -27,8 +27,10 @@ namespace
 {
 	std::string FindMime( const fs::path& ext, const Cfg::MimeMap& mime )
 	{
+		// default mime type for all unknown extension is "text/html". this is because
+		// we normally don't use extension for html pages.
 		Cfg::MimeMap::const_iterator i = mime.find( ext ) ;
-		return i != mime.end() ? i->second : "application/octet-stream" ;
+		return i != mime.end() ? i->second : "text/html" ;
 	}
 
 	Cfg::MimeMap MakeMimeMap( const Json::Object& json )
