@@ -60,10 +60,7 @@ namespace
 		{
 		}
 
-		virtual Base& End() = 0
-		{
-			return parent == 0 ? *this : *parent ;
-		}
+		virtual Base& End() = 0 ;
 
 		virtual Base& Value( const Int& i ) = 0 ;
 		virtual Map& Key( const std::string& key )
@@ -73,7 +70,17 @@ namespace
 		
 		Map AddMap(int id) ;
 		Array AddArray( int id );
+	
+	protected :
+		~Base()
+		{
+		}
 	} ;
+	
+	Base& Base::End()
+	{
+		return parent == 0 ? *this : *parent ;
+	}
 
 	struct Map : public Base
 	{
