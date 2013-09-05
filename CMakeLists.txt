@@ -40,14 +40,12 @@ set(Boost_DETAILED_FAILURE_MSG ON )
 find_package(Boost COMPONENTS filesystem system regex date_time thread chrono timer unit_test_framework REQUIRED )
 find_package(JSONC REQUIRED)
 find_package(FCGI REQUIRED)
-find_package(BFD)
 
 include_directories(
 	${JSONC_INCLUDE_DIR}
 	${Boost_INCLUDE_DIR}
 	${FCGI_INCLUDE_DIR}
 	${webwrite_SOURCE_DIR}/src/core
-	${webwrite_SOURCE_DIR}/src/opt
 	${webwrite_SOURCE_DIR}/test
 )
 
@@ -57,17 +55,6 @@ add_definitions(
 	-DVERSION="${WEBWRITE_VERSION}"
 )
 
-# build bfd classes if libbfd is found
-if ( BFD_FOUND )
-	message( "found libbfd in ${BFD_LIBRARY}" )
-	set( OPT_LIBS   ${DL_LIBRARY} ${BFD_LIBRARY} )
-	file( GLOB_RECURSE OPT_SRC
-		${webwrite_SOURCE_DIR}/src/opt/bfd/*.cc
-		${webwrite_SOURCE_DIR}/src/opt/bfd/*.hh
-	)
-	add_definitions( -DHAVE_BFD )
-endif ( BFD_FOUND )
-
 file (GLOB_RECURSE WEBWRITE_CORE_SRC
     ${webwrite_SOURCE_DIR}/src/core/*.hh
     ${webwrite_SOURCE_DIR}/src/core/*.cc
@@ -75,7 +62,6 @@ file (GLOB_RECURSE WEBWRITE_CORE_SRC
 
 add_library( wb_core
 	${WEBWRITE_CORE_SRC}
-	${OPT_SRC}
 )
 
 # not recursive for source in the root source dir
@@ -88,7 +74,6 @@ add_executable( webwrite ${WEBWRITE_MAIN_SRC} )
 
 target_link_libraries( webwrite
 	wb_core
-	${OPT_LIBS}
 	${Boost_LIBRARIES}
 	${JSONC_LIBRARY}
 	${FCGI_LIBRARY}
