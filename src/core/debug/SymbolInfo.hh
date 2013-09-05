@@ -1,6 +1,6 @@
 /*
 	grive: an GPL program to sync a local directory with Google Drive
-	Copyright (C) 2012  Wan Wai Ho
+	Copyright (C) 2006  Wan Wai Ho
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -17,31 +17,26 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Exception.hh"
+#pragma once
 
-#include "debug/Backtrace.hh"
-#include "debug/Debug.hh"
+#include "Addr.hh"
 
-#include <boost/exception/all.hpp>
-
-#include <cstdlib>
-#include <iterator>
-#include <sstream>
+#include <memory>
+#include <iosfwd>
 
 namespace wb {
 
-class Backtrace ;
-
-Exception::Exception( )
+///	ource code symbolic information
+/**	\internal
+	
+	This class represents symbolic information about the source code,
+	e.g. function names and line numbers. It provides an interface to
+	lookup these informations by address.
+*/
+namespace debug
 {
-#ifdef HAVE_BFD
-	*this << expt::Backtrace_( Backtrace() ) ;
-#endif
-}
-
-const char* Exception::what() const throw()
-{
-	return boost::diagnostic_information_what( *this ) ;
-}
+	std::size_t Backtrace( addr_t *stack, std::size_t count ) ;
+	void PrintTrace( const addr_t *stack, std::size_t count, std::ostream& os ) ;
+} ;
 
 } // end of namespace

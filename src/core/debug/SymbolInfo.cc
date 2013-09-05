@@ -1,6 +1,6 @@
 /*
 	grive: an GPL program to sync a local directory with Google Drive
-	Copyright (C) 2012  Wan Wai Ho
+	Copyright (C) 2006  Wan Wai Ho
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -17,31 +17,34 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Exception.hh"
+#include "SymbolInfo.hh"
+#include "Debug.hh"
 
-#include "debug/Backtrace.hh"
-#include "debug/Debug.hh"
+// glibc backtrace
+#include <execinfo.h>
 
-#include <boost/exception/all.hpp>
-
+#include <algorithm>
+#include <cassert>
+#include <cstring>
 #include <cstdlib>
-#include <iterator>
-#include <sstream>
+#include <iostream>
+#include <iomanip>
+#include <vector>
 
-namespace wb {
+namespace wb { namespace debug {
 
-class Backtrace ;
-
-Exception::Exception( )
+/// A simple wrapper around glibc backtrace.
+std::size_t Backtrace( addr_t *stack, std::size_t count )
 {
-#ifdef HAVE_BFD
-	*this << expt::Backtrace_( Backtrace() ) ;
-#endif
+	return ::backtrace( stack, count ) ;
 }
 
-const char* Exception::what() const throw()
+void PrintTrace( const addr_t *stack, std::size_t count, std::ostream& os )
 {
-	return boost::diagnostic_information_what( *this ) ;
+	char **func = ::backtrace_symbols(stack, count) ;
+	
+	for ( std::size_t i = 0 ; i < count && func != 0 && func[i] != 0 ; ++i )
+		os << "#"  << i << " [" << stack[i] << "] " << Demangle(func[i]) << std::endl ;
 }
 
-} // end of namespace
+} } // end of namespace

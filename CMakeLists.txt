@@ -40,11 +40,13 @@ set(Boost_DETAILED_FAILURE_MSG ON )
 find_package(Boost COMPONENTS filesystem system regex date_time thread chrono timer unit_test_framework REQUIRED )
 find_package(JSONC REQUIRED)
 find_package(FCGI REQUIRED)
+find_package(LibXML2 REQUIRED)
 
 include_directories(
 	${JSONC_INCLUDE_DIR}
 	${Boost_INCLUDE_DIR}
 	${FCGI_INCLUDE_DIR}
+	${LibXML2_INCLUDE_DIR}
 	${webwrite_SOURCE_DIR}/src/core
 	${webwrite_SOURCE_DIR}/test
 )
@@ -77,6 +79,7 @@ target_link_libraries( webwrite
 	${Boost_LIBRARIES}
 	${JSONC_LIBRARY}
 	${FCGI_LIBRARY}
+	${LibXML2_LIBRARIES}
 )
 
 install(TARGETS webwrite RUNTIME DESTINATION bin)
@@ -92,7 +95,7 @@ add_executable( unittest
 target_link_libraries( unittest wb_core
 	${JSONC_LIBRARY}
 	${Boost_LIBRARIES}
-	${OPT_LIBS}
+	${LibXML2_LIBRARIES}
 )
 
 if ( WIN32 )

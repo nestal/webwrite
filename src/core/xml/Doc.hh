@@ -1,6 +1,6 @@
 /*
-	grive: an GPL program to sync a local directory with Google Drive
-	Copyright (C) 2012  Wan Wai Ho
+	webwrite: an GPL wiki-like website with in-place editing
+	Copyright (C) 2013 Wan Wai Ho
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -14,34 +14,27 @@
 
 	You should have received a copy of the GNU General Public License
 	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+	MA  02110-1301, USA.
 */
 
-#include "Exception.hh"
+#pragma once
 
-#include "debug/Backtrace.hh"
-#include "debug/Debug.hh"
+#include <string>
 
-#include <boost/exception/all.hpp>
+//! XML lib forward declaration
+struct _xmlDoc ;
 
-#include <cstdlib>
-#include <iterator>
-#include <sstream>
+namespace xml {
 
-namespace wb {
-
-class Backtrace ;
-
-Exception::Exception( )
+class Doc
 {
-#ifdef HAVE_BFD
-	*this << expt::Backtrace_( Backtrace() ) ;
-#endif
-}
+public :
+	explicit Doc( const std::string& fname ) ;
 
-const char* Exception::what() const throw()
-{
-	return boost::diagnostic_information_what( *this ) ;
-}
+private :
+	_xmlDoc         *m_doc ;
+} ;
 
 } // end of namespace
+
