@@ -24,16 +24,49 @@
 
 //! XML lib forward declaration
 struct _xmlDoc ;
+struct _xmlNode ;
 
 namespace xml {
 
-class Doc
+class Node
+{
+protected :
+	explicit Node( _xmlNode *node ) ;
+
+public :
+	Node() ;
+
+	Node Children() const ;
+
+	Node operator[]( const std::string& sel ) const ;
+
+protected :
+public :
+	_xmlNode*	Get() ;
+
+private :
+	_xmlNode	*m_node ;
+} ;
+
+class OwnedNode : public Node
+{
+protected :
+	explicit OwnedNode( _xmlNode *node ) ;
+
+public :
+	OwnedNode() ;
+	OwnedNode( const OwnedNode& rhs ) ;
+	~OwnedNode() ;
+} ;
+
+class Doc : public Node
 {
 public :
 	explicit Doc( const std::string& fname ) ;
+	~Doc() ;
 
-private :
-	_xmlDoc         *m_doc ;
+protected :
+	_xmlDoc* Me() ;
 } ;
 
 } // end of namespace

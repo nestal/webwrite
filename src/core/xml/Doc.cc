@@ -26,10 +26,59 @@
 
 namespace xml {
 
-Doc::Doc( const std::string& fname ) :
-	m_doc( ::xmlParseFile( fname.c_str( ) ) )
+Node::Node() :
+	m_node(0)
 {
+}
 
+Node::Node( _xmlNode *node ) :
+	m_node( node )
+{
+}
+
+xmlNodePtr Node::Get()
+{
+	return m_node ;
+}
+
+Node Node::Children() const
+{
+	return Node(m_node->children) ;
+}
+
+Node Node::operator[]( const std::string& sel ) const
+{
+	for ( xmlNodePtr n = m_node->children ; n != 0 ; n = n->next )
+	{
+		if ( sel == reinterpret_cast<const char*>(n->name) )
+			return Node(n) ;
+	}
+	return Node() ;
+}
+
+OwnedNode::OwnedNode( _xmlNode *node ) :
+	Node( node )
+{
+}
+
+OwnedNode::~OwnedNode()
+{
+	::xmlFreeNode( Get() ) ;
+}
+
+Doc::Doc( const std::string& fname ) :
+	Node( reinterpret_cast<xmlNodePtr>(::xmlParseFile( fname.c_str( ) ) ) )
+{
+}
+
+Doc::~Doc()
+{
+	::xmlFreeDoc( Me() ) ;
+}
+
+_xmlDoc* Doc::Me()
+{
+	return reinterpret_cast<xmlDocPtr>(Get()) ;
 }
 
 } // end of namespace
