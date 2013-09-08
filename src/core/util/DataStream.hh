@@ -20,6 +20,7 @@
 #pragma once
 
 #include <boost/iostreams/concepts.hpp>
+#include <boost/iostreams/stream.hpp>
 #include <cstddef>
 
 namespace wb {
@@ -70,6 +71,18 @@ public :
 
 private :
 	Sink	*m_out ;
+} ;
+
+class StdOutStream
+{
+public :
+	explicit StdOutStream( Sink *sink ) ;
+	
+	std::ostream& Str() ;
+
+private :
+	RealSink							m_sink ;
+	boost::iostreams::stream<RealSink>	m_str ;
 } ;
 
 } // end of namespace

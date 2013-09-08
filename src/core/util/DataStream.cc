@@ -1,5 +1,5 @@
 /*
-	webwrite: an GPL wiki-like website with in-place editing
+	grive: an GPL program to sync a local directory with Google Drive
 	Copyright (C) 2013 Wan Wai Ho
 
 	This program is free software; you can redistribute it and/or
@@ -18,28 +18,29 @@
 	MA  02110-1301, USA.
 */
 
-#include "NullDataStream.hh"
+#include "DataStream.hh"
 
 namespace wb {
 
-NullDataStream::NullDataStream( )
+RealSink::RealSink( Sink *out ) :
+	m_out( out )
 {
 }
 
-std::streamsize NullDataStream::read( char *data, std::streamsize size )
+std::streamsize RealSink::write( const char *data, std::streamsize size )
 {
-	return size ;
+	return m_out->write(data, size) ;
 }
 
-std::streamsize NullDataStream::write( const char *data, std::streamsize size )
+StdOutStream::StdOutStream( Sink *sink ) :
+	m_sink( sink ),
+	m_str( m_sink )
 {
-	return size ;
 }
 
-Sink* DevNull()
+std::ostream& StdOutStream::Str()
 {
-	static NullDataStream instance ;
-	return &instance ;
+	return m_str ;
 }
 
 } // end of namespace

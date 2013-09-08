@@ -271,8 +271,7 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 {
 	req->CacheControl(0) ;
 	
-	RealSink rs( req->Out() ) ;
-	boost::iostreams::stream<RealSink> os( rs ) ;
+	std::ostream&	os( StdOutStream(req->Out()).Str() ) ;
 	os << 
 		"Content-type: text/html\r\n\r\n"
 		"<ul>" ;
