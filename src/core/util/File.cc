@@ -149,7 +149,7 @@ void File::Close()
 {
 	if ( IsOpened() )
 	{
-		close( m_fd ) ;
+		::close( m_fd ) ;
 		m_fd = -1 ;
 	}
 }
@@ -162,7 +162,7 @@ bool File::IsOpened() const
 /**	Read bytes from file. See DataStream::Read() for details.
 	\throw	Error	In case of any error.
 */
-std::size_t File::Read( char *ptr, std::size_t size )
+std::streamsize File::read( char *ptr, std::streamsize size )
 {
 	assert( IsOpened() ) ;
 	ssize_t count = ::read( m_fd, ptr, size ) ;
@@ -177,7 +177,7 @@ std::size_t File::Read( char *ptr, std::size_t size )
 	return count ;
 }
 
-std::size_t File::Write( const char *ptr, std::size_t size )
+std::streamsize File::write( const char *ptr, std::streamsize size )
 {
 	assert( IsOpened() ) ;
 	ssize_t count = ::write( m_fd, ptr, size ) ;

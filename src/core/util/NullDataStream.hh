@@ -24,13 +24,13 @@
 
 namespace wb {
 
-class NullDataStream : public DataStream
+class NullDataStream : public Sink, public Source
 {
 public :
 	NullDataStream( ) ;
 
-	std::size_t Read( char *data, std::size_t size ) ;
-	std::size_t Write( const char *data, std::size_t size ) ;
+	std::streamsize read( char *data, std::streamsize size ) ;
+	std::streamsize write( const char *data, std::streamsize size ) ;
 } ;
 
 } // end of namespace

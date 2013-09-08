@@ -25,7 +25,8 @@
 
 namespace wb {
 
-class DataStream ;
+class Source ;
+class Sink ;
 
 class HTMLStreamFilter
 {
@@ -34,7 +35,7 @@ public :
 
 	HTMLStreamFilter() ;
 	
-	void Parse( DataStream *in, DataStream *out ) ;
+	void Parse( Source *in, Sink *out ) ;
 
 private :
 	bool CheckElement( const std::string& element ) ;

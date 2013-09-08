@@ -26,7 +26,7 @@
 
 namespace wb {
 
-class DataStream ;
+class Source ;
 class File ;
 
 /*!	\brief	HTTP multi-part form data. Defined in RFC2388/1867.
@@ -44,15 +44,12 @@ public :
 	> Callback ;
 
 public :
-	FormData( DataStream *in, const std::string& ctype ) ;
+	FormData( Source *in, const std::string& ctype ) ;
 
 	void Save( const fs::path& path, const Callback& callback ) ;
 
 private :
-	static std::size_t ReadUntil( DataStream *out, const std::string& target ) ;
-	
-private :
-	DataStream	*m_in ;
+	Source		*m_in ;
 	std::string	m_boundary ;
 } ;
 

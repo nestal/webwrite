@@ -370,12 +370,12 @@ std::ostream& operator<<( std::ostream& os, const Json& json )
 	return os << ::json_object_to_json_string( json.m_json ) ;
 }
 
-void Json::Write( DataStream *out ) const
+void Json::Write( Sink *out ) const
 {
 	assert( out != 0 ) ;
 
 	const char *str = ::json_object_to_json_string( m_json ) ;
-	out->Write( str, std::strlen(str) ) ;
+	out->write( str, std::strlen(str) ) ;
 }
 
 Json::Type Json::DataType() const
@@ -487,7 +487,7 @@ Json Json::Parse( const std::string& str )
 /// Parse a file. The file is loaded from file system.
 /// \throw	Error	expt::ErrMsg contains a human-readable message describing the
 ///					error.
-Json Json::Parse( DataStream *in )
+Json Json::Parse( Source *in )
 {
 	assert( in != 0 ) ;
 
@@ -497,7 +497,7 @@ Json Json::Parse( DataStream *in )
 	char buf[1024] ;
 	std::size_t count = 0 ;
 
-	while ( (count = in->Read( buf, sizeof(buf) ) ) > 0 )
+	while ( (count = in->read( buf, sizeof(buf) ) ) > 0 )
 	{
 		json = ::json_tokener_parse_ex( tok, buf, count ) ;
 		

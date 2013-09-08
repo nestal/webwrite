@@ -81,7 +81,7 @@ HTMLStreamFilter::HTMLStreamFilter()
 }
 
 /// Parsed according to W3C specification: http://www.w3.org/TR/html5/syntax.html
-void HTMLStreamFilter::Parse( DataStream *in, DataStream *out )
+void HTMLStreamFilter::Parse( Source *in, Sink *out )
 {
 	StreamParser inp( in ) ;
 	
@@ -105,7 +105,7 @@ void HTMLStreamFilter::Parse( DataStream *in, DataStream *out )
 		if ( good )
 		{
 			std::string element = '<' + tag.Str() ;
-			out->Write( element.c_str(), element.size() ) ;
+			out->write( element.c_str(), element.size() ) ;
 		
 			// tag not closed yet. read its attributes
 			if ( r.target == ' ' )

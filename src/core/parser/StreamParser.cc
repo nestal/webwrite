@@ -30,7 +30,7 @@
 
 namespace wb {
 
-StreamParser::StreamParser( DataStream *in ) :
+StreamParser::StreamParser( Source *in ) :
 	m_in( in ), m_end( m_cache )
 {
 	assert( in != 0 ) ;
@@ -46,7 +46,7 @@ StreamParser::StreamParser( DataStream *in ) :
 	\return			Actually number of bytes copied. This is always
 					less than or equal to `count`.
 */
-std::size_t StreamParser::Consume( std::size_t count, DataStream *out )
+std::size_t StreamParser::Consume( std::size_t count, Sink *out )
 {
 	assert( out != 0 ) ;
 	std::size_t total = 0 ;
@@ -54,7 +54,7 @@ std::size_t StreamParser::Consume( std::size_t count, DataStream *out )
 	while ( count > 0 )
 	{
 		std::size_t actual = std::min( Size( ), count ) ;
-		out->Write( m_cache, actual ) ;
+		out->write( m_cache, actual ) ;
 
 		std::size_t remain = Size( ) - actual ;
 		std::memmove( m_cache, m_cache + actual, remain ) ;
@@ -73,7 +73,7 @@ std::size_t StreamParser::Consume( std::size_t count, DataStream *out )
 
 // no need to put the definition in header for private functions
 template<typename Find>
-StreamParser::Result StreamParser::FindUntil( Find find, DataStream *out )
+StreamParser::Result StreamParser::FindUntil( Find find, Sink *out )
 {
 	assert( out != 0 ) ;
 
@@ -114,7 +114,7 @@ const char* StreamParser::FindChar(
 	return std::find( begin, end, target ) ;
 }
 
-StreamParser::Result StreamParser::ReadUntil( char target, DataStream *out )
+StreamParser::Result StreamParser::ReadUntil( char target, Sink *out )
 {
 	assert( out != 0 ) ;
 	return FindUntil(
@@ -128,7 +128,7 @@ const char* StreamParser::FindAnyChar(
 }
 
 StreamParser::Result StreamParser::ReadUntilAny(
-	const std::string& target, DataStream *out )
+	const std::string& target, Sink *out )
 {
 	assert( out != 0 ) ;
 	return FindUntil(
@@ -145,7 +145,7 @@ StreamParser::Result StreamParser::ReadUntilAny(
 	\return			Parser result. Result::target is not updated.
 */
 StreamParser::Result StreamParser::ReadUntil(
-    const std::string& target, DataStream *out )
+    const std::string& target, Sink *out )
 {
 	assert( !target.empty() ) ;
 	assert( Capacity() >= target.size() ) ;
@@ -187,7 +187,7 @@ bool StreamParser::Refill( )
 	if ( Size( ) == Capacity( ) )
 		return true ;
 
-	std::size_t read = m_in->Read( m_end, Capacity( ) - Size( ) ) ;
+	std::size_t read = m_in->read( m_end, Capacity( ) - Size( ) ) ;
 	m_end += read ;
 	return read > 0 ;
 }

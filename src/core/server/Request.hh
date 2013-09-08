@@ -20,12 +20,14 @@
 
 #pragma once
 
+#include "util/DataStream.hh"
+
 #include <string>
 
 namespace wb {
 
-class DataStream ;
-class OutputStream ;
+class Source ;
+class Sink ;
 class Json ;
 
 class Request
@@ -43,8 +45,8 @@ public :
 	virtual std::string ContentType() const = 0 ;
 
 	// input and output
-	virtual DataStream* In() = 0 ;
-	virtual DataStream* Out() = 0 ;
+	virtual Source*	In() = 0 ;
+	virtual Sink*	Out() = 0 ;
 
 	// helpers
 	virtual void CacheControl( std::size_t max_age ) = 0 ;

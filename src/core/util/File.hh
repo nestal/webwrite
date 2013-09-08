@@ -35,7 +35,7 @@ namespace wb {
 	It is a simple wrapper around the UNIX file descriptor. It will
 	throw exceptions (i.e. Error) when it encounters errors.
 */
-class File : public DataStream
+class File : public Source, public Sink
 {
 public :
 	/// File specific errors. It often includes
@@ -58,8 +58,8 @@ public :
 	void Close() ;
 	bool IsOpened() const ;
 	
-	std::size_t Read( char *ptr, std::size_t size ) ;
-	std::size_t Write( const char *ptr, std::size_t size ) ;
+	std::streamsize read( char *data, std::streamsize size ) ;
+	std::streamsize write( const char *data, std::streamsize size ) ;
 
 	off_t Seek( off_t offset, int whence ) ;
 	off_t Tell() const ;

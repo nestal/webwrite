@@ -18,8 +18,8 @@
 */
 
 #include "util/StringStream.hh"
-#include "util/OutputStream.hh"
 #include <boost/test/unit_test.hpp>
+#include <boost/iostreams/stream.hpp>
 
 using namespace wb ;
 
@@ -28,9 +28,10 @@ namespace
 	struct F
 	{
 		StringStream		ss ;
-		OutputStream		out ;
+		RealSink			rs ;
+		boost::iostreams::stream<RealSink>	out ;
 		
-		F() : out( &ss )
+		F() : rs( &ss ), out( rs )
 		{
 		}
 	} ;

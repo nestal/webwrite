@@ -36,7 +36,7 @@ namespace wb {
 
 /*!	\brief	initialize the form data
 */
-FormData::FormData( DataStream *in, const std::string& ctype ) :
+FormData::FormData( Source *in, const std::string& ctype ) :
 	m_in( in )
 {
 	assert( m_in != 0 ) ;

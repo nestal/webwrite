@@ -32,16 +32,29 @@ namespace wb {
 
 const std::size_t buf_size = 8 * 1024 ;
 
-class FCGIRequest::StreamWrapper : public DataStream
+class FCGIRequest::SrcWrapper : public Source
 {
 public :
-	explicit StreamWrapper( FCGX_Stream *str ) :
+	explicit SrcWrapper( FCGX_Stream *str ) :
 		m_str( str )
 	{
 	}
 	
-	std::size_t Read( char *data, std::size_t size ) ;
-	std::size_t Write( const char *data, std::size_t size ) ;
+	std::streamsize read(char *data, std::streamsize size) ;
+
+private :
+	FCGX_Stream	*m_str ;
+} ;
+
+class FCGIRequest::SinkWrapper : public Sink
+{
+public :
+	explicit SinkWrapper( FCGX_Stream *str ) :
+		m_str( str )
+	{
+	}
+	
+	std::streamsize write(const char *data, std::streamsize size) ;
 
 private :
 	FCGX_Stream	*m_str ;
@@ -49,8 +62,8 @@ private :
 
 FCGIRequest::FCGIRequest( FCGX_Request *req ) :
 	m_req( req ),
-	m_in( new StreamWrapper( m_req->in ) ),
-	m_out( new StreamWrapper( m_req->out ) )
+	m_in( new SrcWrapper( m_req->in ) ),
+	m_out( new SinkWrapper( m_req->out ) )
 {
 }
 
@@ -58,12 +71,12 @@ FCGIRequest::~FCGIRequest()
 {
 }
 
-DataStream* FCGIRequest::In()
+Source* FCGIRequest::In()
 {
 	return m_in.get() ;
 }
 
-DataStream* FCGIRequest::Out()
+Sink* FCGIRequest::Out()
 {
 	return m_out.get() ;
 }
@@ -93,12 +106,12 @@ void FCGIRequest::XSendFile( const std::string& file )
 	FCGX_FPrintF( m_req->out, "X-Accel-Redirect: %s\r\n\r\n", file.c_str() ) ;
 }
 
-std::size_t FCGIRequest::StreamWrapper::Read( char *data, std::size_t size )
+std::streamsize FCGIRequest::SrcWrapper::read( char *data, std::streamsize size )
 {
 	return ::FCGX_GetStr( data, size, m_str ) ;
 }
 
-std::size_t FCGIRequest::StreamWrapper::Write( const char *data, std::size_t size )
+std::streamsize FCGIRequest::SinkWrapper::write( const char *data, std::streamsize size )
 {
 	return ::FCGX_PutStr( data, size, m_str ) ;
 }

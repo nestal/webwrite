@@ -29,8 +29,9 @@
 namespace wb {
 
 class Json ;
-class DataStream ;
 class PrintF ;
+class Source ;
+class Sink ;
 
 /*!	\brief HTTP request object
 
@@ -51,8 +52,8 @@ public :
 	std::string Query() const ;
 	std::string ContentType() const ;
 	
-	DataStream* In() ;
-	DataStream* Out() ;
+	Source*	In() ;
+	Sink*	Out() ;
 
 	// helpers
 	void CacheControl( std::size_t max_age ) ;
@@ -71,8 +72,10 @@ public :
 private :
 	FCGX_Request	*m_req ;
 	
-	class StreamWrapper ;
-	std::auto_ptr<StreamWrapper> m_in, m_out ;
+	class SrcWrapper ;
+	class SinkWrapper ;
+	std::auto_ptr<SrcWrapper>	m_in ;
+	std::auto_ptr<SinkWrapper>	m_out ;
 } ;
 
 } // end of namespace

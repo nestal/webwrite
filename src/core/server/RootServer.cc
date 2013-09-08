@@ -26,12 +26,12 @@
 #include "parser/HTMLStreamFilter.hh"
 #include "util/Atomic.hh"
 #include "util/File.hh"
-#include "util/OutputStream.hh"
 
 #include <boost/regex.hpp>
 #include <boost/bind.hpp>
 #include <boost/timer/timer.hpp>
 #include <boost/tokenizer.hpp>
+#include <boost/iostreams/stream.hpp>
 
 #include <ctime>
 #include <set>
@@ -174,7 +174,7 @@ void RootServer::Load( Request *req, const Resource& res )
 	}
 }
 
-void RootServer::FilterHTML( DataStream *html, const Resource& res )
+void RootServer::FilterHTML( Source *html, const Resource& res )
 {
 	fs::path file = res.DataPath() ;
 	
@@ -271,7 +271,8 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 {
 	req->CacheControl(0) ;
 	
-	OutputStream os( req->Out() ) ;
+	RealSink rs( req->Out() ) ;
+	boost::iostreams::stream<RealSink> os( rs ) ;
 	os << 
 		"Content-type: text/html\r\n\r\n"
 		"<ul>" ;
@@ -309,7 +310,7 @@ void RootServer::ServeIndex( Request *req, const Resource& res )
 
 void RootServer::ServeMimeCss( Request *req, const Resource& )
 {
-	req->Out()->Write( m_mime_css.c_str(), m_mime_css.size() ) ;
+	req->Out()->write( m_mime_css.c_str(), m_mime_css.size() ) ;
 }
 
 void RootServer::NotFound( Request *req, const Resource& )
@@ -359,7 +360,7 @@ std::string RootServer::IndexHtml( )
 	char temp[80] ;
 	
 	std::size_t count = 0 ;
-	while ( (count = idx.Read( &temp[0], sizeof(temp) ) ) > 0 )
+	while ( (count = idx.read( &temp[0], sizeof(temp) ) ) > 0 )
 		html.insert( html.end(), temp, temp + count ) ;
 
 	boost::format fmt(html) ;

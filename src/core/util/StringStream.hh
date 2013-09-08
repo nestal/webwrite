@@ -38,13 +38,13 @@ namespace wb {
 	
 	The limit is current 1024 bytes.
 */
-class StringStream : public DataStream
+class StringStream : public Source, public Sink
 {
 public :
 	explicit StringStream( const std::string& init = std::string() ) ;
 
-	std::size_t Read( char *data, std::size_t size ) ;
-	std::size_t Write( const char *data, std::size_t size ) ;
+	std::streamsize read( char *data, std::streamsize size ) ;
+	std::streamsize write( const char *data, std::streamsize size ) ;
 
 	const std::string& Str() const ;
 	void Str( const std::string& str ) ;

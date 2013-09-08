@@ -20,6 +20,7 @@
 #pragma once
 
 #include "util/Atomic.hh"
+#include "util/DataStream.hh"
 #include "util/FileSystem.hh"
 
 #include "parser/Query.hh"
@@ -64,7 +65,7 @@ private :
 	void ServeLib( Request *req, const Resource& res ) ;
 	static std::string CssMimeType( const std::string& type ) ;
 
-	void FilterHTML( DataStream *html, const Resource& res ) ;
+	void FilterHTML( Source *html, const Resource& res ) ;
 
 	// static content generators
 	static std::string GenerateMimeCss( ) ;

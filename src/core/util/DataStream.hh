@@ -19,17 +19,20 @@
 
 #pragma once
 
+#include <boost/iostreams/concepts.hpp>
 #include <cstddef>
 
 namespace wb {
 
+namespace io = boost::iostreams ;
+
 /**	\brief	Encapsulation of data streams. Useful for unit tests.
 	This class provides two functions: Read() and Write().
 */
-class DataStream
+class Source : public boost::iostreams::source
 {
 protected :
-	virtual ~DataStream() {}
+	virtual ~Source() {}
 	
 public :
 	/**	Reading from the stream. The caller indicates that it wants
@@ -43,11 +46,30 @@ public :
 						0 indicates the end of stream, i.e. you will
 						still get 0 if you call again.
 	*/
-	virtual std::size_t Read( char *data, std::size_t size ) = 0 ;
-	virtual std::size_t Write( const char *data, std::size_t size ) = 0 ;
+	virtual std::streamsize read( char *data, std::streamsize size ) = 0 ;
+} ;
+
+class Sink : public boost::iostreams::sink
+{
+protected :
+	virtual ~Sink() {}
+
+public :
+	virtual std::streamsize write( const char *data, std::streamsize size ) = 0 ;
 } ;
 
 /// Stream for /dev/null, i.e. read and writing nothing
-DataStream* DevNull() ;
+Sink* DevNull() ;
+
+class RealSink : public Sink
+{
+public :
+	explicit RealSink( Sink *out ) ;
+	
+	std::streamsize write( const char *data, std::streamsize size ) ;
+
+private :
+	Sink	*m_out ;
+} ;
 
 } // end of namespace

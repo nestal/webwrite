@@ -19,13 +19,11 @@
 
 #pragma once
 
-#include "util//DataStream.hh"
+#include "util/DataStream.hh"
 
 #include <string>
 
 namespace wb {
-
-class DataStream ;
 
 /**	\brief	A parser base on DataStream
 
@@ -38,7 +36,7 @@ class DataStream ;
 class StreamParser
 {
 public :
-	explicit StreamParser( DataStream *in ) ;
+	explicit StreamParser( Source *in ) ;
 
 	/// Result of parsing. Used by StreamParser::ReadUntil()
 	struct Result
@@ -48,11 +46,11 @@ public :
 		std::size_t	consumed ;	///< number of bytes consumed.
 	} ;
 
-	Result ReadUntil( const std::string& target, DataStream *out ) ;
-	Result ReadUntil( char target, DataStream *out ) ;
-	Result ReadUntilAny( const std::string& first_of, DataStream *out ) ;
-	Result ReadUntilNot( const std::string& first_of, DataStream *out ) ;
-	std::size_t Consume( std::size_t count, DataStream *out = DevNull() ) ;
+	Result ReadUntil( const std::string& target, Sink *out ) ;
+	Result ReadUntil( char target, Sink *out ) ;
+	Result ReadUntilAny( const std::string& first_of, Sink *out ) ;
+	Result ReadUntilNot( const std::string& first_of, Sink *out ) ;
+	std::size_t Consume( std::size_t count, Sink *out = DevNull() ) ;
 		
 	bool Refill() ;
 	std::size_t Size() const ;
@@ -60,16 +58,16 @@ public :
 
 private :
 	template <typename Find>
-	Result FindUntil( Find find, DataStream *out ) ;
+	Result FindUntil( Find find, Sink *out ) ;
 	
 	static const char* FindChar( const char *begin, const char *end, char target ) ;
 	static const char* FindAnyChar( const char *begin, const char *end,
 		const std::string& target ) ;
 
 private :
-	DataStream	*m_in ;
-	char		m_cache[80] ;
-	char		*m_end ;
+	Source	*m_in ;
+	char	m_cache[80] ;
+	char	*m_end ;
 } ;
 
 } // end of namespace

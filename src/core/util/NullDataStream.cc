@@ -26,20 +26,30 @@ NullDataStream::NullDataStream( )
 {
 }
 
-std::size_t NullDataStream::Read( char *, std::size_t size )
+std::streamsize NullDataStream::read( char *data, std::streamsize size )
 {
 	return size ;
 }
 
-std::size_t NullDataStream::Write( const char *, std::size_t size )
+std::streamsize NullDataStream::write( const char *data, std::streamsize size )
 {
 	return size ;
 }
 
-DataStream* DevNull()
+Sink* DevNull()
 {
 	static NullDataStream instance ;
 	return &instance ;
+}
+
+RealSink::RealSink( Sink *out ) :
+	m_out( out )
+{
+}
+
+std::streamsize RealSink::write( const char *data, std::streamsize size )
+{
+	return m_out->write(data, size) ;
 }
 
 } // end of namespace

@@ -38,18 +38,18 @@ StringStream::StringStream( const std::string& init ) :
 /// Read `size` bytes from the stream. Those bytes will be removed from
 /// the underlying string by calling `std::string::erase()`. Therefore, it is
 /// not a good idea to call Read() to read byte-by-byte.
-std::size_t StringStream::Read( char *data, std::size_t size )
+std::streamsize StringStream::read( char *data, std::streamsize size )
 {
 	// wow! no need to count count == 0
-	std::size_t count = std::min( m_str.size(), size ) ;
+	std::size_t count = std::min( m_str.size(), static_cast<std::size_t>(size) ) ;
 	std::copy( m_str.begin(), m_str.begin() + count, data ) ;
 	m_str.erase( 0, count ) ;
 	return count ;
 }
 
-std::size_t StringStream::Write( const char *data, std::size_t size )
+std::streamsize StringStream::write( const char *data, std::streamsize size )
 {
-	std::size_t count = std::min( size, capacity - m_str.size() ) ;
+	std::size_t count = std::min( static_cast<std::size_t>(size), capacity - m_str.size() ) ;
 	m_str.insert( m_str.end(), data, data+count ) ;
 	return count ;
 }
