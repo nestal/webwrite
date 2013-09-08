@@ -41,10 +41,16 @@ std::size_t Backtrace( addr_t *stack, std::size_t count )
 
 void PrintTrace( const addr_t *stack, std::size_t count, std::ostream& os )
 {
+	// call ::backtrace_symbols() to get the strings
 	char **func = ::backtrace_symbols(stack, count) ;
 	
-	for ( std::size_t i = 0 ; i < count && func != 0 && func[i] != 0 ; ++i )
-		os << "#"  << i << " [" << stack[i] << "] " << Demangle(func[i]) << std::endl ;
+	if ( func != 0 )
+	{
+		for ( std::size_t i = 0 ; i < count && func[i] != 0 ; ++i )
+			os << "#"  << i << " [" << stack[i] << "] " << Demangle(func[i]) << std::endl ;
+	
+		std::free(func) ;
+	}
 }
 
 } } // end of namespace

@@ -58,8 +58,6 @@ std::ostream& operator<<( std::ostream& os, const wb::Backtrace& b )
 	// the 2nd one is the Backtrace() constructor
 	// both are not interesting to user
 	debug::PrintTrace( b.m_stack, b.m_count, os ) ;
-	
-	
 	return os ;
 }
 

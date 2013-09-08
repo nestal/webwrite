@@ -1,5 +1,5 @@
 /*
-	webwrite: an GPL wiki-like website with in-place editing
+	grive: an GPL program to sync a local directory with Google Drive
 	Copyright (C) 2013 Wan Wai Ho
 
 	This program is free software; you can redistribute it and/or
@@ -20,20 +20,32 @@
 
 #pragma once
 
-#include "Node.hh"
+#include <string>
+
+//! XML lib forward declaration
+struct _xmlDoc ;
+struct _xmlNode ;
 
 namespace xml {
 
-class Doc : public Node
+class CNode
 {
-public :
-	explicit Doc( const std::string& fname ) ;
-	Doc( const Doc& rhs ) ;
-	~Doc() ;
-
 protected :
-	_xmlDoc* Self() ;
+	explicit CNode( _xmlNode *node ) ;
+
+public :
+	CNode() ;
+
+	CNode Children() const ;
+
+	CNode operator[]( const std::string& sel ) const ;
+	CNode FindSiblings( const std::string& name ) const ;
+
+public :
+	_xmlNode*	Get() const ;
+
+private :
+	_xmlNode	*m_node ;
 } ;
 
 } // end of namespace
-

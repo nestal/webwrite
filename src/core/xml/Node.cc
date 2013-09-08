@@ -1,5 +1,5 @@
 /*
-	webwrite: an GPL wiki-like website with in-place editing
+	grive: an GPL program to sync a local directory with Google Drive
 	Copyright (C) 2013 Wan Wai Ho
 
 	This program is free software; you can redistribute it and/or
@@ -18,22 +18,33 @@
 	MA  02110-1301, USA.
 */
 
-#pragma once
-
 #include "Node.hh"
+
+#include <libxml/tree.h>
 
 namespace xml {
 
-class Doc : public Node
+Node::Node()
 {
-public :
-	explicit Doc( const std::string& fname ) ;
-	Doc( const Doc& rhs ) ;
-	~Doc() ;
+}
 
-protected :
-	_xmlDoc* Self() ;
-} ;
+Node::Node( xmlNodePtr node ) : CNode( node )
+{
+}
+
+Node Node::operator[]( const std::string& sel )
+{
+	return Node(Get()->children).FindSiblings( sel ) ;
+}
+
+Node Node::FindSiblings( const std::string& name )
+{
+	for ( xmlNodePtr n = Get() ; n != 0 ; n = n->next )
+	{
+		if ( name == reinterpret_cast<const char*>(n->name) )
+			return Node(n) ;
+	}
+	return Node() ;
+}
 
 } // end of namespace
-

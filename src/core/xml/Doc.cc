@@ -21,62 +21,28 @@
 #include "Doc.hh"
 
 #include <libxml/parser.h>
+#include <libxml/tree.h>
 
 #include <iostream>
 
 namespace xml {
-
-Node::Node() :
-	m_node(0)
-{
-}
-
-Node::Node( _xmlNode *node ) :
-	m_node( node )
-{
-}
-
-xmlNodePtr Node::Get()
-{
-	return m_node ;
-}
-
-Node Node::Children() const
-{
-	return Node(m_node->children) ;
-}
-
-Node Node::operator[]( const std::string& sel ) const
-{
-	for ( xmlNodePtr n = m_node->children ; n != 0 ; n = n->next )
-	{
-		if ( sel == reinterpret_cast<const char*>(n->name) )
-			return Node(n) ;
-	}
-	return Node() ;
-}
-
-OwnedNode::OwnedNode( _xmlNode *node ) :
-	Node( node )
-{
-}
-
-OwnedNode::~OwnedNode()
-{
-	::xmlFreeNode( Get() ) ;
-}
 
 Doc::Doc( const std::string& fname ) :
 	Node( reinterpret_cast<xmlNodePtr>(::xmlParseFile( fname.c_str( ) ) ) )
 {
 }
 
-Doc::~Doc()
+Doc::Doc( const Doc& rhs ) :
+	Node( reinterpret_cast<xmlNodePtr>(::xmlCopyDoc( Self(), 1 ) ) )
 {
-	::xmlFreeDoc( Me() ) ;
 }
 
-_xmlDoc* Doc::Me()
+Doc::~Doc()
+{
+	::xmlFreeDoc( Self() ) ;
+}
+
+_xmlDoc* Doc::Self()
 {
 	return reinterpret_cast<xmlDocPtr>(Get()) ;
 }

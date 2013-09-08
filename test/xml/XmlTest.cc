@@ -35,7 +35,7 @@ BOOST_FIXTURE_TEST_SUITE( DocTest, F )
 BOOST_AUTO_TEST_CASE( Test )
 {
 	Doc a( TEST_DATA "hihi.xml" ) ;
-	Node b = a["hihi"] ;
+	CNode b = a["hihi"] ;
 	
 	BOOST_CHECK( b.Get() != 0 ) ;
 }
