@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE( Test )
 	Doc a( TEST_DATA "hihi.xml" ) ;
 	CNode b = a["hihi"] ;
 	
-	BOOST_CHECK( b.Get() != 0 ) ;
+	BOOST_CHECK_EQUAL( b.ParentDoc(), &a ) ;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

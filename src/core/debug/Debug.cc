@@ -29,7 +29,7 @@
 #include <ostream>
 #include <iomanip>
 
-namespace wb {
+namespace wb { namespace debug {
 
 std::string Demangle( const char *name )
 {
@@ -68,4 +68,4 @@ std::ostream& PrintHex( std::ostream& os, const void *buf, std::size_t size )
 	return os ;
 }
 
-} // end of namespace
+} } // end of namespace

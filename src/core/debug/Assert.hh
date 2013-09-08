@@ -20,44 +20,20 @@
 
 #pragma once
 
-#include <string>
+#define WB_ASSERT_VOID_CAST static_cast<void>
 
-//! XML lib forward declaration
-struct _xmlDoc ;
-struct _xmlNode ;
-
-namespace xml {
-
-class Doc ;
-
-class CNode
+namespace wb { namespace debug
 {
-protected :
-	explicit CNode( _xmlNode *node ) ;
+	void AssertFail( const char *expr, const char *file, int line, const char *func ) ;
+}}
 
-public :
-	CNode() ;
+#ifdef NDEBUG
+	#define WB_ASSERT(expr)		(WB_ASSERT_VOID_CAST(0))
 
-	// tree access
-	CNode Prev() const ;
-	CNode Next() const ;
-	CNode Parent() const ;
-	CNode Children() const ;
-	const Doc* ParentDoc() const ;
+#else
+	#define WB_ASSERT(expr)	\
+		((expr)								\
+			? WB_ASSERT_VOID_CAST(0)		\
+			: wb::debug::AssertFail(__STRING(expr), __FILE__, __LINE__, __PRETTY_FUNCTION__))
 
-	// attributes
-	std::string Name() const ;
-
-	// operations
-	CNode operator[]( const std::string& sel ) const ;
-	CNode FindSiblings( const std::string& name ) const ;
-
-protected :
-	static Doc* FromDoc( _xmlDoc *doc ) ;
-	_xmlNode*	Self() const ;
-
-private :
-	_xmlNode	*m_node ;
-} ;
-
-} // end of namespace
+#endif

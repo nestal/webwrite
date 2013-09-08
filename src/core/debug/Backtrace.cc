@@ -52,13 +52,18 @@ Backtrace::Backtrace( const Backtrace& bt ) :
 	\param	b	The backtrace information.
 	\sa SymbolInfo::Backtrace(), SymbolInfo::Instance()
 */
-std::ostream& operator<<( std::ostream& os, const wb::Backtrace& b )
+std::ostream& operator<<( std::ostream& os, const Backtrace& b )
 {
 	// the 1st function in the stack is SymbolInfo::Backtrace()
 	// the 2nd one is the Backtrace() constructor
 	// both are not interesting to user
 	debug::PrintTrace( b.m_stack, b.m_count, os ) ;
 	return os ;
+}
+
+void Backtrace::Write( std::FILE *out ) const
+{
+	debug::PrintTrace( m_stack, m_count, ::fileno(out) ) ;
 }
 
 std::string Backtrace::ToString( ) const

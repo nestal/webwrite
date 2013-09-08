@@ -53,4 +53,9 @@ void PrintTrace( const addr_t *stack, std::size_t count, std::ostream& os )
 	}
 }
 
+void PrintTrace( const addr_t *stack, std::size_t count, int fd )
+{
+	::backtrace_symbols_fd(stack, count, fd ) ;
+}
+
 } } // end of namespace

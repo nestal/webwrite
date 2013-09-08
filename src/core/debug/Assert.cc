@@ -18,46 +18,23 @@
 	MA  02110-1301, USA.
 */
 
-#pragma once
+#include "Assert.hh"
+#include "Backtrace.hh"
 
-#include <string>
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
 
-//! XML lib forward declaration
-struct _xmlDoc ;
-struct _xmlNode ;
+namespace wb { namespace debug {
 
-namespace xml {
-
-class Doc ;
-
-class CNode
+void AssertFail( const char *expr, const char *file, int line, const char *func )
 {
-protected :
-	explicit CNode( _xmlNode *node ) ;
+	std::cerr
+		<< "Assertion \"" << expr << "\" failure!\n"
+		<< "In function " << func << " (file: " << file << " line: " << line << ")\n" ;
+	
+	Backtrace().Write(stderr) ;
+	std::abort() ;
+}
 
-public :
-	CNode() ;
-
-	// tree access
-	CNode Prev() const ;
-	CNode Next() const ;
-	CNode Parent() const ;
-	CNode Children() const ;
-	const Doc* ParentDoc() const ;
-
-	// attributes
-	std::string Name() const ;
-
-	// operations
-	CNode operator[]( const std::string& sel ) const ;
-	CNode FindSiblings( const std::string& name ) const ;
-
-protected :
-	static Doc* FromDoc( _xmlDoc *doc ) ;
-	_xmlNode*	Self() const ;
-
-private :
-	_xmlNode	*m_node ;
-} ;
-
-} // end of namespace
+} } // end of namespace

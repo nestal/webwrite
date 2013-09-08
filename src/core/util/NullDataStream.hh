@@ -31,8 +31,6 @@ public :
 
 	std::size_t Read( char *data, std::size_t size ) ;
 	std::size_t Write( const char *data, std::size_t size ) ;
-	
-	static NullDataStream instance ;
 } ;
 
 } // end of namespace

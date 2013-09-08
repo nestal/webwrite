@@ -32,7 +32,7 @@ public :
 	~Doc() ;
 
 protected :
-	_xmlDoc* Self() ;
+	_xmlDoc* Self() const ;
 } ;
 
 } // end of namespace

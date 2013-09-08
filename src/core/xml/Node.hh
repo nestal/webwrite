@@ -32,6 +32,12 @@ protected :
 public :
 	Node() ;
 
+	Node Prev() ;
+	Node Next() ;
+	Node Parent() ;
+	Node Children() ;
+	Doc* ParentDoc() ;
+
 	Node operator[]( const std::string& sel ) ;
 	Node FindSiblings( const std::string& name ) ;
 } ;

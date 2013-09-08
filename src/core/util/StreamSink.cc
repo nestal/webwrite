@@ -22,14 +22,14 @@
 
 #include "DataStream.hh"
 
-#include <cassert>
+#include "debug/Assert.hh"
 
 namespace wb {
 
 StreamSink::StreamSink( DataStream *out ) :
 	m_out( out )
 {
-	assert( m_out != 0 ) ;
+	WB_ASSERT( m_out != 0 ) ;
 }
 
 std::streamsize StreamSink::write( const char* s, std::streamsize n )

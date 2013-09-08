@@ -32,14 +32,39 @@ Node::Node( xmlNodePtr node ) : CNode( node )
 {
 }
 
+Doc* Node::ParentDoc()
+{
+	return CNode::FromDoc(Self()->doc) ;
+}
+
+Node Node::Prev()
+{
+	return Node(Self()->prev) ;
+}
+
+Node Node::Next()
+{
+	return Node(Self()->next) ;
+}
+
+Node Node::Parent()
+{
+	return Node(Self()->parent) ;
+}
+
+Node Node::Children()
+{
+	return Node(Self()->children) ;
+}
+
 Node Node::operator[]( const std::string& sel )
 {
-	return Node(Get()->children).FindSiblings( sel ) ;
+	return Children().FindSiblings( sel ) ;
 }
 
 Node Node::FindSiblings( const std::string& name )
 {
-	for ( xmlNodePtr n = Get() ; n != 0 ; n = n->next )
+	for ( xmlNodePtr n = Self() ; n != 0 ; n = n->next )
 	{
 		if ( name == reinterpret_cast<const char*>(n->name) )
 			return Node(n) ;

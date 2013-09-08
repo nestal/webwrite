@@ -21,6 +21,7 @@
 
 #include "Addr.hh"
 
+#include <cstdio>
 #include <iosfwd>
 #include <string>
 
@@ -44,9 +45,10 @@ public :
 	Backtrace( const Backtrace& bt ) ;
 	
 	friend std::ostream& operator<<( std::ostream& os,
-	                                 const wb::Backtrace& bt ) ;
+	                                 const Backtrace& bt ) ;
 
 	std::string ToString( ) const ;
+	void Write( std::FILE *out ) const ;
 
 private :
 	addr_t		m_stack[100] ;

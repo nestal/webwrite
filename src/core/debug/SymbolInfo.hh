@@ -37,6 +37,7 @@ namespace debug
 {
 	std::size_t Backtrace( addr_t *stack, std::size_t count ) ;
 	void PrintTrace( const addr_t *stack, std::size_t count, std::ostream& os ) ;
+	void PrintTrace( const addr_t *stack, std::size_t count, int fd ) ;
 } ;
 
 } // end of namespace

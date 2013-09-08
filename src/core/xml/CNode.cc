@@ -20,7 +20,12 @@
 
 #include "CNode.hh"
 
+#include "Doc.hh"
+#include "debug/Assert.hh"
+
 #include <libxml/tree.h>
+
+#include <cassert>
 
 namespace xml {
 
@@ -34,7 +39,7 @@ CNode::CNode( _xmlNode *node ) :
 {
 }
 
-xmlNodePtr CNode::Get() const
+xmlNodePtr CNode::Self() const
 {
 	return m_node ;
 }
@@ -46,7 +51,7 @@ CNode CNode::Children() const
 
 CNode CNode::operator[]( const std::string& sel ) const
 {
-	return CNode(m_node->children).FindSiblings( sel ) ;
+	return Children().FindSiblings( sel ) ;
 }
 
 CNode CNode::FindSiblings( const std::string& name ) const
@@ -57,6 +62,32 @@ CNode CNode::FindSiblings( const std::string& name ) const
 			return CNode(n) ;
 	}
 	return CNode() ;
+}
+
+const Doc* CNode::ParentDoc() const
+{
+	return FromDoc(m_node->doc) ;
+}
+
+CNode CNode::Prev() const
+{
+	return CNode(m_node->prev) ;
+}
+
+CNode CNode::Next() const
+{
+	return CNode(m_node->next) ;
+}
+
+CNode CNode::Parent() const
+{
+	return CNode(m_node->parent) ;
+}
+
+Doc* CNode::FromDoc( _xmlDoc *doc )
+{
+	WB_ASSERT( doc != 0 ) ;
+	return reinterpret_cast<Doc*>( doc->_private ) ;
 }
 
 } // end of namespace

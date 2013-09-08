@@ -23,6 +23,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
+#include <cassert>
 #include <iostream>
 
 namespace xml {
@@ -30,6 +31,7 @@ namespace xml {
 Doc::Doc( const std::string& fname ) :
 	Node( reinterpret_cast<xmlNodePtr>(::xmlParseFile( fname.c_str( ) ) ) )
 {
+	Self()->_private = this ;
 }
 
 Doc::Doc( const Doc& rhs ) :
@@ -42,9 +44,9 @@ Doc::~Doc()
 	::xmlFreeDoc( Self() ) ;
 }
 
-_xmlDoc* Doc::Self()
+_xmlDoc* Doc::Self() const
 {
-	return reinterpret_cast<xmlDocPtr>(Get()) ;
+	return reinterpret_cast<xmlDocPtr>(Node::Self()) ;
 }
 
 } // end of namespace

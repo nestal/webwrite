@@ -22,8 +22,6 @@
 
 namespace wb {
 
-NullDataStream NullDataStream::instance ;
-
 NullDataStream::NullDataStream( )
 {
 }
@@ -40,7 +38,8 @@ std::size_t NullDataStream::Write( const char *, std::size_t size )
 
 DataStream* DevNull()
 {
-	return &NullDataStream::instance ;
+	static NullDataStream instance ;
+	return &instance ;
 }
 
 } // end of namespace
