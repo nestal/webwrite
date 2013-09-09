@@ -20,34 +20,27 @@
 
 #pragma once
 
-#include "Node.hh"
-
-namespace wb
-{
-	class Source ;
-}
+#include "util/Exception.hh"
 
 namespace xml {
 
-class Doc : public Node
+namespace expt
 {
-public :
-	explicit Doc( const std::string& fname ) ;
-	explicit Doc( wb::Source *src ) ;
-	Doc( const Doc& rhs ) ;
-	~Doc() ;
+	struct Error : virtual wb::Exception
+	{
+	} ;
+	
+	typedef boost::error_info<struct Msg, 		std::string>	Msg_ ;
+	typedef boost::error_info<struct File,		std::string>	File_ ;
+	typedef boost::error_info<struct Line,		int>			Line_ ;
+	typedef boost::error_info<struct Code,		int>			Code_ ;
+	typedef boost::error_info<struct Column,	int>			Column_ ;
+	
+	void ThrowLastError( const char *func, const char *src_file, int src_line ) ;
+}
 
-protected :
-    // callback for read file
-    static int ReadCallback( void *pthis, char *buffer, int len ) ;
-    static int CloseCallback( void *pthis ) ;
-
-private :
-    void Init() ;
-
-protected :
-	_xmlDoc* Self() const ;
-} ;
+#define THROW_LAST_XML_EXCEPTION()	\
+	xml::expt::ThrowLastError( __PRETTY_FUNCTION__, __FILE__, __LINE__ )
 
 } // end of namespace
 

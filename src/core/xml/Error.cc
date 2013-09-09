@@ -18,36 +18,29 @@
 	MA  02110-1301, USA.
 */
 
-#pragma once
+#include "Error.hh"
 
-#include "Node.hh"
+#include <libxml/xmlerror.h>
 
-namespace wb
+namespace xml { namespace expt {
+
+void ThrowLastError( const char *func, const char *src_file, int src_line )
 {
-	class Source ;
+	xmlErrorPtr err = xmlGetLastError() ;
+	if ( err != 0 )
+		throw Error()
+			
+			// info thrown by BOOST_THROW_EXCEPTION
+			<< boost::throw_function(func)
+			<< boost::throw_file(src_file)
+			<< boost::throw_line(src_line)
+			
+			// libxml2 error info
+			<< Msg_( err->message )
+			<< File_( err->file )
+			<< Line_( err->line )
+			<< Code_( err->code )
+			<< Column_( err->int2 ) ;
 }
 
-namespace xml {
-
-class Doc : public Node
-{
-public :
-	explicit Doc( const std::string& fname ) ;
-	explicit Doc( wb::Source *src ) ;
-	Doc( const Doc& rhs ) ;
-	~Doc() ;
-
-protected :
-    // callback for read file
-    static int ReadCallback( void *pthis, char *buffer, int len ) ;
-    static int CloseCallback( void *pthis ) ;
-
-private :
-    void Init() ;
-
-protected :
-	_xmlDoc* Self() const ;
-} ;
-
-} // end of namespace
-
+} } // end of namespace

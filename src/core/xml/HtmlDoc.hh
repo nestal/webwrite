@@ -20,33 +20,20 @@
 
 #pragma once
 
-#include "Node.hh"
-
-namespace wb
-{
-	class Source ;
-}
+#include "Doc.hh"
 
 namespace xml {
 
-class Doc : public Node
+class HtmlDoc : public Doc
 {
 public :
-	explicit Doc( const std::string& fname ) ;
-	explicit Doc( wb::Source *src ) ;
-	Doc( const Doc& rhs ) ;
-	~Doc() ;
+	explicit HtmlDoc( const std::string& fname ) ;
+	explicit HtmlDoc( wb::Source *src ) ;
 
-protected :
-    // callback for read file
-    static int ReadCallback( void *pthis, char *buffer, int len ) ;
-    static int CloseCallback( void *pthis ) ;
+	HtmlDoc( const HtmlDoc& rhs ) ;
+	~HtmlDoc() ;
 
 private :
-    void Init() ;
-
-protected :
-	_xmlDoc* Self() const ;
 } ;
 
 } // end of namespace

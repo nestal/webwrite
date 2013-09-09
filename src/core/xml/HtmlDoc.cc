@@ -18,36 +18,27 @@
 	MA  02110-1301, USA.
 */
 
-#pragma once
-
-#include "Node.hh"
-
-namespace wb
-{
-	class Source ;
-}
+#include "HtmlDoc.hh"
 
 namespace xml {
 
-class Doc : public Node
+HtmlDoc::HtmlDoc( const std::string& fname ) :
+	Doc(fname)
 {
-public :
-	explicit Doc( const std::string& fname ) ;
-	explicit Doc( wb::Source *src ) ;
-	Doc( const Doc& rhs ) ;
-	~Doc() ;
+}
 
-protected :
-    // callback for read file
-    static int ReadCallback( void *pthis, char *buffer, int len ) ;
-    static int CloseCallback( void *pthis ) ;
+HtmlDoc::HtmlDoc( wb::Source *src ) :
+	Doc(src)
+{
+}
 
-private :
-    void Init() ;
+HtmlDoc::HtmlDoc( const HtmlDoc& rhs ) :
+	Doc( rhs )
+{
+}
 
-protected :
-	_xmlDoc* Self() const ;
-} ;
+HtmlDoc::~HtmlDoc()
+{
+}
 
 } // end of namespace
-

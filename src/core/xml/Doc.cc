@@ -19,11 +19,14 @@
 */
 
 #include "Doc.hh"
+#include "Error.hh"
+
+#include "debug/Assert.hh"
+#include "util/DataStream.hh"
 
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include <cassert>
 #include <iostream>
 
 namespace xml {
@@ -31,12 +34,35 @@ namespace xml {
 Doc::Doc( const std::string& fname ) :
 	Node( reinterpret_cast<xmlNodePtr>(::xmlParseFile( fname.c_str( ) ) ) )
 {
+	Init() ;
+}
+
+void Doc::Init()
+{
+	if ( Self() == 0 )
+		THROW_LAST_XML_EXCEPTION() ;
+	
 	Self()->_private = this ;
+}
+
+Doc::Doc( wb::Source *src ) :
+	Node( reinterpret_cast<xmlNodePtr>(::xmlReadIO(
+		Doc::ReadCallback,
+		Doc::CloseCallback,
+		src,
+		0,
+		0,
+		XML_PARSE_RECOVER   | XML_PARSE_PEDANTIC  |
+		XML_PARSE_NONET     | XML_PARSE_COMPACT ) )
+	)
+{
+	Init() ;
 }
 
 Doc::Doc( const Doc& rhs ) :
 	Node( reinterpret_cast<xmlNodePtr>(::xmlCopyDoc( Self(), 1 ) ) )
 {
+	Init() ;
 }
 
 Doc::~Doc()
@@ -47,6 +73,19 @@ Doc::~Doc()
 _xmlDoc* Doc::Self() const
 {
 	return reinterpret_cast<xmlDocPtr>(Node::Self()) ;
+}
+
+int Doc::ReadCallback( void *pvsrc, char *buffer, int len )
+{
+	wb::Source *src = reinterpret_cast<wb::Source*>(pvsrc) ;
+	
+	WB_ASSERT( src != 0 ) ;
+	return src->read(buffer, len) ;
+}
+
+int Doc::CloseCallback( void *pvsrc )
+{
+	return 0 ;
 }
 
 } // end of namespace
