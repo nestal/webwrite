@@ -23,9 +23,9 @@
 #include "Request.hh"
 #include "log/Log.hh"
 #include "parser/FormData.hh"
-#include "parser/HTMLStreamFilter.hh"
 #include "util/Atomic.hh"
 #include "util/File.hh"
+#include "xml/HtmlDoc.hh"
 
 #include <boost/regex.hpp>
 #include <boost/bind.hpp>
@@ -178,14 +178,16 @@ void RootServer::FilterHTML( Source *html, const Resource& res )
 {
 	fs::path file = res.DataPath() ;
 	
-	HTMLStreamFilter filter;
+//	HTMLStreamFilter filter;
 	
 	fs::create_directories( file.parent_path() ) ;
 	{
-		File dest( file, 0600 ) ;
-		filter.Parse( html, &dest ) ;
+//		File dest( file, 0600 ) ;
+//		filter.Parse( html, &dest ) ;
+		xml::HtmlDoc doc( html ) ;
+		doc.Save( file.generic_string() ) ;
 	}
-	
+
 	// save metadata after closing the file	
 	if ( fs::file_size(file) > 0 )
 		res.SaveMeta() ;
@@ -270,8 +272,10 @@ void RootServer::ServeVar( Request *req, const Resource& )
 void RootServer::ServeIndex( Request *req, const Resource& res )
 {
 	req->CacheControl(0) ;
+	std::cout << "??" << std::endl ;
 	
-	std::ostream&	os( StdOutStream(req->Out()).Str() ) ;
+	StdOutStream 	sos(req->Out()) ;
+	std::ostream&	os = sos.Str() ;
 	os << 
 		"Content-type: text/html\r\n\r\n"
 		"<ul>" ;

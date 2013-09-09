@@ -19,9 +19,13 @@
 */
 
 #include "xml/Doc.hh"
+#include "xml/HtmlDoc.hh"
+#include "util/File.hh"
+
 #include <boost/test/unit_test.hpp>
 
 using namespace xml ;
+using namespace wb ;
 
 namespace
 {
@@ -32,10 +36,28 @@ namespace
 
 BOOST_FIXTURE_TEST_SUITE( DocTest, F )
 
-BOOST_AUTO_TEST_CASE( Test )
+BOOST_AUTO_TEST_CASE( TestNormal )
 {
 	Doc a( TEST_DATA "hihi.xml" ) ;
 	CNode b = a["hihi"] ;
+	
+	BOOST_CHECK_EQUAL( b.ParentDoc(), &a ) ;
+}
+
+BOOST_AUTO_TEST_CASE( TestSource )
+{
+	File in( TEST_DATA "hihi.xml" ) ;
+	Doc a( &in ) ;
+	CNode b = a["hihi"] ;
+	
+	BOOST_CHECK_EQUAL( b.ParentDoc(), &a ) ;
+}
+
+BOOST_AUTO_TEST_CASE( TestHtmlSource )
+{
+	File in( TEST_DATA "hihi.html" ) ;
+	HtmlDoc a( &in ) ;
+	CNode b = a["html"] ;
 	
 	BOOST_CHECK_EQUAL( b.ParentDoc(), &a ) ;
 }

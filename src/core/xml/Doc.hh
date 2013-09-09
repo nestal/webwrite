@@ -36,8 +36,12 @@ public :
 	explicit Doc( wb::Source *src ) ;
 	Doc( const Doc& rhs ) ;
 	~Doc() ;
+	
+	void Save( const std::string fname ) const ;
 
 protected :
+	explicit Doc( _xmlDoc *self ) ;
+
     // callback for read file
     static int ReadCallback( void *pthis, char *buffer, int len ) ;
     static int CloseCallback( void *pthis ) ;
@@ -47,6 +51,7 @@ private :
 
 protected :
 	_xmlDoc* Self() const ;
+	virtual bool Check() const ;
 } ;
 
 } // end of namespace

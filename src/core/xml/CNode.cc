@@ -39,6 +39,10 @@ CNode::CNode( _xmlNode *node ) :
 {
 }
 
+CNode::~CNode()
+{
+}
+
 xmlNodePtr CNode::Self() const
 {
 	return m_node ;
@@ -82,6 +86,11 @@ CNode CNode::Next() const
 CNode CNode::Parent() const
 {
 	return CNode(m_node->parent) ;
+}
+
+std::string CNode::Name() const
+{
+	return reinterpret_cast<const char*>(m_node->name) ;
 }
 
 Doc* CNode::FromDoc( _xmlDoc *doc )

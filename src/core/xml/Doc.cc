@@ -28,6 +28,7 @@
 #include <libxml/tree.h>
 
 #include <iostream>
+#include <cstdio>
 
 namespace xml {
 
@@ -43,6 +44,7 @@ void Doc::Init()
 		THROW_LAST_XML_EXCEPTION() ;
 	
 	Self()->_private = this ;
+	WB_ASSERT( Check() ) ;
 }
 
 Doc::Doc( wb::Source *src ) :
@@ -60,13 +62,20 @@ Doc::Doc( wb::Source *src ) :
 }
 
 Doc::Doc( const Doc& rhs ) :
-	Node( reinterpret_cast<xmlNodePtr>(::xmlCopyDoc( Self(), 1 ) ) )
+	Node( reinterpret_cast<xmlNodePtr>(::xmlCopyDoc(rhs.Self(), 1)) )
+{
+	Init() ;
+}
+
+Doc::Doc( _xmlDoc *self ) :
+	Node( reinterpret_cast<xmlNodePtr>(self) )
 {
 	Init() ;
 }
 
 Doc::~Doc()
 {
+	WB_ASSERT( Check() ) ;
 	::xmlFreeDoc( Self() ) ;
 }
 
@@ -78,14 +87,29 @@ _xmlDoc* Doc::Self() const
 int Doc::ReadCallback( void *pvsrc, char *buffer, int len )
 {
 	wb::Source *src = reinterpret_cast<wb::Source*>(pvsrc) ;
-	
 	WB_ASSERT( src != 0 ) ;
+	
 	return src->read(buffer, len) ;
 }
 
 int Doc::CloseCallback( void *pvsrc )
 {
 	return 0 ;
+}
+
+bool Doc::Check() const
+{
+	return Self()->_private == this ;
+}
+
+void Doc::Save( const std::string fname ) const
+{
+	std::FILE *out = std::fopen( fname.c_str(), "w" ) ;
+	if ( out != 0 )
+	{
+		::xmlDocDump( out, Self() ) ;
+		std::fclose(out) ;
+	}
 }
 
 } // end of namespace

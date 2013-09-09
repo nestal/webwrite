@@ -19,26 +19,46 @@
 */
 
 #include "HtmlDoc.hh"
+#include "debug/Assert.hh"
+
+#include <libxml/HTMLparser.h>
 
 namespace xml {
 
 HtmlDoc::HtmlDoc( const std::string& fname ) :
-	Doc(fname)
+	Doc( reinterpret_cast<xmlDocPtr>(::htmlReadFile(
+		fname.c_str(),
+		"UTF-8",
+		HTML_PARSE_RECOVER   | HTML_PARSE_PEDANTIC  |
+		HTML_PARSE_NONET     | HTML_PARSE_COMPACT	|
+		HTML_PARSE_NOERROR ) )
+	)
 {
 }
 
 HtmlDoc::HtmlDoc( wb::Source *src ) :
-	Doc(src)
+	Doc( reinterpret_cast<xmlDocPtr>(::htmlReadIO(
+		Doc::ReadCallback,
+		Doc::CloseCallback,
+		src,
+		0,
+		"UTF-8",
+		HTML_PARSE_RECOVER   | HTML_PARSE_PEDANTIC  |
+		HTML_PARSE_NONET     | HTML_PARSE_COMPACT	|
+		HTML_PARSE_NOERROR ) )
+	)
 {
 }
 
 HtmlDoc::HtmlDoc( const HtmlDoc& rhs ) :
 	Doc( rhs )
 {
+	WB_ASSERT( Check() ) ;
 }
 
 HtmlDoc::~HtmlDoc()
 {
+	WB_ASSERT( Check() ) ;
 }
 
 } // end of namespace

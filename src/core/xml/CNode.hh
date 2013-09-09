@@ -37,6 +37,7 @@ protected :
 
 public :
 	CNode() ;
+	virtual ~CNode() ;
 
 	// tree access
 	CNode Prev() const ;
