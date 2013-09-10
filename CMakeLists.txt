@@ -93,8 +93,8 @@ add_executable( unittest
 	${WEBWRITE_UT_SRC} )
 
 target_link_libraries( unittest wb_core
-	${JSONC_LIBRARY}
 	${Boost_LIBRARIES}
+	${JSONC_LIBRARY}
 	${LibXML2_LIBRARIES}
 )
 
