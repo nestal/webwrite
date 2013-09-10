@@ -18,29 +18,29 @@
 	MA  02110-1301, USA.
 */
 
-#include "SourceSHA1.hh"
+#pragma once
 
-#include "debug/Assert.hh"
+#include "util/DataStream.hh"
+#include "SHA1.hh"
 
 namespace wb {
 
-SourceSHA1::SourceSHA1( Source *in ) : m_in(in)
+class FilterSHA1 : public Source, public Sink
 {
-	WB_ASSERT( m_in != 0 ) ;
-}
-
-std::streamsize SourceSHA1::read( char *data, std::streamsize size )
-{
-	std::streamsize count = m_in->read( data, size ) ;
-	if ( count > 0 )
-		m_sha.Input( data, count ) ;
+public :
+	explicit FilterSHA1( Source *in ) ;
+	explicit FilterSHA1( Sink *out ) ;
 	
-	return count ;
-}
+	std::streamsize read( char *data, std::streamsize size ) ;
+	std::streamsize write( const char *data, std::streamsize size ) ;
 
-SHA1::Digest SourceSHA1::Result()
-{
-	return m_sha.Result() ;
-}
+	SHA1::Digest Result() ;
+
+private :
+	SHA1	m_sha ;
+	Source	*m_in ;
+	Sink	*m_out ;
+} ;
 
 } // end of namespace
+

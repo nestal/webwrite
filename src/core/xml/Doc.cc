@@ -92,7 +92,17 @@ int Doc::ReadCallback( void *pvsrc, char *buffer, int len )
 	return src->read(buffer, len) ;
 }
 
-int Doc::CloseCallback( void *pvsrc )
+int Doc::WriteCallback( void *pvsink, const char *buffer, int len)
+{
+	WB_ASSERT( pvsink != 0 ) ;
+
+	wb::Sink *sink = reinterpret_cast<wb::Sink*>(pvsink) ;
+	WB_ASSERT( sink != 0 ) ;
+	
+	return sink->write(buffer, len) ;
+}
+
+int Doc::CloseCallback( void * )
 {
 	return 0 ;
 }
@@ -110,6 +120,23 @@ void Doc::Save( const std::string fname ) const
 		::xmlDocDump( out, Self() ) ;
 		std::fclose(out) ;
 	}
+}
+
+void Doc::Save( wb::Sink *sink ) const
+{
+	WB_ASSERT( sink != 0 ) ;
+
+	xmlOutputBufferPtr out = xmlAllocOutputBuffer(0) ; 
+
+	if ( out == 0 )
+		THROW_LAST_XML_EXCEPTION() ;
+
+	out->context		= sink ;
+	out->writecallback	= Doc::WriteCallback ;
+	out->closecallback	= Doc::CloseCallback ;
+	
+	xmlSaveFileTo( out, Self(), 0 ) ;
+//	xmlOutputBufferClose( out ) ;
 }
 
 } // end of namespace

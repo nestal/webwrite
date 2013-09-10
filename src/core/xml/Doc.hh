@@ -25,6 +25,7 @@
 namespace wb
 {
 	class Source ;
+	class Sink ;
 }
 
 namespace xml {
@@ -38,14 +39,16 @@ public :
 	~Doc() ;
 	
 	void Save( const std::string fname ) const ;
+	void Save( wb::Sink *sink ) const ;
 
 protected :
 	explicit Doc( _xmlDoc *self ) ;
 
     // callback for read file
-    static int ReadCallback( void *pthis, char *buffer, int len ) ;
-    static int CloseCallback( void *pthis ) ;
-
+    static int ReadCallback( void *pvsrc, char *buffer, int len ) ;
+    static int CloseCallback( void *ctx ) ;
+    static int WriteCallback( void *pvsink, const char *buffer, int len) ;
+    
 private :
     void Init() ;
 

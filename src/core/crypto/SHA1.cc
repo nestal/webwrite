@@ -23,7 +23,7 @@
 #include "util/CArray.hh"
 
 #include <algorithm>
-#include <iterator>
+#include <iomanip>
 #include <sstream>
 
 namespace wb {
@@ -66,7 +66,9 @@ namespace std
 	ostream& operator<<( ostream& os, const wb::SHA1::Digest& d )
 	{
 		os << std::hex ;
-		std::copy( wb::Begin(d.bytes), wb::End(d.bytes), std::ostream_iterator<unsigned>(os) ) ;
+		for ( int i = 0 ; i < wb::SHA1::m_size ; ++i )
+			os << std::setfill('0') << std::setw(2) << static_cast<unsigned>(d.bytes[i]) ;
+
 		return os ;
 	}
 }

@@ -21,7 +21,7 @@
 
 #include "Config.hh"
 #include "Request.hh"
-//#include "crypto/SinkSHA1.hh"
+#include "crypto/FilterSHA1.hh"
 #include "log/Log.hh"
 #include "parser/FormData.hh"
 #include "util/Atomic.hh"
@@ -182,7 +182,11 @@ void RootServer::FilterHTML( Source *html, const Resource& res )
 	fs::create_directories( file.parent_path() ) ;
 	{
 		xml::HtmlDoc doc( html ) ;
-		doc.Save( file.generic_string() ) ;
+		File		out( file, 0600 ) ;
+		FilterSHA1	sha( static_cast<Sink*>(&out) ) ;
+		doc.Save( &sha ) ;
+		
+		Log( "file %1% = %2%", file, sha.Result(), log::verbose ) ;
 	}
 
 	// save metadata after closing the file	
