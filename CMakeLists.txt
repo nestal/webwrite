@@ -60,6 +60,8 @@ add_definitions(
 file (GLOB_RECURSE WEBWRITE_CORE_SRC
     ${webwrite_SOURCE_DIR}/src/core/*.hh
     ${webwrite_SOURCE_DIR}/src/core/*.cc
+    ${webwrite_SOURCE_DIR}/src/core/crypto/*.h
+    ${webwrite_SOURCE_DIR}/src/core/crypto/*.c
 )
 
 add_library( wb_core

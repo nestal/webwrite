@@ -21,6 +21,7 @@
 
 #include "Config.hh"
 #include "Request.hh"
+//#include "crypto/SinkSHA1.hh"
 #include "log/Log.hh"
 #include "parser/FormData.hh"
 #include "util/Atomic.hh"
@@ -201,6 +202,7 @@ void RootServer::Save( Request *req, const Resource& res )
 		res.MoveToAttic() ;
 	
 		// read input data, do filtering and save the file
+
 		FilterHTML( req->In(), res ) ;
 
 		// if the new file is empty, that means the user wants to delete the file
