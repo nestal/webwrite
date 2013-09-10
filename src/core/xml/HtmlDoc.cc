@@ -61,4 +61,8 @@ HtmlDoc::~HtmlDoc()
 	WB_ASSERT( Check() ) ;
 }
 
+void HtmlDoc::SaveContent( const std::string& fname ) const
+{
+}
+
 } // end of namespace

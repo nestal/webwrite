@@ -34,9 +34,7 @@ class Backtrace ;
 
 Exception::Exception( )
 {
-#ifdef HAVE_BFD
 	*this << expt::Backtrace_( Backtrace() ) ;
-#endif
 }
 
 const char* Exception::what() const throw()

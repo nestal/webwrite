@@ -47,8 +47,14 @@ void PrintTrace( const addr_t *stack, std::size_t count, std::ostream& os )
 	if ( func != 0 )
 	{
 		for ( std::size_t i = 0 ; i < count && func[i] != 0 ; ++i )
-			os << "#"  << i << " [" << stack[i] << "] " << Demangle(func[i]) << std::endl ;
-	
+		{
+			std::string raw = func[i] ;
+			std::string line = raw.substr(
+				raw.find_first_of('(') + 1,
+				raw.find_last_of('+') - raw.find_first_of('(') - 1 ) ;
+			
+			os << "#"  << i << ' ' << Demangle(line.c_str()) << std::endl ;
+		}
 		std::free(func) ;
 	}
 }

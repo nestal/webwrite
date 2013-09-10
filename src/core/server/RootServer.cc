@@ -178,12 +178,8 @@ void RootServer::FilterHTML( Source *html, const Resource& res )
 {
 	fs::path file = res.DataPath() ;
 	
-//	HTMLStreamFilter filter;
-	
 	fs::create_directories( file.parent_path() ) ;
 	{
-//		File dest( file, 0600 ) ;
-//		filter.Parse( html, &dest ) ;
 		xml::HtmlDoc doc( html ) ;
 		doc.Save( file.generic_string() ) ;
 	}
@@ -272,7 +268,6 @@ void RootServer::ServeVar( Request *req, const Resource& )
 void RootServer::ServeIndex( Request *req, const Resource& res )
 {
 	req->CacheControl(0) ;
-	std::cout << "??" << std::endl ;
 	
 	StdOutStream 	sos(req->Out()) ;
 	std::ostream&	os = sos.Str() ;

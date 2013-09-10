@@ -33,6 +33,8 @@ public :
 	HtmlDoc( const HtmlDoc& rhs ) ;
 	~HtmlDoc() ;
 
+	void SaveContent( const std::string& fname ) const ;
+	
 private :
 } ;
 
