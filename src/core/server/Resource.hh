@@ -56,7 +56,7 @@ public :
 	~Resource() ;
 
 	bool CheckRedir( const std::string& uri ) const ;
-	void Update( const xml::HtmlDoc& page ) const ;
+	void Update( const xml::HtmlDoc& page ) ;
 
 	/// a path to the resource relative to the "wb-root"
 	const fs::path& Path() const ;

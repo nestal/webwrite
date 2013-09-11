@@ -39,7 +39,7 @@ class RootServer
 public :
 	RootServer( ) ;
 	
-	void Work( Request *req, const Resource& res ) ;
+	void Work( Request *req, Resource& res ) ;
 
 private :
 	// error handlers
@@ -56,8 +56,8 @@ private :
 	void ServeStats( Request *req, const Resource& res ) ;
 	
 	// POST requests
-	void Save( Request *req, const Resource& res ) ;
-	void Upload( Request *req, const Resource& res ) ;
+	void Save( Request *req, Resource& res ) ;
+	void Upload( Request *req, Resource& res ) ;
 
 	// other helpers
 	void ServeFile( Request *req, const fs::path& path ) ;
@@ -65,7 +65,7 @@ private :
 	void ServeLib( Request *req, const Resource& res ) ;
 	static std::string CssMimeType( const std::string& type ) ;
 
-	void FilterHTML( Source *html, const Resource& res ) ;
+	void FilterHTML( Source *html, Resource& res ) ;
 
 	// static content generators
 	static std::string GenerateMimeCss( ) ;
@@ -91,7 +91,7 @@ private :
 	std::string m_mime_css ;
 
 	// query string parser
-	typedef boost::function<void (RootServer*, Request*, const Resource&)> Function ;
+	typedef boost::function<void (RootServer*, Request*, Resource&)> Function ;
 	struct Handler
 	{
 		Function		func ;

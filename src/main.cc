@@ -79,13 +79,13 @@ void InitLog( )
 
 void Thread( int sock, RootServer *srv, boost::mutex *mutex )
 {
-	FCGX_Request request ;
-	FCGX_InitRequest( &request, sock, 0 ) ;
+	FCGX_Request cgi ;
+	FCGX_InitRequest( &cgi, sock, 0 ) ;
 
 	while ( true )
 	{
 		mutex->lock() ;
-		int r = FCGX_Accept_r( &request ) ;
+		int r = FCGX_Accept_r( &cgi ) ;
 		mutex->unlock() ;
 		if ( r < 0 )
 		{
@@ -95,10 +95,11 @@ void Thread( int sock, RootServer *srv, boost::mutex *mutex )
 		else
 		{
 			// make sure FCGIRequest destroys before calling FCGX_Finish_r()
-			FCGIRequest req( &request ) ;
-			srv->Work( &req, Resource( req.SansQueryURI() ) ) ;
+			FCGIRequest cgi_wrap( &cgi ) ;
+			Resource res( cgi_wrap.SansQueryURI() ) ;
+			srv->Work( &cgi_wrap, res ) ;
 		}
-		FCGX_Finish_r( &request ) ;
+		FCGX_Finish_r( &cgi ) ;
 	}
 }
 

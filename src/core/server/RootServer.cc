@@ -75,7 +75,7 @@ RootServer::RootServer( ) :
 	post.Add( "upload",	Handler(&RootServer::Upload) ) ;
 }
 
-void RootServer::Work( Request *req, const Resource& res ) 
+void RootServer::Work( Request *req, Resource& res ) 
 {
 	using boost::timer::cpu_timer;
 	using boost::timer::cpu_times;
@@ -175,7 +175,7 @@ void RootServer::Load( Request *req, const Resource& res )
 	}
 }
 
-void RootServer::FilterHTML( Source *html, const Resource& res )
+void RootServer::FilterHTML( Source *html, Resource& res )
 {
 	fs::path file = res.DataPath() ;
 	
@@ -192,7 +192,7 @@ void RootServer::FilterHTML( Source *html, const Resource& res )
 		res.SaveMeta() ;
 }
 
-void RootServer::Save( Request *req, const Resource& res )
+void RootServer::Save( Request *req, Resource& res )
 {
 	// only save when the file is NOT a lib file
 	if ( !IsLibFile(res) )
@@ -225,7 +225,7 @@ void RootServer::Save( Request *req, const Resource& res )
 	req->SeeOther( res.UrlPath().generic_string() + "?data" ) ;
 }
 	
-void RootServer::Upload( Request *req, const Resource& res )
+void RootServer::Upload( Request *req, Resource& res )
 {
 	FormData form( req->In(), req->ContentType() ) ;
 	form.Save( res.DataPath().parent_path(), OnFileUploaded ) ;

@@ -82,7 +82,7 @@ Resource::~Resource()
 {
 }
 
-void Resource::Update( const xml::HtmlDoc& page ) const
+void Resource::Update( const xml::HtmlDoc& page )
 {
 	File rand ;
 	fs::path rand_path = rand.OpenRandom( Cfg::Inst().attic.path / "tmp-page" ) ;
