@@ -1,5 +1,5 @@
 /*
-	grive: an GPL program to sync a local directory with Google Drive
+	webwrite: an GPL wiki-like website with in-place editing
 	Copyright (C) 2012  Wan Wai Ho
 
 	This program is free software; you can redistribute it and/or
@@ -17,29 +17,25 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Exception.hh"
+#include "util/File.hh"
+#include <boost/test/unit_test.hpp>
 
-#include "debug/Backtrace.hh"
-#include "debug/Debug.hh"
+using namespace wb ;
 
-#include <boost/exception/all.hpp>
-
-#include <cstdlib>
-#include <iterator>
-#include <sstream>
-
-namespace wb {
-
-class Backtrace ;
-
-Exception::Exception( )
+namespace
 {
-//	*this << expt::Backtrace_( Backtrace() ) ;
+	struct F
+	{
+	} ;
 }
 
-const char* Exception::what() const throw()
+BOOST_FIXTURE_TEST_SUITE( FileTest, F )
+
+BOOST_AUTO_TEST_CASE( TestRandom )
 {
-	return boost::diagnostic_information_what( *this ) ;
+	File f ;
+	fs::path p = f.OpenRandom( "tmp-file-XXXXXX" ) ;
+	std::cout << p << std::endl ;
 }
 
-} // end of namespace
+BOOST_AUTO_TEST_SUITE_END()

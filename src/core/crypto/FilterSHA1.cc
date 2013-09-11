@@ -52,7 +52,7 @@ std::streamsize FilterSHA1::write( const char *data, std::streamsize size )
 	return count ;
 }
 
-SHA1::Digest FilterSHA1::Result()
+SHA1::Val FilterSHA1::Result()
 {
 	return m_sha.Result() ;
 }

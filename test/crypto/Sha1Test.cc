@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE( Test )
 	SHA1 ss ;
 	ss.Input( "hahaha", 6 ) ;
 
-	SHA1::Digest result = ss.Result( ) ;
+	SHA1::Val result = ss.Result( ) ;
 	std::cout << result << std::endl ;
 }
 

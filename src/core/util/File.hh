@@ -55,6 +55,7 @@ public :
 
 	void OpenForRead( const fs::path& path ) ;
 	void OpenForWrite( const fs::path& path, int mode = 0600 ) ;
+	fs::path OpenRandom( const fs::path& tmplate ) ;
 	void Close() ;
 	bool IsOpened() const ;
 	

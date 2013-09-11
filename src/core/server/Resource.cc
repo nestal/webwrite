@@ -19,17 +19,18 @@
 
 #include "Resource.hh"
 #include "Config.hh"
+
+#include "crypto/SHA1.hh"
+#include "crypto/FilterSHA1.hh"
 #include "parser/Json.hh"
 #include "parser/UriChar.hh"
 #include "parser/UriCharIterator.hh"
 #include "util/File.hh"
 #include "log/Log.hh"
-
-#include <boost/exception/diagnostic_information.hpp>
+#include "xml/HtmlDoc.hh"
 
 #include <algorithm>
 #include <bitset>
-#include <cassert>
 #include <string>
 
 namespace
@@ -79,6 +80,20 @@ Resource::Resource( const std::string& uri )
 
 Resource::~Resource()
 {
+}
+
+void Resource::Update( const xml::HtmlDoc& page ) const
+{
+	File rand ;
+	fs::path rand_path = rand.OpenRandom( Cfg::Inst().attic.path / "tmp-page" ) ;
+	
+	FilterSHA1	sha( static_cast<Sink*>(&rand) ) ;
+	page.Save( &sha ) ;
+
+	// rename file using its SHA checksum
+	fs::rename( rand_path, Cfg::Inst().attic.path / sha.Result().Str() ) ;
+
+	Log( "file %1% = %2%", rand_path, sha.Result(), log::verbose ) ;
 }
 
 bool Resource::CheckRedir( const std::string& uri ) const

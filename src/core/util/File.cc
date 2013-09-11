@@ -19,7 +19,7 @@
 
 #include "File.hh"
 
-#include <cassert>
+#include "debug/Assert.hh"
 
 // boost headers
 #include <boost/throw_exception.hpp>
@@ -28,6 +28,10 @@
 #include <boost/exception/errinfo_file_name.hpp>
 #include <boost/exception/errinfo_file_open_mode.hpp>
 #include <boost/exception/info.hpp>
+
+#include <climits>
+#include <cstdlib>
+#include <cstring>
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -45,7 +49,7 @@ namespace {
 
 off_t LSeek( int fd, off_t offset, int whence )
 {
-	assert( fd >= 0 ) ;
+	WB_ASSERT( fd >= 0 ) ;
 	
 	off_t r = ::lseek( fd, offset, whence ) ;
 	if ( r == static_cast<off_t>(-1) )
@@ -114,7 +118,7 @@ void File::Open( const fs::path& path, int flags, int mode )
 	if ( IsOpened() )
 		Close() ;
 	
-	assert( m_fd == -1 ) ;
+	WB_ASSERT( m_fd == -1 ) ;
 	m_fd = ::open( path.string().c_str(), flags, mode ) ;
 	if ( m_fd == -1 )
 	{
@@ -145,6 +149,33 @@ void File::OpenForWrite( const fs::path& path, int mode )
 	Open( path, flags, mode ) ;
 }
 
+fs::path File::OpenRandom( const fs::path& tmplate )
+{
+#ifdef WIN32
+	BOOST_THROW_EXCEPTION( Error() ) ;
+#else
+	if ( IsOpened() )
+		Close() ;
+
+	char rand_file[PATH_MAX] ;
+	std::string tmpl_str = tmplate.string() + "XXXXXX" ;
+	::strncpy( rand_file, tmpl_str.c_str(), sizeof(rand_file) ) ;
+
+	m_fd = ::mkstemp(rand_file) ;
+	if ( m_fd == -1 )
+	{
+		BOOST_THROW_EXCEPTION(
+			Error()
+				<< boost::errinfo_api_function("mkstemp")
+				<< boost::errinfo_errno(errno)
+				<< boost::errinfo_file_name(tmplate.string())
+		) ;
+	}
+	
+	return fs::path(rand_file) ;
+#endif
+}
+
 void File::Close()
 {
 	if ( IsOpened() )
@@ -164,7 +195,7 @@ bool File::IsOpened() const
 */
 std::streamsize File::read( char *ptr, std::streamsize size )
 {
-	assert( IsOpened() ) ;
+	WB_ASSERT( IsOpened() ) ;
 	ssize_t count = ::read( m_fd, ptr, size ) ;
 	if ( count == -1 )
 	{
@@ -179,7 +210,7 @@ std::streamsize File::read( char *ptr, std::streamsize size )
 
 std::streamsize File::write( const char *ptr, std::streamsize size )
 {
-	assert( IsOpened() ) ;
+	WB_ASSERT( IsOpened() ) ;
 	ssize_t count = ::write( m_fd, ptr, size ) ;
 	if ( count == -1 )
 	{
@@ -194,29 +225,29 @@ std::streamsize File::write( const char *ptr, std::streamsize size )
 
 off_t File::Seek( off_t offset, int whence )
 {
-	assert( IsOpened() ) ;
+	WB_ASSERT( IsOpened() ) ;
 	return LSeek( m_fd, offset, whence ) ;
 }
 
 off_t File::Tell() const
 {
-	assert( IsOpened() ) ;
+	WB_ASSERT( IsOpened() ) ;
 	return LSeek( m_fd, 0, SEEK_CUR ) ;
 }
 
 u64_t File::Size() const
 {
-	assert( IsOpened() ) ;
+	WB_ASSERT( IsOpened() ) ;
 	
 	struct stat s = FStat(m_fd) ;
 	
-	assert( s.st_size >= 0 ) ;
+	WB_ASSERT( s.st_size >= 0 ) ;
 	return static_cast<uint64_t>( s.st_size ) ;
 }
 
 void File::Chmod( int mode )
 {
-	assert( IsOpened() ) ;
+	WB_ASSERT( IsOpened() ) ;
 #ifndef WIN32	
 	if ( ::fchmod( m_fd, mode ) != 0 )
 	{
@@ -232,10 +263,10 @@ void File::Chmod( int mode )
 /// This function is not implemented in win32 yet.
 void* File::Map( off_t offset, std::size_t length )
 {
-	assert( IsOpened() ) ;
+	WB_ASSERT( IsOpened() ) ;
 	
 #ifdef WIN32
-	assert( false ) ;
+	WB_ASSERT( false ) ;
 	return 0 ;
 #else
 	void *addr = ::mmap( 0, length, PROT_READ, MAP_PRIVATE, m_fd, offset ) ;

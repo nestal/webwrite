@@ -45,14 +45,14 @@ void SHA1::Reset()
 	::SHA1Reset( &m_ctx ) ;
 }
 
-SHA1::Digest SHA1::Result( )
+SHA1::Val SHA1::Result( )
 {
-	Digest result ;
+	Val result ;
 	::SHA1Result( &m_ctx, result.bytes ) ;
 	return result ;
 }
 
-std::string SHA1::Digest::Str() const
+std::string SHA1::Val::Str() const
 {
 	std::ostringstream ss ;
 	ss << *this ;
@@ -63,7 +63,7 @@ std::string SHA1::Digest::Str() const
 
 namespace std
 {
-	ostream& operator<<( ostream& os, const wb::SHA1::Digest& d )
+	ostream& operator<<( ostream& os, const wb::SHA1::Val& d )
 	{
 		os << std::hex ;
 		for ( int i = 0 ; i < wb::SHA1::m_size ; ++i )

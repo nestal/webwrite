@@ -41,7 +41,7 @@ public :
 	struct Error : virtual Exception {} ;
 	typedef boost::error_info<struct ErrNum, int>	ErrNum_ ;
 
-	struct Digest
+	struct Val
 	{
 		unsigned char bytes[m_size] ;
 	
@@ -53,7 +53,7 @@ public :
 
 	void Input( const void *data, std::size_t size ) ;
 	void Reset() ;
-	Digest Result( ) ;
+	Val Result( ) ;
 
 private :
 	SHA1Context	m_ctx ;
@@ -63,5 +63,5 @@ private :
 
 namespace std
 {
-	ostream& operator<<( ostream& os, const wb::SHA1::Digest& d ) ;
+	ostream& operator<<( ostream& os, const wb::SHA1::Val& d ) ;
 }

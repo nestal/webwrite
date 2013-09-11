@@ -25,6 +25,11 @@
 #include <ctime>
 #include <memory>
 
+namespace xml
+{
+	class HtmlDoc ;
+}
+
 namespace wb {
 
 class Json ;
@@ -51,6 +56,7 @@ public :
 	~Resource() ;
 
 	bool CheckRedir( const std::string& uri ) const ;
+	void Update( const xml::HtmlDoc& page ) const ;
 
 	/// a path to the resource relative to the "wb-root"
 	const fs::path& Path() const ;

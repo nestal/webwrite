@@ -34,7 +34,7 @@ public :
 	std::streamsize read( char *data, std::streamsize size ) ;
 	std::streamsize write( const char *data, std::streamsize size ) ;
 
-	SHA1::Digest Result() ;
+	SHA1::Val Result() ;
 
 private :
 	SHA1	m_sha ;

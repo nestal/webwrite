@@ -182,11 +182,9 @@ void RootServer::FilterHTML( Source *html, const Resource& res )
 	fs::create_directories( file.parent_path() ) ;
 	{
 		xml::HtmlDoc doc( html ) ;
-		File		out( file, 0600 ) ;
-		FilterSHA1	sha( static_cast<Sink*>(&out) ) ;
-		doc.Save( &sha ) ;
+		doc.Save( file.string() ) ;
 		
-		Log( "file %1% = %2%", file, sha.Result(), log::verbose ) ;
+		res.Update( doc ) ;
 	}
 
 	// save metadata after closing the file	
